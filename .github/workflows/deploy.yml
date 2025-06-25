@@ -33,7 +33,23 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Publish to NPM
-        run: npm publish
+      - name: Install 1Password CLI
+        run: |
+          curl -sSfLo op.zip https://cache.agilebits.com/dist/1P/op2/pkg/v2.29.0/op_linux_amd64_v2.29.0.zip
+          unzip -o op.zip op
+          sudo mv op /usr/local/bin/
+          op --version
+
+      - name: Load NPM token from 1Password
+        run: |
+          echo "🔐 Loading NPM token from 1Password..."
+          NPM_TOKEN=$(op read "op://app-keys/NPM_TOKEN/credential" --no-newline)
+          echo "NPM_TOKEN=$NPM_TOKEN" >> $GITHUB_ENV
+          echo "✅ NPM token loaded successfully"
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+      - name: Publish to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
