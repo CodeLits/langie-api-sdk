@@ -161,7 +161,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
         context: string
       }[]
       const [fromLang, toLang] = batchKey.split('|')
-      await translateBatch(items, fromLang, toLang)
+      await fetchAndCacheBatch(items, fromLang, toLang)
     }
 
     // If new items queued during this flush, schedule another run
@@ -225,7 +225,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
    * populate the internal caches so that subsequent calls to t() will
    * synchronously resolve.
    */
-  const translateBatch = async (
+  const fetchAndCacheBatch = async (
     items: { text: string; context?: string }[],
     fromLang = 'en',
     toLang = currentLanguage.value
@@ -336,7 +336,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
   }
 
   // Expose the batch translation method
-  const fetchBatchTranslations = translateBatch
+  const fetchBatchTranslations = fetchAndCacheBatch
 
   // ------------------------------------------------------------------
   // Define translate wrapper simplified
@@ -347,7 +347,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
     // If translating to same language, just return text
     if (fromLang && fromLang === toLang) return text
 
-    const res = await translateBatch([{ text, context }], fromLang, toLang)
+    const res = await fetchAndCacheBatch([{ text, context }], fromLang, toLang)
     if (Array.isArray(res) && res.length > 0) {
       return (res[0] as any).translated || (res[0] as any).t || (res[0] as any).translation || text
     }
@@ -362,6 +362,8 @@ export function useTranslator(options: TranslatorOptions = {}) {
     getTranslation,
     clearTranslations,
     fetchLanguages,
-    fetchBatchTranslations
+    fetchBatchTranslations,
+    currentLanguage,
+    setLanguage
   }
 }
