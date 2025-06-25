@@ -3,3 +3,5 @@ description:
 globs: 
 alwaysApply: true
 ---
+
+use bun as the main package manager.
