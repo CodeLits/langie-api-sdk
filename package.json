@@ -29,7 +29,7 @@
 	"scripts": {
 		"build": "tsup",
 		"dev": "tsup --watch",
-		"dev:demo": "vite examples/demo",
+		"dev:demo": "vite --config examples/demo/vite.config.ts",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"lint": "eslint .",
