@@ -9,9 +9,7 @@ const {
   availableLanguages,
   setLanguage,
   isLoading: isTranslatorLoading
-} = useTranslator({
-  translatorHost: 'https://api.langie.uk'
-})
+} = useTranslator()
 
 const isDark = ref(false)
 const interfaceLang = ref('en')

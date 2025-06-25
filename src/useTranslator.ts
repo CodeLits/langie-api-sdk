@@ -1,6 +1,7 @@
 import { ref, watch, reactive, type Ref } from 'vue'
 import { translateBatch, fetchAvailableLanguages } from './core'
 import type { TranslatorOptions, TranslatorLanguage } from './types'
+import { DEFAULT_API_HOST } from './constants'
 
 const availableLanguages: Ref<TranslatorLanguage[]> = ref([])
 const translations: { [key: string]: string } = reactive({})
@@ -14,7 +15,7 @@ let _languagesCache: TranslatorLanguage[] | null = null
 let _languagesPromise: Promise<TranslatorLanguage[]> | null = null
 
 export function useTranslator(options: TranslatorOptions = {}) {
-  const translatorHost = options.translatorHost || 'http://localhost:8081'
+  const translatorHost = options.translatorHost || DEFAULT_API_HOST
   const defaultLanguage = options.defaultLanguage || 'en'
   const fallbackLanguage = options.fallbackLanguage || 'en'
 
@@ -363,6 +364,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
     fetchLanguages,
     fetchBatchTranslations,
     currentLanguage,
-    setLanguage
+    setLanguage,
+    isLoading
   }
 }
