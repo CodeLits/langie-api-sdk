@@ -1,5 +1,5 @@
 {
-	"name": "@VivaProgress/langie-api-sdk",
+	"name": "langie-api-sdk",
 	"version": "1.0.4",
 	"description": "Lightweight translation SDK for Vue.js applications",
 	"type": "module",
@@ -52,7 +52,6 @@
 	},
 	"homepage": "https://github.com/VivaProgress/langie-api-sdk#readme",
 	"publishConfig": {
-		"registry": "https://npm.pkg.github.com",
 		"access": "public"
 	},
 	"peerDependencies": {
