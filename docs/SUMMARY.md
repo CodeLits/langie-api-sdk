@@ -29,11 +29,11 @@ The documentation is organized into the following sections:
 
 ```bash
 # Install the package
-npm install vue-translator-sdk
+npm install langie-api-sdk
 
 # Import and use
-import { useTranslator } from 'vue-translator-sdk'
-import { LanguageSelect, T } from 'vue-translator-sdk/components'
+import { useTranslator } from 'langie-api-sdk'
+import { LanguageSelect, T } from 'langie-api-sdk/components'
 
 // Use in components
 const { translate } = useTranslator({
@@ -56,8 +56,8 @@ const { translate } = useTranslator({
 
 ## Contributing
 
-We welcome contributions to the Vue Translator SDK! Please see the [Contributing Guide](../CONTRIBUTING.md) for more information.
+We welcome contributions to the Langie API SDK! Please see the [Contributing Guide](/CONTRIBUTING.md) for more information.
 
 ## License
 
-Vue Translator SDK is licensed under the [Apache 2.0 License](../LICENSE).
+Langie API SDK is licensed under the [Apache 2.0 License](/LICENSE).

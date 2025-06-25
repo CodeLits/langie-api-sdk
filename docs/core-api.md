@@ -57,7 +57,7 @@ interface TranslateServiceResponse {
 ### Example
 
 ```javascript
-import { translateBatch } from 'vue-translator-sdk'
+import { translateBatch } from 'langie-api-sdk'
 
 // Translate multiple texts in a single request
 const results = await translateBatch(
@@ -111,7 +111,7 @@ interface TranslatorLanguage {
 ### Example
 
 ```javascript
-import { fetchAvailableLanguages } from 'vue-translator-sdk'
+import { fetchAvailableLanguages } from 'langie-api-sdk'
 
 // Fetch available languages
 const languages = await fetchAvailableLanguages({
@@ -146,7 +146,7 @@ console.log(languages)
 The core functions throw errors when something goes wrong. You should wrap your calls in try/catch blocks to handle these errors:
 
 ```javascript
-import { translateBatch } from 'vue-translator-sdk'
+import { translateBatch } from 'langie-api-sdk'
 
 try {
   const results = await translateBatch([{ text: 'Hello', to_lang: 'fr' }])
@@ -171,7 +171,7 @@ Common errors include:
 For large amounts of text, consider breaking them into smaller batches:
 
 ```javascript
-import { translateBatch } from 'vue-translator-sdk'
+import { translateBatch } from 'langie-api-sdk'
 
 // Helper function to chunk an array
 function chunkArray(array, size) {
@@ -210,7 +210,7 @@ const translations = await translateLarge(largeTextArray, 'fr', {
 For better performance, you might want to implement a simple cache:
 
 ```javascript
-import { translateBatch } from 'vue-translator-sdk'
+import { translateBatch } from 'langie-api-sdk'
 
 // Simple in-memory cache
 const translationCache = new Map()

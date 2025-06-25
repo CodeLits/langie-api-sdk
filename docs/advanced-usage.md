@@ -17,7 +17,7 @@ You can use interpolation in your translations:
 
 <script setup>
 import { ref } from 'vue'
-import { T } from 'vue-translator-sdk/components'
+import { T } from 'langie-api-sdk/components'
 
 const username = ref('John')
 </script>
@@ -38,7 +38,7 @@ For pluralization, you can use conditional rendering:
 
 <script setup>
 import { ref } from 'vue'
-import { T } from 'vue-translator-sdk/components'
+import { T } from 'langie-api-sdk/components'
 
 const count = ref(2)
 </script>
@@ -57,8 +57,8 @@ For more complex formatting, you can use computed properties:
 
 <script setup>
 import { computed } from 'vue'
-import { T } from 'vue-translator-sdk/components'
-import { useTranslator } from 'vue-translator-sdk'
+import { T } from 'langie-api-sdk/components'
+import { useTranslator } from 'langie-api-sdk'
 
 const { translate } = useTranslator()
 
@@ -81,7 +81,7 @@ You can create a custom translation provider to extend the SDK's functionality:
 ```js
 // translationProvider.js
 import { ref, readonly, inject, provide } from 'vue'
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 const TRANSLATOR_INJECTION_KEY = Symbol('translator')
 
@@ -180,8 +180,8 @@ For a better user experience, you can handle loading states:
 </template>
 
 <script setup>
-import { T } from 'vue-translator-sdk/components'
-import { useTranslator } from 'vue-translator-sdk'
+import { T } from 'langie-api-sdk/components'
+import { useTranslator } from 'langie-api-sdk'
 
 const { isLoading } = useTranslator()
 </script>
@@ -228,7 +228,7 @@ For large applications, you might want to lazy load translations:
 ```js
 // translationLoader.js
 import { ref, computed } from 'vue'
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 export function useLazyTranslator(options = {}) {
   const { translate, currentLanguage, setLanguage, ...rest } = useTranslator(options)

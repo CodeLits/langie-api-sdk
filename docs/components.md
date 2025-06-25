@@ -7,7 +7,7 @@ Vue Translator SDK provides ready-to-use Vue components that you can integrate i
 Components are available through the `/components` subpath:
 
 ```js
-import { LanguageSelect, T } from 'vue-translator-sdk/components'
+import { LanguageSelect, T } from 'langie-api-sdk/components'
 ```
 
 ## LanguageSelect
@@ -48,8 +48,8 @@ The `LanguageSelect` component provides a dropdown menu for selecting a language
 </template>
 
 <script setup>
-import { LanguageSelect } from 'vue-translator-sdk/components'
-import { useTranslator } from 'vue-translator-sdk'
+import { LanguageSelect } from 'langie-api-sdk/components'
+import { useTranslator } from 'langie-api-sdk'
 
 const { currentLanguage } = useTranslator()
 </script>
@@ -74,7 +74,7 @@ const { currentLanguage } = useTranslator()
 </template>
 
 <script setup>
-import { LanguageSelect } from 'vue-translator-sdk/components'
+import { LanguageSelect } from 'langie-api-sdk/components'
 
 function handleLanguageChange(langCode) {
   console.log(`Language changed to: ${langCode}`)
@@ -118,7 +118,7 @@ The `T` component is a lightweight wrapper for translating text within templates
 </template>
 
 <script setup>
-import { T } from 'vue-translator-sdk/components'
+import { T } from 'langie-api-sdk/components'
 </script>
 ```
 
@@ -133,7 +133,7 @@ import { T } from 'vue-translator-sdk/components'
 
 <script setup>
 import { ref } from 'vue'
-import { T } from 'vue-translator-sdk/components'
+import { T } from 'langie-api-sdk/components'
 
 const username = ref('John')
 </script>
@@ -149,7 +149,7 @@ const username = ref('John')
 </template>
 
 <script setup>
-import { T } from 'vue-translator-sdk/components'
+import { T } from 'langie-api-sdk/components'
 </script>
 ```
 
@@ -165,7 +165,7 @@ import { T } from 'vue-translator-sdk/components'
 </template>
 
 <script setup>
-import { T } from 'vue-translator-sdk/components'
+import { T } from 'langie-api-sdk/components'
 
 function doSomething() {
   alert('Button clicked!')
@@ -185,7 +185,7 @@ function doSomething() {
 </template>
 
 <script setup>
-import { T } from 'vue-translator-sdk/components'
+import { T } from 'langie-api-sdk/components'
 </script>
 ```
 
@@ -194,7 +194,7 @@ import { T } from 'vue-translator-sdk/components'
 For SSR environments, the SDK provides special versions of the components that work during server rendering:
 
 ```js
-import { LanguageSelectSSR, TSSR } from 'vue-translator-sdk/components'
+import { LanguageSelectSSR, TSSR } from 'langie-api-sdk/components'
 ```
 
 These components render minimal placeholders during server rendering and are replaced with the full components during client hydration.
@@ -216,7 +216,7 @@ These components render minimal placeholders during server rendering and are rep
 </template>
 
 <script setup>
-import { LanguageSelect, T } from 'vue-translator-sdk/components'
+import { LanguageSelect, T } from 'langie-api-sdk/components'
 </script>
 ```
 
@@ -258,8 +258,8 @@ You can create your own custom components that use the translation functionality
 </template>
 
 <script setup>
-import { T } from 'vue-translator-sdk/components'
-import { useTranslator } from 'vue-translator-sdk'
+import { T } from 'langie-api-sdk/components'
+import { useTranslator } from 'langie-api-sdk'
 
 const props = defineProps({
   text: {

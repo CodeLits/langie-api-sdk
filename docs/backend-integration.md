@@ -365,7 +365,7 @@ app.post('/api/translate', validateApiKey, (req, res) => {
 Then configure the SDK to include the API key:
 
 ```javascript
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 const { translate } = useTranslator({
   translatorHost: 'https://your-translation-api.com',

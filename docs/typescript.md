@@ -53,7 +53,7 @@ import type {
   TranslateServiceResponse,
   TranslatorLanguage,
   TranslatorOptions
-} from 'vue-translator-sdk'
+} from 'langie-api-sdk'
 ```
 
 ## Using Types with API Functions
@@ -61,8 +61,8 @@ import type {
 The SDK's API functions are fully typed:
 
 ```typescript
-import { translateBatch, fetchAvailableLanguages } from 'vue-translator-sdk'
-import type { TranslateRequestBody, TranslatorOptions } from 'vue-translator-sdk'
+import { translateBatch, fetchAvailableLanguages } from 'langie-api-sdk'
+import type { TranslateRequestBody, TranslatorOptions } from 'langie-api-sdk'
 
 // Type-safe function calls
 async function translate() {
@@ -87,8 +87,8 @@ The `useTranslator` composable returns fully typed objects:
 
 ```typescript
 import { ref } from 'vue'
-import { useTranslator } from 'vue-translator-sdk'
-import type { TranslatorOptions, TranslatorLanguage } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
+import type { TranslatorOptions, TranslatorLanguage } from 'langie-api-sdk'
 
 // Typed options
 const options: TranslatorOptions = {
@@ -127,8 +127,8 @@ When creating custom components that use the SDK, you can leverage TypeScript fo
 // CustomTranslator.vue
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { useTranslator } from 'vue-translator-sdk'
-import type { TranslatorOptions } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
+import type { TranslatorOptions } from 'langie-api-sdk'
 
 export default defineComponent({
   props: {
@@ -163,8 +163,8 @@ Or with the script setup syntax:
 ```vue
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useTranslator } from 'vue-translator-sdk'
-import type { TranslatorOptions } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
+import type { TranslatorOptions } from 'langie-api-sdk'
 
 const props = defineProps<{
   text: string
@@ -184,8 +184,8 @@ When extending the SDK's functionality, you can create your own type definitions
 
 ```typescript
 // customTranslator.ts
-import { useTranslator } from 'vue-translator-sdk'
-import type { TranslatorOptions, TranslatorLanguage } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
+import type { TranslatorOptions, TranslatorLanguage } from 'langie-api-sdk'
 import { ref, computed } from 'vue'
 
 // Define custom return type
@@ -248,7 +248,7 @@ When working with components that emit events, you can type the events:
 </template>
 
 <script setup lang="ts">
-import { LanguageSelect } from 'vue-translator-sdk/components'
+import { LanguageSelect } from 'langie-api-sdk/components'
 
 function handleLanguageChange(langCode: string) {
   console.log(`Language changed to: ${langCode}`)
@@ -263,9 +263,9 @@ If you need to augment the SDK's types, you can do so using TypeScript's module 
 
 ```typescript
 // typings.d.ts
-import 'vue-translator-sdk'
+import 'langie-api-sdk'
 
-declare module 'vue-translator-sdk' {
+declare module 'langie-api-sdk' {
   interface TranslatorOptions {
     // Add your custom options
     customFeature?: boolean
@@ -286,8 +286,8 @@ For more complex scenarios, you can use generics:
 
 ```typescript
 // typedTranslator.ts
-import { useTranslator } from 'vue-translator-sdk'
-import type { TranslatorOptions } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
+import type { TranslatorOptions } from 'langie-api-sdk'
 
 // Define a type for translation keys
 type TranslationKey = string

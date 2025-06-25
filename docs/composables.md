@@ -62,7 +62,7 @@ An object containing the following properties and methods:
 </template>
 
 <script setup>
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 const { translate, currentLanguage, setLanguage } = useTranslator({
   translatorHost: 'https://your-translation-api.com',
@@ -87,7 +87,7 @@ For longer texts or when you need to handle loading states:
 
 <script setup>
 import { ref } from 'vue'
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 const { translateAsync, isLoading } = useTranslator()
 const translation = ref('')
@@ -120,7 +120,7 @@ Working with the available languages:
 
 <script setup>
 import { computed } from 'vue'
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 const { translate, currentLanguage, setLanguage, availableLanguages } = useTranslator()
 
@@ -139,7 +139,7 @@ You can configure the translator globally in your main.js/ts file:
 // main.js
 import { createApp } from 'vue'
 import App from './App.vue'
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 const app = createApp(App)
 
@@ -161,7 +161,7 @@ Then use it in components without providing options:
 
 ```vue
 <script setup>
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 // Uses global configuration
 const { translate } = useTranslator()
@@ -173,7 +173,7 @@ const { translate } = useTranslator()
 You can persist the user's language preference in localStorage:
 
 ```js
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 import { watch } from 'vue'
 
 const STORAGE_KEY = 'preferred-language'
@@ -197,7 +197,7 @@ watch(currentLanguage, (newLang) => {
 The composable automatically detects the user's browser language, but you can customize this behavior:
 
 ```js
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 // Custom language detection function
 function detectUserLanguage() {
@@ -221,7 +221,7 @@ const { translate } = useTranslator({
 
 ```vue
 <script setup>
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -244,7 +244,7 @@ For more complex scenarios, you can create a custom provider:
 ```js
 // translator-provider.js
 import { provide, inject, reactive, readonly } from 'vue'
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 const TRANSLATOR_KEY = Symbol('translator')
 

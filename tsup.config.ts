@@ -26,7 +26,7 @@ export default defineConfig({
   esbuildOptions(options) {
     options.banner = {
       js: `/**
- * @vivaprogress/langie-api-sdk v${pkg.version}
+ * langie-api-sdk v${pkg.version}
  * (c) ${new Date().getFullYear()} ${pkg.author}
  * @license ${pkg.license}
  * 

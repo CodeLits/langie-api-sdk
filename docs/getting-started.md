@@ -4,20 +4,9 @@ This guide will help you get started with Vue Translator SDK in your Vue.js appl
 
 ## Installation
 
-You can install Vue Translator SDK using your preferred package manager:
-
 ```bash
 # npm
-npm install vue-translator-sdk
-
-# yarn
-yarn add vue-translator-sdk
-
-# pnpm
-pnpm add vue-translator-sdk
-
-# bun
-bun add vue-translator-sdk
+npm install langie-api-sdk
 ```
 
 ## Basic Setup
@@ -28,7 +17,7 @@ bun add vue-translator-sdk
 // main.js or main.ts
 import { createApp } from 'vue'
 import App from './App.vue'
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 const app = createApp(App)
 
@@ -55,7 +44,7 @@ app.mount('#app')
 </template>
 
 <script setup>
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 const { translate, setLanguage, currentLanguage } = useTranslator()
 </script>
@@ -74,7 +63,7 @@ const { translate, setLanguage, currentLanguage } = useTranslator()
 </template>
 
 <script setup>
-import { LanguageSelect, T } from 'vue-translator-sdk/components'
+import { LanguageSelect, T } from 'langie-api-sdk/components'
 </script>
 ```
 

@@ -1,6 +1,6 @@
-# Contributing to Vue Translator SDK
+# Contributing to Langie API SDK
 
-Thank you for your interest in contributing to Vue Translator SDK! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Langie API SDK! This document provides guidelines and instructions for contributing.
 
 ## Development Setup
 
@@ -8,12 +8,6 @@ Thank you for your interest in contributing to Vue Translator SDK! This document
 2. Install dependencies:
    ```bash
    npm install
-   # or
-   yarn
-   # or
-   pnpm install
-   # or
-   bun install
    ```
 3. Start development:
    ```bash
@@ -23,23 +17,23 @@ Thank you for your interest in contributing to Vue Translator SDK! This document
 ## Project Structure
 
 ```
-vue-translator-sdk/
-├── dist/               # Build output (generated)
-├── examples/           # Usage examples
-├── src/                # Source code
-│   ├── components/     # Vue components
-│   │   ├── __tests__/  # Component tests
-│   │   ├── T.vue       # Translation component
-│   │   └── LanguageSelect.vue
-│   ├── __tests__/      # Unit tests
-│   ├── core.ts         # Core translation functions
-│   ├── types.ts        # TypeScript type definitions
-│   └── useTranslator.ts # Vue composable
-├── .eslintrc.js        # ESLint configuration
-├── .prettierrc.json    # Prettier configuration
-├── package.json        # Package manifest
-├── tsup.config.ts      # Build configuration
-└── vitest.config.ts    # Test configuration
+langie-api-sdk/
+├── dist/                # Build output
+├── docs/                # Documentation files
+├── examples/            # Usage examples
+├── scripts/             # Shell scripts
+├── src/                 # Source code
+│   ├── components/      # Vue components
+│   ├── __tests__/       # Component tests
+│   ├── core.spec.ts     # Core API tests
+│   ├── useTranslator.spec.ts # Composable tests
+│   ├── ...
+├── .github/             # GitHub Actions workflows
+├── LICENSE              # License file
+├── package.json         # Package manifest
+├── tsconfig.json        # TypeScript configuration
+├── tsup.config.ts       # Build configuration
+└── vitest.config.ts     # Test configuration
 ```
 
 ## Development Workflow

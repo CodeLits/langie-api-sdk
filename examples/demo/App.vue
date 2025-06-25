@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useTranslator } from '../../src/useTranslator'
-import LanguageSelect from '../../src/components/LanguageSelect.vue'
+import { useTranslator } from '@/useTranslator'
+import LanguageSelect from '@/components/LanguageSelect.vue'
 
 const {
   translate,

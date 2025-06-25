@@ -29,7 +29,7 @@ Vue Translator SDK is a lightweight, flexible translation library for Vue.js app
 
 ## Quick Links
 
-- [GitHub Repository](https://github.com/langer/vue-translator-sdk)
-- [NPM Package](https://www.npmjs.com/package/vue-translator-sdk)
-- [Issue Tracker](https://github.com/langer/vue-translator-sdk/issues)
+- [GitHub Repository](https://github.com/VivaProgress/langie-api-sdk)
+- [NPM Package](https://www.npmjs.com/package/langie-api-sdk)
+- [Issue Tracker](https://github.com/VivaProgress/langie-api-sdk/issues)
 - [Examples](../examples/)
