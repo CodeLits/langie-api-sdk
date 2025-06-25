@@ -1,6 +1,6 @@
-# Vue Translator SDK
+# Langie API SDK
 
-[![npm version](https://img.shields.io/npm/v/vue-translator-sdk.svg?style=flat)](https://www.npmjs.com/package/vue-translator-sdk)
+[![npm version](https://img.shields.io/npm/v/langie-api-sdk.svg?style=flat)](https://www.npmjs.com/package/langie-api-sdk)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A lightweight, flexible translation SDK for Vue.js applications. Easily integrate multilingual support into your Vue projects with minimal configuration.
@@ -18,16 +18,16 @@ A lightweight, flexible translation SDK for Vue.js applications. Easily integrat
 
 ```bash
 # npm
-npm install vue-translator-sdk
+npm install langie-api-sdk
 
 # yarn
-yarn add vue-translator-sdk
+yarn add langie-api-sdk
 
 # pnpm
-pnpm add vue-translator-sdk
+pnpm add langie-api-sdk
 
 # bun
-bun add vue-translator-sdk
+bun add langie-api-sdk
 ```
 
 ## Quick Start
@@ -36,7 +36,7 @@ bun add vue-translator-sdk
 
 ```vue
 <script setup>
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 const { translate, currentLanguage } = useTranslator({
   translatorHost: 'https://your-translation-api.com',
@@ -56,7 +56,7 @@ const { translate, currentLanguage } = useTranslator({
 
 ```vue
 <script setup>
-import { LanguageSelect, T } from 'vue-translator-sdk/components'
+import { LanguageSelect, T } from 'langie-api-sdk/components'
 </script>
 
 <template>
@@ -79,7 +79,7 @@ import { LanguageSelect, T } from 'vue-translator-sdk/components'
 Translates multiple texts in a single request.
 
 ```js
-import { translateBatch } from 'vue-translator-sdk'
+import { translateBatch } from 'langie-api-sdk'
 
 // Example usage
 const results = await translateBatch(
@@ -99,7 +99,7 @@ const results = await translateBatch(
 Fetches available languages from the translation service.
 
 ```js
-import { fetchAvailableLanguages } from 'vue-translator-sdk'
+import { fetchAvailableLanguages } from 'langie-api-sdk'
 
 // Example usage
 const languages = await fetchAvailableLanguages({
@@ -157,7 +157,7 @@ To use this SDK, you need a translation service with the following API endpoints
 - `POST /api/translate` - For translating text
 - `GET /api/languages` - For fetching available languages
 
-See the [API Documentation](https://github.com/langer/vue-translator-sdk/wiki/API-Documentation) for detailed API requirements.
+See the [API Documentation](https://github.com/langer/langie-api-sdk/wiki/API-Documentation) for detailed API requirements.
 
 ## Configuration
 
@@ -167,7 +167,7 @@ You can configure the SDK globally or per-instance:
 // In your main.js
 import { createApp } from 'vue'
 import App from './App.vue'
-import { useTranslator } from 'vue-translator-sdk'
+import { useTranslator } from 'langie-api-sdk'
 
 // Global configuration
 const { install } = useTranslator({

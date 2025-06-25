@@ -1,5 +1,5 @@
 {
-	"name": "vue-translator-sdk",
+	"name": "langie-api-sdk",
 	"version": "1.0.0",
 	"description": "Lightweight translation SDK for Vue.js applications",
 	"type": "module",
@@ -38,16 +38,16 @@
 		"internationalization",
 		"localization"
 	],
-	"author": "Langer Team",
+	"author": "nlit",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/langer/vue-translator-sdk"
+		"url": "git+https://github.com/VivaProgress/langie-api-sdk.git"
 	},
 	"bugs": {
-		"url": "https://github.com/langer/vue-translator-sdk/issues"
+		"url": "https://github.com/VivaProgress/langie-api-sdk/issues"
 	},
-	"homepage": "https://github.com/langer/vue-translator-sdk#readme",
+	"homepage": "https://github.com/VivaProgress/langie-api-sdk#readme",
 	"peerDependencies": {
 		"vue": "^3.0.0"
 	},
@@ -56,6 +56,7 @@
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"@vitejs/plugin-vue": "^5.0.0",
+		"esbuild-plugin-vue-next": "^0.1.4",
 		"eslint": "^8.0.0",
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-vue": "^9.0.0",
@@ -65,5 +66,10 @@
 		"vite": "^5.0.0",
 		"vitest": "^1.0.0",
 		"vue": "^3.0.0"
+	},
+	"dependencies": {
+		"client-only": "^0.0.1",
+		"fuse.js": "^7.1.0",
+		"vue-select": "^3.20.4"
 	}
 }
