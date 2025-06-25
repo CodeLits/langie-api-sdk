@@ -52,7 +52,7 @@
 	},
 	"homepage": "https://github.com/VivaProgress/langie-api-sdk#readme",
 	"publishConfig": {
-		"registry": "https://npm.pkg.github.com"
+		"access": "public"
 	},
 	"peerDependencies": {
 		"vue": "^3.0.0"
