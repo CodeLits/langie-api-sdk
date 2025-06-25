@@ -1,6 +1,6 @@
 # Langie API SDK
 
-[![npm version](https://img.shields.io/npm/v/langie-api-sdk.svg?style=flat)](https://www.npmjs.com/package/langie-api-sdk)
+[![npm version](https://img.shields.io/npm/v/@vivaprogress/langie-api-sdk.svg?style=flat)](https://www.npmjs.com/package/@vivaprogress/langie-api-sdk)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A lightweight, flexible translation SDK for Vue.js applications. Easily integrate multilingual support into your Vue projects with minimal configuration.
@@ -18,16 +18,16 @@ A lightweight, flexible translation SDK for Vue.js applications. Easily integrat
 
 ```bash
 # npm
-npm install langie-api-sdk
+npm install @vivaprogress/langie-api-sdk
 
 # yarn
-yarn add langie-api-sdk
+yarn add @vivaprogress/langie-api-sdk
 
 # pnpm
-pnpm add langie-api-sdk
+pnpm add @vivaprogress/langie-api-sdk
 
 # bun
-bun add langie-api-sdk
+bun add @vivaprogress/langie-api-sdk
 ```
 
 ## Quick Start
@@ -36,7 +36,7 @@ bun add langie-api-sdk
 
 ```vue
 <script setup>
-import { useTranslator } from 'langie-api-sdk'
+import { useTranslator } from '@vivaprogress/langie-api-sdk'
 
 const { translate, currentLanguage } = useTranslator({
   translatorHost: 'https://your-translation-api.com',
@@ -56,7 +56,7 @@ const { translate, currentLanguage } = useTranslator({
 
 ```vue
 <script setup>
-import { LanguageSelect, T } from 'langie-api-sdk/components'
+import { LanguageSelect, T } from '@vivaprogress/langie-api-sdk/components'
 </script>
 
 <template>
@@ -79,7 +79,7 @@ import { LanguageSelect, T } from 'langie-api-sdk/components'
 Translates multiple texts in a single request.
 
 ```js
-import { translateBatch } from 'langie-api-sdk'
+import { translateBatch } from '@vivaprogress/langie-api-sdk'
 
 // Example usage
 const results = await translateBatch(
@@ -99,7 +99,7 @@ const results = await translateBatch(
 Fetches available languages from the translation service.
 
 ```js
-import { fetchAvailableLanguages } from 'langie-api-sdk'
+import { fetchAvailableLanguages } from '@vivaprogress/langie-api-sdk'
 
 // Example usage
 const languages = await fetchAvailableLanguages({
@@ -167,7 +167,7 @@ You can configure the SDK globally or per-instance:
 // In your main.js
 import { createApp } from 'vue'
 import App from './App.vue'
-import { useTranslator } from 'langie-api-sdk'
+import { useTranslator } from '@vivaprogress/langie-api-sdk'
 
 // Global configuration
 const { install } = useTranslator({
