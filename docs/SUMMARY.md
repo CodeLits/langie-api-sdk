@@ -44,12 +44,10 @@ const { translate } = useTranslator({
 ## API Overview
 
 - **Core Functions**:
-
   - `translateBatch()` - Translate multiple texts in a batch
   - `fetchAvailableLanguages()` - Get available languages
 
 - **Composables**:
-
   - `useTranslator()` - Vue composable for reactive translations
 
 - **Components**:
@@ -62,4 +60,4 @@ We welcome contributions to the Vue Translator SDK! Please see the [Contributing
 
 ## License
 
-Vue Translator SDK is licensed under the [MIT License](../LICENSE).
+Vue Translator SDK is licensed under the [Apache 2.0 License](../LICENSE).

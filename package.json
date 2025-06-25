@@ -1,22 +1,25 @@
 {
 	"name": "@VivaProgress/langie-api-sdk",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Lightweight translation SDK for Vue.js applications",
 	"type": "module",
-	"main": "dist/index.js",
+	"main": "dist/index.cjs",
 	"module": "dist/index.mjs",
 	"types": "dist/index.d.ts",
+	"style": "dist/index.css",
 	"exports": {
 		".": {
+			"types": "./dist/index.d.ts",
 			"import": "./dist/index.mjs",
-			"require": "./dist/index.js",
-			"types": "./dist/index.d.ts"
+			"require": "./dist/index.cjs"
 		},
 		"./components": {
+			"types": "./dist/components/index.d.ts",
 			"import": "./dist/components/index.mjs",
-			"require": "./dist/components/index.js",
-			"types": "./dist/components/index.d.ts"
-		}
+			"require": "./dist/components/index.cjs"
+		},
+		"./styles": "./dist/index.css",
+		"./dist/index.css": "./dist/index.css"
 	},
 	"files": [
 		"dist",
@@ -39,7 +42,7 @@
 		"localization"
 	],
 	"author": "nlit",
-	"license": "MIT",
+	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/VivaProgress/langie-api-sdk.git"

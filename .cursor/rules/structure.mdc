@@ -1,0 +1,16 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+```
+./docs - documentation
+./examples - examples
+./components - components
+./__tests__ - tests
+./CHANGELOG.md - changelog
+./CONTRIBUTING.md - contributing
+./CODE_OF_CONDUCT.md - code of conduct
+./CODE_OF_CONDUCT.md - code of conduct
+```

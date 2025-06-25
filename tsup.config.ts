@@ -18,12 +18,20 @@ export default defineConfig({
   clean: true,
   esbuildPlugins: [vue()],
   external: ['vue', ...Object.keys(pkg.peerDependencies || {})],
+  outExtension({ format }) {
+    return {
+      js: format === 'esm' ? '.mjs' : '.cjs'
+    }
+  },
   esbuildOptions(options) {
     options.banner = {
       js: `/**
  * @vivaprogress/langie-api-sdk v${pkg.version}
  * (c) ${new Date().getFullYear()} ${pkg.author}
  * @license ${pkg.license}
+ * 
+ * Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  */`
     }
   }

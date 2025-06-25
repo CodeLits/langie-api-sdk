@@ -1,7 +1,7 @@
 # Langie API SDK
 
 [![npm version](https://img.shields.io/npm/v/@vivaprogress/langie-api-sdk.svg?style=flat)](https://www.npmjs.com/package/@vivaprogress/langie-api-sdk)
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Apache 2.0 License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 A lightweight, flexible translation SDK for Vue.js applications. Easily integrate multilingual support into your Vue projects with minimal configuration.
 
@@ -184,4 +184,4 @@ app.mount('#app')
 
 ## License
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
