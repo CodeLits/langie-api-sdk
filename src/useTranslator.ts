@@ -5,7 +5,6 @@ import type { TranslatorOptions, TranslatorLanguage } from './types'
 const availableLanguages: Ref<TranslatorLanguage[]> = ref([])
 const translations: { [key: string]: string } = reactive({})
 const uiTranslations: { [key: string]: string } = reactive({})
-const translatorHost = ref(process.env.TRANSLATOR_HOST || 'localhost:8081')
 
 // Prevent repeated auto-selection of interface language
 let _autoSelected = false
