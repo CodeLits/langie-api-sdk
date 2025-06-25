@@ -1,0 +1,69 @@
+{
+	"name": "vue-translator-sdk",
+	"version": "1.0.0",
+	"description": "Lightweight translation SDK for Vue.js applications",
+	"type": "module",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		},
+		"./components": {
+			"import": "./dist/components/index.mjs",
+			"require": "./dist/components/index.js",
+			"types": "./dist/components/index.d.ts"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"lint": "eslint .",
+		"format": "prettier --write ."
+	},
+	"keywords": [
+		"vue",
+		"translation",
+		"i18n",
+		"internationalization",
+		"localization"
+	],
+	"author": "Langer Team",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/langer/vue-translator-sdk"
+	},
+	"bugs": {
+		"url": "https://github.com/langer/vue-translator-sdk/issues"
+	},
+	"homepage": "https://github.com/langer/vue-translator-sdk#readme",
+	"peerDependencies": {
+		"vue": "^3.0.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20.0.0",
+		"@typescript-eslint/eslint-plugin": "^6.0.0",
+		"@typescript-eslint/parser": "^6.0.0",
+		"@vitejs/plugin-vue": "^5.0.0",
+		"eslint": "^8.0.0",
+		"eslint-config-prettier": "^9.0.0",
+		"eslint-plugin-vue": "^9.0.0",
+		"prettier": "^3.0.0",
+		"tsup": "^8.0.0",
+		"typescript": "^5.0.0",
+		"vite": "^5.0.0",
+		"vitest": "^1.0.0",
+		"vue": "^3.0.0"
+	}
+}

@@ -1,0 +1,187 @@
+# Vue Translator SDK
+
+[![npm version](https://img.shields.io/npm/v/vue-translator-sdk.svg?style=flat)](https://www.npmjs.com/package/vue-translator-sdk)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+A lightweight, flexible translation SDK for Vue.js applications. Easily integrate multilingual support into your Vue projects with minimal configuration.
+
+## Features
+
+- 🌍 **Language Detection** - Automatically detect user's preferred language
+- 🔄 **Batch Translation** - Efficiently translate multiple texts in a single request
+- 🧩 **Vue Components** - Ready-to-use Vue components for common translation needs
+- 📦 **Lightweight** - Small footprint with no heavy dependencies
+- 🔌 **Composable API** - Use the `useTranslator` composable for reactive translations
+- 🚀 **Flexible Backend** - Connect to any translation service with a compatible API
+
+## Installation
+
+```bash
+# npm
+npm install vue-translator-sdk
+
+# yarn
+yarn add vue-translator-sdk
+
+# pnpm
+pnpm add vue-translator-sdk
+
+# bun
+bun add vue-translator-sdk
+```
+
+## Quick Start
+
+### Basic Usage
+
+```vue
+<script setup>
+import { useTranslator } from 'vue-translator-sdk'
+
+const { translate, currentLanguage } = useTranslator({
+  translatorHost: 'https://your-translation-api.com',
+  apiKey: 'your-api-key' // Optional
+})
+</script>
+
+<template>
+  <div>
+    <p>Current language: {{ currentLanguage }}</p>
+    <p>{{ translate('Hello world!') }}</p>
+  </div>
+</template>
+```
+
+### Using Components
+
+```vue
+<script setup>
+import { LanguageSelect, T } from 'vue-translator-sdk/components'
+</script>
+
+<template>
+  <div>
+    <!-- Language selector dropdown -->
+    <LanguageSelect />
+
+    <!-- Translate text -->
+    <T>Welcome to our application!</T>
+  </div>
+</template>
+```
+
+## API Reference
+
+### Core Functions
+
+#### `translateBatch(translations, options)`
+
+Translates multiple texts in a single request.
+
+```js
+import { translateBatch } from 'vue-translator-sdk'
+
+// Example usage
+const results = await translateBatch(
+  [
+    { text: 'Hello', from_lang: 'en', to_lang: 'fr' },
+    { text: 'World', from_lang: 'en', to_lang: 'fr' }
+  ],
+  {
+    translatorHost: 'https://your-translator-api.com',
+    apiKey: 'optional-api-key'
+  }
+)
+```
+
+#### `fetchAvailableLanguages(options)`
+
+Fetches available languages from the translation service.
+
+```js
+import { fetchAvailableLanguages } from 'vue-translator-sdk'
+
+// Example usage
+const languages = await fetchAvailableLanguages({
+  translatorHost: 'https://your-translator-api.com',
+  apiKey: 'optional-api-key',
+  minPopularity: 0.1, // Filter by minimum popularity
+  country: 'US', // Optional country filter
+  region: 'EU' // Optional region filter
+})
+```
+
+### Composables
+
+#### `useTranslator(options)`
+
+Vue composable for reactive translations.
+
+```js
+const { translate, currentLanguage, setLanguage, availableLanguages, isLoading } = useTranslator({
+  translatorHost: 'https://your-translator-api.com',
+  apiKey: 'optional-api-key',
+  defaultLanguage: 'en',
+  fallbackLanguage: 'en'
+})
+```
+
+### Components
+
+#### `<LanguageSelect />`
+
+A dropdown component for selecting languages.
+
+```vue
+<LanguageSelect :show-flags="true" :show-native-names="true" class="my-custom-class" />
+```
+
+#### `<T>`
+
+A component for translating text.
+
+```vue
+<T>Hello world!</T>
+
+<!-- With dynamic content -->
+<T>Hello {{ username }}!</T>
+
+<!-- With HTML -->
+<T v-html="'<b>Bold</b> text'"></T>
+```
+
+## Backend API Requirements
+
+To use this SDK, you need a translation service with the following API endpoints:
+
+- `POST /api/translate` - For translating text
+- `GET /api/languages` - For fetching available languages
+
+See the [API Documentation](https://github.com/langer/vue-translator-sdk/wiki/API-Documentation) for detailed API requirements.
+
+## Configuration
+
+You can configure the SDK globally or per-instance:
+
+```js
+// In your main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+import { useTranslator } from 'vue-translator-sdk'
+
+// Global configuration
+const { install } = useTranslator({
+  translatorHost: process.env.TRANSLATOR_HOST,
+  apiKey: process.env.TRANSLATOR_API_KEY,
+  defaultLanguage: 'en',
+  fallbackLanguage: 'en'
+})
+
+const app = createApp(App)
+app.use(install)
+app.mount('#app')
+```
+
+## License
+
+[MIT](LICENSE)
