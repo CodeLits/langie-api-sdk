@@ -365,9 +365,9 @@ app.post('/api/translate', validateApiKey, (req, res) => {
 Then configure the SDK to include the API key:
 
 ```javascript
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
-const { translate } = useTranslator({
+const { translate } = useLangie({
   translatorHost: 'https://your-translation-api.com',
   apiKey: 'your-secret-api-key'
 })

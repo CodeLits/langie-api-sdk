@@ -58,9 +58,9 @@ For more complex formatting, you can use computed properties:
 <script setup>
 import { computed } from 'vue'
 import { T } from 'langie-api-sdk/components'
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
-const { translate } = useTranslator()
+const { translate } = useLangie()
 
 const props = defineProps({
   username: String,
@@ -81,13 +81,13 @@ You can create a custom translation provider to extend the SDK's functionality:
 ```js
 // translationProvider.js
 import { ref, readonly, inject, provide } from 'vue'
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
 const TRANSLATOR_INJECTION_KEY = Symbol('translator')
 
 export function createTranslator(options = {}) {
   // Get base functionality from the SDK
-  const base = useTranslator(options)
+  const base = useLangie(options)
 
   // Add custom functionality
   const customTranslator = {
@@ -121,7 +121,7 @@ export function provideTranslator(options = {}) {
 }
 
 // Consumer for dependency injection
-export function useTranslatorInjection() {
+export function useLangieInjection() {
   const translator = inject(TRANSLATOR_INJECTION_KEY)
   if (!translator) {
     throw new Error('No translator provided! Did you call provideTranslator?')
@@ -153,9 +153,9 @@ provideTranslator({
 </template>
 
 <script setup>
-import { useTranslatorInjection } from './translationProvider'
+import { useLangieInjection } from './translationProvider'
 
-const { translateWithContext, translateWithFallback } = useTranslatorInjection()
+const { translateWithContext, translateWithFallback } = useLangieInjection()
 </script>
 ```
 
@@ -181,9 +181,9 @@ For a better user experience, you can handle loading states:
 
 <script setup>
 import { T } from 'langie-api-sdk/components'
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
-const { isLoading } = useTranslator()
+const { isLoading } = useLangie()
 </script>
 
 <style scoped>
@@ -228,10 +228,10 @@ For large applications, you might want to lazy load translations:
 ```js
 // translationLoader.js
 import { ref, computed } from 'vue'
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
 export function useLazyTranslator(options = {}) {
-  const { translate, currentLanguage, setLanguage, ...rest } = useTranslator(options)
+  const { translate, currentLanguage, setLanguage, ...rest } = useLangie(options)
 
   // Track loaded translation modules
   const loadedModules = ref(new Set())
@@ -305,11 +305,11 @@ You can integrate the translator with Pinia for state management:
 ```js
 // stores/translator.js
 import { defineStore } from 'pinia'
-import { useTranslator } from 'vue-translator-sdk'
+import { useLangie } from 'vue-translator-sdk'
 
-export const useTranslatorStore = defineStore('translator', () => {
+export const useLangieStore = defineStore('translator', () => {
   const { translate, translateAsync, currentLanguage, setLanguage, availableLanguages, isLoading } =
-    useTranslator({
+    useLangie({
       translatorHost: 'https://your-translation-api.com',
       apiKey: 'your-api-key'
     })
@@ -369,9 +369,9 @@ Then use it in your components:
 
 <script setup>
 import { T } from 'vue-translator-sdk/components'
-import { useTranslatorStore } from './stores/translator'
+import { useLangieStore } from './stores/translator'
 
-const { translate, recentTranslations } = useTranslatorStore()
+const { translate, recentTranslations } = useLangieStore()
 </script>
 ```
 
@@ -382,7 +382,7 @@ You can implement offline support by caching translations:
 ```js
 // offlineTranslator.js
 import { ref, watch } from 'vue'
-import { useTranslator } from 'vue-translator-sdk'
+import { useLangie } from 'vue-translator-sdk'
 
 // Check if we're online
 const isOnline = ref(navigator.onLine)
@@ -391,7 +391,7 @@ window.addEventListener('offline', () => (isOnline.value = false))
 
 export function useOfflineTranslator(options = {}) {
   const { translate, translateAsync, currentLanguage, setLanguage, ...rest } =
-    useTranslator(options)
+    useLangie(options)
 
   // Initialize cache from localStorage
   const CACHE_KEY = 'translation-cache'

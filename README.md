@@ -22,25 +22,15 @@ Experience all features including:
 - 🔄 **Batch Translation** - Efficiently translate multiple texts in a single request
 - 🧩 **Vue Components** - Ready-to-use Vue components for common translation needs
 - 📦 **Lightweight** - Small footprint with no heavy dependencies
-- 🔌 **Composable API** - Use the `useTranslator` composable for reactive translations
+- 🔌 **Composable API** - Use the `useLangie` composable for reactive translations
 - 🚀 **Flexible Backend** - Connect to any translation service with a compatible API
 - ⚡ **SSR Compatible** - Works seamlessly with Nuxt.js and other SSR frameworks
-- 🔍 **Enhanced UI** - Searchable language dropdowns with flag icons using vue-select
+- 🔍 **Enhanced UI** - Searchable language dropdowns with flag icons
 
 ## Installation
 
 ```bash
-# npm
 npm install langie-api-sdk
-
-# yarn
-yarn add langie-api-sdk
-
-# pnpm
-pnpm add langie-api-sdk
-
-# bun
-bun add langie-api-sdk
 ```
 
 ## Quick Start
@@ -49,9 +39,9 @@ bun add langie-api-sdk
 
 ```vue
 <script setup>
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
-const { translate, currentLanguage, l } = useTranslator({
+const { translate, currentLanguage } = useLangie({
   translatorHost: 'https://your-translation-api.com',
   apiKey: 'your-api-key' // Optional
 })
@@ -74,10 +64,7 @@ import { LanguageSelect, lt } from 'langie-api-sdk/components'
 
 <template>
   <div>
-    <!-- Language selector dropdown -->
     <LanguageSelect />
-
-    <!-- Translate text -->
     <lt>Welcome to our application!</lt>
   </div>
 </template>
@@ -89,12 +76,9 @@ import { LanguageSelect, lt } from 'langie-api-sdk/components'
 
 #### `translateBatch(translations, options)`
 
-Translates multiple texts in a single request.
-
 ```js
 import { translateBatch } from 'langie-api-sdk'
 
-// Example usage
 const results = await translateBatch(
   [
     { text: 'Hello', from_lang: 'en', to_lang: 'fr' },
@@ -109,33 +93,24 @@ const results = await translateBatch(
 
 #### `fetchAvailableLanguages(options)`
 
-Fetches available languages from the translation service.
-
 ```js
 import { fetchAvailableLanguages } from 'langie-api-sdk'
 
-// Example usage
 const languages = await fetchAvailableLanguages({
   translatorHost: 'https://your-translator-api.com',
-  apiKey: 'optional-api-key',
   minPopularity: 0.1, // Filter by minimum popularity
-  country: 'US', // Optional country filter
-  region: 'EU' // Optional region filter
+  country: 'US' // Optional country filter
 })
 ```
 
 ### Composables
 
-#### `useTranslator(options)`
-
-Vue composable for reactive translations.
+#### `useLangie(options)`
 
 ```js
-const { translate, currentLanguage, setLanguage, availableLanguages, isLoading } = useTranslator({
+const { translate, currentLanguage, setLanguage, availableLanguages, isLoading } = useLangie({
   translatorHost: 'https://your-translator-api.com',
-  apiKey: 'optional-api-key',
-  defaultLanguage: 'en',
-  fallbackLanguage: 'en'
+  defaultLanguage: 'en'
 })
 ```
 
@@ -143,51 +118,30 @@ const { translate, currentLanguage, setLanguage, availableLanguages, isLoading }
 
 #### `<LanguageSelect />`
 
-A dropdown component for selecting languages.
-
 ```vue
 <LanguageSelect :show-flags="true" :show-native-names="true" class="my-custom-class" />
 ```
 
 #### `<lt>`
 
-A component for translating text.
-
 ```vue
 <lt>Hello world!</lt>
-
-<!-- With dynamic content -->
 <lt>Hello {{ username }}!</lt>
-
-<!-- With HTML -->
 <lt v-html="'<b>Bold</b> text'"></lt>
 ```
 
-## Backend API Requirements
-
-To use this SDK, you need a translation service with the following API endpoints:
-
-- `POST /api/translate` - For translating text
-- `GET /api/languages` - For fetching available languages
-
-See the [API Documentation](https://github.com/langer/langie-api-sdk/wiki/API-Documentation) for detailed API requirements.
-
 ## Configuration
 
-You can configure the SDK globally or per-instance:
+### Global Configuration
 
 ```js
-// In your main.js
 import { createApp } from 'vue'
-import App from './App.vue'
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
-// Global configuration
-const { install } = useTranslator({
+const { install } = useLangie({
   translatorHost: process.env.TRANSLATOR_HOST,
   apiKey: process.env.TRANSLATOR_API_KEY,
-  defaultLanguage: 'en',
-  fallbackLanguage: 'en'
+  defaultLanguage: 'en'
 })
 
 const app = createApp(App)
@@ -195,33 +149,37 @@ app.use(install)
 app.mount('#app')
 ```
 
+## Backend Requirements
+
+Your translation service needs these endpoints:
+
+- `POST /translate` - For translating text
+- `GET /languages` - For fetching available languages
+
 ## Framework Compatibility
 
-### ✅ Tested and Working
+### ✅ Supported Frameworks
 
-- **Vue.js 3.x** - Full support with Composition API
+- **Vue.js 3.x** - Full Composition API support
 - **Nuxt.js 3.x** - SSR/SSG compatible with automatic client-only rendering
-- **Vite** - Optimized builds and hot module replacement
+- **Vite** - Optimized builds and HMR
 - **TypeScript** - Full type definitions included
 
 ### SSR Support
 
-The SDK automatically detects SSR environments (like Nuxt) and handles hydration properly:
+Components automatically handle SSR environments:
 
 ```vue
-<!-- Automatically wraps in ClientOnly for Nuxt -->
+<!-- Works in both SSR and client-only environments -->
 <lt>Text to translate</lt>
-
-<!-- Works normally in client-only Vue apps -->
-<lt>Another text</lt>
 ```
 
-The components will:
+Features:
 
-- ✅ Render server-side safely without hydration mismatches
-- ✅ Automatically use `ClientOnly` wrapper in Nuxt environments
-- ✅ Provide fallback rendering during server-side rendering
-- ✅ Handle dynamic imports and code splitting properly
+- ✅ Safe server-side rendering without hydration mismatches
+- ✅ Automatic `ClientOnly` wrapper in Nuxt environments
+- ✅ Proper fallback rendering during SSR
+- ✅ Dynamic imports and code splitting support
 
 ## License
 

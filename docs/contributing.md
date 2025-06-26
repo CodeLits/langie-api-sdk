@@ -30,7 +30,7 @@ langie-api-sdk/
 │   ├── language-aliases.ts # Language alias definitions
 │   ├── search-utils.ts  # Search functionality
 │   ├── core.ts         # Core API functions
-│   ├── useTranslator.ts # Vue composable
+│   ├── useLangie.ts # Vue composable
 │   └── ...
 ├── .github/             # GitHub Actions workflows
 ├── netlify.toml         # Netlify deployment config

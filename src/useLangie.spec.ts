@@ -7,26 +7,26 @@ vi.mock('./core', () => ({
   translateBatch: vi.fn()
 }))
 
-describe('useTranslator', () => {
-  let useTranslatorFresh: typeof import('./useTranslator').useTranslator
+describe('useLangie', () => {
+  let useLangieFresh: typeof import('./useLangie').useLangie
   let core: typeof import('./core')
 
   beforeEach(async () => {
     vi.resetModules()
     core = await import('./core')
-    useTranslatorFresh = (await import('./useTranslator')).useTranslator
+    useLangieFresh = (await import('./useLangie')).useLangie
     vi.clearAllMocks()
   })
 
   it('initializes correctly', () => {
-    const { currentLanguage, availableLanguages } = useTranslatorFresh({ defaultLanguage: 'fr' })
+    const { currentLanguage, availableLanguages } = useLangieFresh({ defaultLanguage: 'fr' })
 
     expect(currentLanguage.value).toBe('fr')
     expect(availableLanguages.value).toEqual([])
   })
 
   it('sets language correctly', () => {
-    const { currentLanguage, setLanguage } = useTranslatorFresh()
+    const { currentLanguage, setLanguage } = useLangieFresh()
     expect(currentLanguage.value).toBe('en') // default
     setLanguage('de')
     expect(currentLanguage.value).toBe('de')
@@ -43,7 +43,7 @@ describe('useTranslator', () => {
     })
     global.fetch = mockFetch
 
-    const translator = useTranslatorFresh()
+    const translator = useLangieFresh()
     const langs = await translator.fetchLanguages()
 
     expect(mockFetch).toHaveBeenCalledTimes(1)
@@ -51,7 +51,7 @@ describe('useTranslator', () => {
   })
 
   it('returns original text when calling l() initially', () => {
-    const translator = useTranslatorFresh()
+    const translator = useLangieFresh()
     translator.setLanguage('es')
 
     const result = translator.l('hello')

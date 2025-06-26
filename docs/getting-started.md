@@ -32,12 +32,12 @@ npm install langie-api-sdk
 // main.js or main.ts
 import { createApp } from 'vue'
 import App from './App.vue'
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
 const app = createApp(App)
 
 // Optional: Register globally
-const { install } = useTranslator({
+const { install } = useLangie({
   translatorHost: 'https://your-translation-api.com',
   apiKey: 'your-api-key', // Optional
   defaultLanguage: 'en',
@@ -59,9 +59,9 @@ app.mount('#app')
 </template>
 
 <script setup>
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
-const { translate, setLanguage, currentLanguage } = useTranslator()
+const { translate, setLanguage, currentLanguage } = useLangie()
 </script>
 ```
 
@@ -87,7 +87,7 @@ import { LanguageSelect, lt } from 'langie-api-sdk/components'
 When initializing the translator, you can provide several configuration options:
 
 ```js
-const { translate } = useTranslator({
+const { translate } = useLangie({
   // Required: URL of your translation service
   translatorHost: 'https://your-translation-api.com',
 

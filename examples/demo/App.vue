@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useTranslator, DEFAULT_API_HOST, DEV_API_HOST } from '@/index'
+import { useLangie, DEFAULT_API_HOST, DEV_API_HOST } from '@/index'
 // Import the component directly from source for demo
 import lt from '@/components/lt.vue'
 // Import LanguageSelect from the main package
@@ -17,7 +17,7 @@ const {
   fetchLanguages,
   l,
   isLoading: isTranslatorLoading
-} = useTranslator({
+} = useLangie({
   translatorHost: API_HOST
 })
 
@@ -97,7 +97,7 @@ onMounted(async () => {
   // Check service health first
   await checkServiceHealth()
 
-  // The useTranslator composable now handles the initial fetch automatically.
+  // The useLangie composable now handles the initial fetch automatically.
   // This explicit call is redundant and causes a double-fetch.
   //
   // if (serviceStatus.value.includes('✅') && !rateLimited.value) {

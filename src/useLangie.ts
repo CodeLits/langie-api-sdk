@@ -19,7 +19,7 @@ let _autoSelected = false
 let _languagesCache: TranslatorLanguage[] | null = null
 let _languagesPromise: Promise<TranslatorLanguage[]> | null = null
 
-export function useTranslator(options: TranslatorOptions = {}) {
+export function useLangie(options: TranslatorOptions = {}) {
   // If a host is provided in options, it overrides the global host for all instances.
   // This ensures that the first initialization (e.g., from App.vue) sets the host correctly.
   if (options.translatorHost) {
@@ -79,7 +79,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
 
       let url = '/languages'
       if (countryHint) url += `?country=${countryHint}`
-      console.log('[useTranslator] Fetching languages', { country: countryHint, url })
+      console.log('[useLangie] Fetching languages', { country: countryHint, url })
 
       _languagesPromise = fetch(`${translatorHost}${url}`).then((res) => res.json())
       const response = (await _languagesPromise) as any
@@ -117,7 +117,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
             ? navigator.languages?.[0] || navigator.language || ''
             : ''
         const browserCode = locale.split('-')[0]
-        console.log('[useTranslator] Browser code', browserCode)
+        console.log('[useLangie] Browser code', browserCode)
         if (browserCode) {
           let pick: TranslatorLanguage | undefined = undefined
           if (browserCode === 'sr') {

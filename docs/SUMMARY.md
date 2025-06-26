@@ -33,11 +33,11 @@ The documentation is organized into the following sections:
 npm install langie-api-sdk
 
 # Import and use
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 import { LanguageSelect, T } from 'langie-api-sdk/components'
 
 // Use in components
-const { translate } = useTranslator({
+const { translate } = useLangie({
   translatorHost: 'https://your-translation-api.com'
 })
 ```
@@ -49,7 +49,7 @@ const { translate } = useTranslator({
   - `fetchAvailableLanguages()` - Get available languages
 
 - **Composables**:
-  - `useTranslator()` - Vue composable for reactive translations
+  - `useLangie()` - Vue composable for reactive translations
 
 - **Components**:
   - `<LanguageSelect />` - Language selection dropdown

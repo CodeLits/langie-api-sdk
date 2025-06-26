@@ -3,8 +3,8 @@ import { render } from '@testing-library/vue'
 import lt from '../lt.vue'
 
 // Mock the composable
-vi.mock('../../useTranslator', () => ({
-  useTranslator: vi.fn()
+vi.mock('../../useLangie', () => ({
+  useLangie: vi.fn()
 }))
 
 describe('lt component', () => {
@@ -12,8 +12,8 @@ describe('lt component', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    const { useTranslator } = await import('../../useTranslator')
-    vi.mocked(useTranslator).mockReturnValue({
+    const { useLangie } = await import('../../useLangie')
+    vi.mocked(useLangie).mockReturnValue({
       l: mockL
     } as any)
   })

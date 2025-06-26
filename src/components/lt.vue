@@ -7,7 +7,7 @@
 <script lang="ts" setup>
 // @ts-nocheck
 import { computed, useSlots } from 'vue'
-import { useTranslator } from '../useTranslator'
+import { useLangie } from '../useLangie'
 
 // Detect if we're running in Nuxt
 const isNuxt = computed(() => {
@@ -39,7 +39,7 @@ const props = defineProps({
 })
 
 const slots = useSlots()
-const { l } = useTranslator()
+const { l } = useLangie()
 
 const keyStr = computed(() => {
   if (props.msg) return props.msg

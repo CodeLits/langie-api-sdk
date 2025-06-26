@@ -49,9 +49,9 @@ The `LanguageSelect` component provides a dropdown menu for selecting a language
 
 <script setup>
 import { LanguageSelect } from 'langie-api-sdk/components'
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
-const { currentLanguage } = useTranslator()
+const { currentLanguage } = useLangie()
 </script>
 ```
 
@@ -259,7 +259,7 @@ You can create your own custom components that use the translation functionality
 
 <script setup>
 import { T } from 'langie-api-sdk/components'
-import { useTranslator } from 'langie-api-sdk'
+import { useLangie } from 'langie-api-sdk'
 
 const props = defineProps({
   text: {
@@ -273,7 +273,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['click'])
-const { isLoading } = useTranslator()
+const { isLoading } = useLangie()
 </script>
 ```
 
