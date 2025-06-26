@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useTranslator, DEV_API_HOST } from '../../dist/index.mjs'
+import { useTranslator, DEV_API_HOST, lt } from '../../dist/index.mjs'
 
 const {
   translate,
@@ -8,6 +8,7 @@ const {
   availableLanguages,
   setLanguage,
   fetchLanguages,
+  l,
   isLoading: isTranslatorLoading
 } = useTranslator({
   translatorHost: DEV_API_HOST
@@ -233,6 +234,14 @@ const canRetryLanguages = computed(() => {
 })
 </script>
 
+<script>
+export default {
+  components: {
+    lt
+  }
+}
+</script>
+
 <template>
   <div
     class="min-h-screen flex items-center justify-center transition-colors bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
@@ -246,7 +255,7 @@ const canRetryLanguages = computed(() => {
             Langie API SDK - Demo App
           </h1>
           <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Real API:
+            <lt orig="en">Real API</lt>:
             <a
               href="https://api.langie.uk"
               target="_blank"
@@ -285,14 +294,14 @@ const canRetryLanguages = computed(() => {
       <div class="mb-6">
         <div class="flex items-center justify-between mb-2">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Interface Language
+            <lt orig="en">Interface Language</lt>
           </label>
           <button
             v-if="canRetryLanguages"
             @click="retryFetchLanguages"
             class="text-xs text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
           >
-            Load API Languages
+            <lt orig="en">Load API Languages</lt>
           </button>
         </div>
         <select
@@ -306,13 +315,13 @@ const canRetryLanguages = computed(() => {
       </div>
 
       <h2 class="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-gray-200">
-        Translation
+        <lt orig="en">Translation</lt>
       </h2>
 
       <div class="grid grid-cols-2 gap-4 mb-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Source Language
+            <lt orig="en">Source Language</lt>
           </label>
           <select
             v-model="sourceLang"
@@ -325,7 +334,7 @@ const canRetryLanguages = computed(() => {
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Target Language
+            <lt orig="en">Target Language</lt>
           </label>
           <select
             v-model="targetLang"
@@ -344,12 +353,12 @@ const canRetryLanguages = computed(() => {
 
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Text to translate
+          <lt orig="en">Text to translate</lt>
         </label>
         <input
           v-model="textToTranslate"
           type="text"
-          placeholder="Enter text to translate"
+          :placeholder="l('Enter text to translate')"
           class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
         />
       </div>
@@ -361,13 +370,15 @@ const canRetryLanguages = computed(() => {
         class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
         @click="handleTranslate"
       >
-        <span v-if="isLoading">Translating...</span>
-        <span v-else-if="rateLimited && !isRateLimitExpired">Rate Limited - Please Wait</span>
-        <span v-else>Translate</span>
+        <span v-if="isLoading"><lt orig="en">Translating...</lt></span>
+        <span v-else-if="rateLimited && !isRateLimitExpired"
+          ><lt orig="en">Rate Limited - Please Wait</lt></span
+        >
+        <span v-else><lt orig="en">Translate</lt></span>
       </button>
 
       <div v-if="translation" class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
-        <h2 class="text-lg font-semibold mb-2">Translation</h2>
+        <h2 class="text-lg font-semibold mb-2"><lt orig="en">Translation</lt></h2>
         <p class="text-gray-800 dark:text-gray-100">{{ translation }}</p>
       </div>
 
