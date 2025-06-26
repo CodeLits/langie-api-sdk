@@ -76,8 +76,15 @@ onMounted(async () => {
       await fetchLanguages({ force: true })
     } catch (err) {
       console.warn('Failed to fetch languages on mount:', err)
-      if (err.message?.includes('429') || err.message?.includes('Too Many Requests')) {
+      // Trigger rate limiting on any fetch failure that could indicate rate limiting
+      if (
+        err.message?.includes('429') ||
+        err.message?.includes('Too Many Requests') ||
+        err.message?.includes('Failed to fetch') ||
+        err.message?.includes('CORS')
+      ) {
         handleRateLimit()
+        console.log('Rate limiting triggered due to API errors')
       }
     }
   }
@@ -125,18 +132,23 @@ const handleTranslate = async () => {
   } catch (err) {
     console.error('Translation error:', err)
 
-    if (err.message?.includes('429') || err.message?.includes('Too Many Requests')) {
-      handleRateLimit()
-      error.value =
-        'API rate limit exceeded. Please wait a moment before trying again. The API has limits to prevent abuse.'
-    } else if (
+    if (
+      err.message?.includes('429') ||
+      err.message?.includes('Too Many Requests') ||
+      err.message?.includes('Failed to fetch') ||
       err.message?.includes('CORS') ||
       err.message?.includes('Access-Control-Allow-Origin')
     ) {
-      error.value = 'CORS error: The translation API needs to allow requests from this domain.'
-    } else if (err.message?.includes('Failed to fetch')) {
-      error.value =
-        'Network error: Unable to connect to the translation service. Please check if the API server is running.'
+      handleRateLimit()
+      if (err.message?.includes('CORS') || err.message?.includes('Access-Control-Allow-Origin')) {
+        error.value =
+          'CORS error: The translation API needs CORS headers configured for this domain.'
+      } else if (err.message?.includes('429') || err.message?.includes('Too Many Requests')) {
+        error.value = 'API rate limit exceeded. Please wait a moment before trying again.'
+      } else {
+        error.value =
+          'Network/API error: Unable to connect to translation service. This could be due to rate limiting or server issues.'
+      }
     } else {
       error.value = err.message || 'Translation failed'
     }
@@ -153,9 +165,14 @@ const retryFetchLanguages = async () => {
     error.value = ''
     await fetchLanguages({ force: true })
   } catch (err) {
-    if (err.message?.includes('429') || err.message?.includes('Too Many Requests')) {
+    if (
+      err.message?.includes('429') ||
+      err.message?.includes('Too Many Requests') ||
+      err.message?.includes('Failed to fetch') ||
+      err.message?.includes('CORS')
+    ) {
       handleRateLimit()
-      error.value = 'API rate limit exceeded. Languages will use fallback list.'
+      error.value = 'API issues detected (rate limiting or CORS). Languages will use fallback list.'
     } else {
       error.value = 'Failed to fetch languages from API. Using fallback list.'
     }
@@ -220,7 +237,7 @@ const canRetryLanguages = computed(() => {
         </button>
       </div>
 
-      <!-- Rate limit warning -->
+      <!-- API Issues warning -->
       <div
         v-if="rateLimited && !isRateLimitExpired"
         class="mb-6 p-4 bg-yellow-50 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300 rounded-md border border-yellow-200 dark:border-yellow-700"
@@ -228,10 +245,10 @@ const canRetryLanguages = computed(() => {
         <div class="flex items-center">
           <span class="text-lg mr-2">⚠️</span>
           <div>
-            <h3 class="font-semibold">API Rate Limit Reached</h3>
+            <h3 class="font-semibold">API Issues Detected</h3>
             <p class="text-sm mt-1">
-              The translation API has rate limits to prevent abuse. Please wait a moment before
-              making more requests. Using fallback language list for now.
+              The translation API is experiencing issues (rate limiting, CORS, or network problems).
+              Using fallback language list. Functionality will be limited until issues resolve.
             </p>
           </div>
         </div>

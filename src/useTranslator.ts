@@ -161,7 +161,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
       queueMap.delete(batchKey)
       const items = Array.from(map.values()) as {
         text: string
-        context: string
+        context?: string
       }[]
       const [fromLang, toLang] = batchKey.split('|')
       await fetchAndCacheBatch(items, fromLang, toLang)
@@ -239,7 +239,8 @@ export function useTranslator(options: TranslatorOptions = {}) {
 
     if (fromLang === toLang) {
       // No translation needed, just echo input
-      items.forEach(({ text, context }) => {
+      items.forEach((item) => {
+        const { text, context } = item
         const ctx = context || 'ui'
         const ck = `${text}_${toLang}_${ctx}`
         translations[ck] = text
@@ -250,9 +251,9 @@ export function useTranslator(options: TranslatorOptions = {}) {
 
     try {
       const requestBody = {
-        translations: items.map(({ text, context }) => ({
-          text,
-          context: context || 'ui',
+        translations: items.map((item) => ({
+          text: item.text,
+          context: item.context || 'ui',
           from_lang: fromLang,
           to_lang: toLang
         }))
