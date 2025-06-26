@@ -211,17 +211,6 @@ watch(textToTranslate, (val) => {
   localStorage.setItem('translateText', val)
 })
 
-watch(
-  availableLanguages,
-  (newVal) => {
-    console.log('[DEBUG] availableLanguages updated:', JSON.parse(JSON.stringify(newVal)))
-    if (!newVal || newVal.length === 0) {
-      console.log('[DEBUG] availableLanguages is empty or invalid. Using fallback list.')
-    }
-  },
-  { deep: true, immediate: true }
-)
-
 // Fallback language options when API languages aren't loaded
 const simpleLanguages = [
   { value: 'en', label: 'English' },
@@ -252,20 +241,6 @@ const displayLanguages = computed(() => {
   }))
 })
 
-watch(
-  displayLanguages,
-  (newVal) => {
-    console.log('[DEBUG] displayLanguages updated:', JSON.parse(JSON.stringify(newVal)))
-    if (newVal && newVal.length > 0) {
-      console.log(
-        '[DEBUG] First language in displayLanguages:',
-        JSON.parse(JSON.stringify(newVal[0]))
-      )
-    }
-  },
-  { deep: true, immediate: true }
-)
-
 const canRetryLanguages = computed(() => {
   return (
     serviceStatus.value.includes('✅') &&
@@ -283,21 +258,17 @@ const canRetryLanguages = computed(() => {
       class="p-8 rounded-lg shadow-md w-full max-w-2xl transition-colors bg-white dark:bg-gray-800"
     >
       <div class="flex justify-between items-center mb-6">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            Langie API SDK - Demo App
-          </h1>
-          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            <lt orig="en">Real API</lt>:
-            <a
-              href="https://api.langie.uk"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline"
-            >
-              https://api.langie.uk
-            </a>
-          </p>
+        <div class="flex items-center space-x-4">
+          <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Langie API SDK</h1>
+          <span
+            class="px-2 py-1 text-xs font-semibold rounded-full"
+            :class="{
+              'bg-green-100 text-green-800': serviceStatus.includes('✅'),
+              'bg-yellow-100 text-yellow-800': serviceStatus.includes('⚠️'),
+              'bg-red-100 text-red-800': serviceStatus.includes('❌')
+            }"
+            >{{ serviceStatus }}</span
+          >
         </div>
         <div class="flex items-center space-x-2">
           <button
@@ -307,57 +278,46 @@ const canRetryLanguages = computed(() => {
             <span v-if="isDark">☀️</span>
             <span v-else>🌙</span>
           </button>
-          <LanguageSelect
-            v-model="interfaceLang"
-            placeholder="UI Language"
-            :disabled="isLoading"
-            :is-dark="isDark"
-            :languages="displayLanguages"
-          />
         </div>
       </div>
 
       <!-- API Issues warning -->
       <div
-        v-if="rateLimited && !isRateLimitExpired"
-        class="mb-6 p-4 bg-yellow-50 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300 rounded-md border border-yellow-200 dark:border-yellow-700"
+        v-if="serviceStatus.includes('❌') || rateLimited"
+        class="p-4 mb-4 text-sm rounded-lg"
+        :class="{
+          'bg-red-100 text-red-700 dark:bg-red-200 dark:text-red-800': serviceStatus.includes('❌'),
+          'bg-yellow-100 text-yellow-700 dark:bg-yellow-200 dark:text-yellow-800': rateLimited
+        }"
+        role="alert"
       >
-        <div class="flex items-center">
-          <span class="text-lg mr-2">⚠️</span>
-          <div>
-            <h3 class="font-semibold">API Issues Detected</h3>
-            <p class="text-sm mt-1">
-              The translation API is experiencing issues (rate limiting, CORS, or network problems).
-              Using fallback language list. Functionality will be limited until issues resolve.
-            </p>
-          </div>
-        </div>
+        <span class="font-medium">
+          <lt v-if="serviceStatus.includes('❌')" orig="en">API Offline</lt>
+          <lt v-else orig="en">Rate Limit</lt>
+        </span>
+        <lt v-if="serviceStatus.includes('❌')" orig="en"
+          >The translation service is currently offline. Using a fallback list of languages.</lt
+        >
+        <lt v-else orig="en"
+          >API rate limit may have been reached. Language list may be incomplete. Please wait a
+          moment.</lt
+        >
       </div>
 
       <div class="mb-6">
-        <div class="flex items-center justify-between mb-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            <lt orig="en">Interface Language</lt>
-          </label>
-          <button
-            v-if="canRetryLanguages"
-            @click="retryFetchLanguages"
-            class="text-xs text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
-          >
-            <lt orig="en">Load API Languages</lt>
-          </button>
-        </div>
-        <div class="flex items-center space-x-4">
-          <LanguageSelect
-            v-model="interfaceLang"
-            :languages="displayLanguages"
-            :is-dark="isDark"
-            placeholder="UI Language"
-          />
-        </div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <lt orig="en">Interface Language</lt>
+        </label>
+        <LanguageSelect
+          v-model="interfaceLang"
+          placeholder="UI Language"
+          :disabled="isLoading"
+          :is-dark="isDark"
+          :languages="displayLanguages"
+        />
       </div>
 
-      <h2 class="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-gray-200">
+      <h2 class="text-2xl font-semibold text-center text-gray-800 dark:text-gray-200 mb-6">
         <lt orig="en">Translation</lt>
       </h2>
 
