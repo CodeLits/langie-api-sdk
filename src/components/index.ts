@@ -1,19 +1,8 @@
 /**
  * Vue components for translation
  */
-import { h, defineComponent, defineAsyncComponent } from 'vue'
+import { defineAsyncComponent } from 'vue'
 
-// Lazy load components to avoid SSR issues
+// Export components using defineAsyncComponent for better compatibility
 export const LanguageSelect = defineAsyncComponent(() => import('./LanguageSelect.vue'))
-export const T = defineAsyncComponent(() => import('./T.vue'))
-
-// SSR-safe fallbacks
-export const LanguageSelectSSR = defineComponent({
-	name: 'LanguageSelect',
-	render: () => h('div')
-})
-
-export const TSSR = defineComponent({
-	name: 'T',
-	render: () => h('span')
-})
+export const lt = defineAsyncComponent(() => import('./lt.vue'))

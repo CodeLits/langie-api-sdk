@@ -14,4 +14,4 @@ export { DEFAULT_API_HOST, DEFAULT_TRANSLATOR_OPTIONS } from './constants'
 export type { TranslateRequestBody, TranslateServiceResponse, TranslatorLanguage } from './types'
 
 // Export components
-export { LanguageSelect, T } from './components'
+export { LanguageSelect, lt } from './components'

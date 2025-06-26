@@ -12,7 +12,14 @@ export default defineConfig({
     'components/index': 'src/components/index.ts'
   },
   format: ['esm', 'cjs'],
-  dts: true,
+  dts: {
+    entry: {
+      index: 'src/index.ts'
+    },
+    compilerOptions: {
+      skipLibCheck: true
+    }
+  },
   splitting: false,
   sourcemap: true,
   clean: true,

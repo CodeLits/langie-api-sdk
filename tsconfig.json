@@ -27,7 +27,7 @@
 		"src/**/*.d.ts",
 		"src/**/*.tsx",
 		"src/**/*.vue",
-		"vue.d.ts",
+		"src/components/vue-shims.d.ts",
 		"vite.config.ts"
 	],
 	"exclude": [

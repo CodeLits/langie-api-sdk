@@ -1,41 +1,41 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render } from '@testing-library/vue'
-import T from '../T.vue'
+import lt from '../lt.vue'
 
 // Mock the composable
 vi.mock('../../useTranslator', () => ({
   useTranslator: vi.fn()
 }))
 
-describe('T component', () => {
-  const mockT = vi.fn((key) => `translated_${key}`)
+describe('lt component', () => {
+  const mockL = vi.fn((key) => `translated_${key}`)
 
   beforeEach(async () => {
     vi.clearAllMocks()
     const { useTranslator } = await import('../../useTranslator')
     vi.mocked(useTranslator).mockReturnValue({
-      t: mockT
+      l: mockL
     } as any)
   })
 
   it('renders translation from msg prop', () => {
-    const { getByText } = render(T, {
+    const { getByText } = render(lt, {
       props: {
         msg: 'hello'
       }
     })
     expect(getByText('translated_hello')).toBeTruthy()
-    expect(mockT).toHaveBeenCalledWith('hello', undefined, undefined)
+    expect(mockL).toHaveBeenCalledWith('hello', undefined, undefined)
   })
 
-  it('passes context and original language to t function', () => {
-    render(T, {
+  it('passes context and original language to l function', () => {
+    render(lt, {
       props: {
         msg: 'greeting',
         ctx: 'salutation',
         orig: 'en'
       }
     })
-    expect(mockT).toHaveBeenCalledWith('greeting', 'salutation', 'en')
+    expect(mockL).toHaveBeenCalledWith('greeting', 'salutation', 'en')
   })
 })

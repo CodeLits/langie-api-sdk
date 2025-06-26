@@ -38,7 +38,7 @@ bun add langie-api-sdk
 <script setup>
 import { useTranslator } from 'langie-api-sdk'
 
-const { translate, currentLanguage } = useTranslator({
+const { translate, currentLanguage, l } = useTranslator({
   translatorHost: 'https://your-translation-api.com',
   apiKey: 'your-api-key' // Optional
 })
@@ -56,7 +56,7 @@ const { translate, currentLanguage } = useTranslator({
 
 ```vue
 <script setup>
-import { LanguageSelect, T } from 'langie-api-sdk/components'
+import { LanguageSelect, lt } from 'langie-api-sdk/components'
 </script>
 
 <template>
@@ -65,7 +65,7 @@ import { LanguageSelect, T } from 'langie-api-sdk/components'
     <LanguageSelect />
 
     <!-- Translate text -->
-    <T>Welcome to our application!</T>
+    <lt>Welcome to our application!</lt>
   </div>
 </template>
 ```
@@ -136,18 +136,18 @@ A dropdown component for selecting languages.
 <LanguageSelect :show-flags="true" :show-native-names="true" class="my-custom-class" />
 ```
 
-#### `<T>`
+#### `<lt>`
 
 A component for translating text.
 
 ```vue
-<T>Hello world!</T>
+<lt>Hello world!</lt>
 
 <!-- With dynamic content -->
-<T>Hello {{ username }}!</T>
+<lt>Hello {{ username }}!</lt>
 
 <!-- With HTML -->
-<T v-html="'<b>Bold</b> text'"></T>
+<lt v-html="'<b>Bold</b> text'"></lt>
 ```
 
 ## Backend API Requirements

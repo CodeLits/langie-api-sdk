@@ -1,4 +1,5 @@
-import { ref, watch, reactive, type Ref } from 'vue'
+import { ref, watch, reactive } from 'vue'
+import type { Ref } from 'vue'
 import { translateBatch, fetchAvailableLanguages } from './core'
 import type { TranslatorOptions, TranslatorLanguage } from './types'
 import { DEFAULT_API_HOST } from './constants'
@@ -39,7 +40,9 @@ export function useTranslator(options: TranslatorOptions = {}) {
       let countryHint = explicitCountry || null
       if (!countryHint && availableLanguages.value && availableLanguages.value.length) {
         const currentLang = currentLanguage.value
-        const entry = availableLanguages.value.find((l) => l.code === currentLang)
+        const entry = availableLanguages.value.find(
+          (l: TranslatorLanguage) => l.code === currentLang
+        )
         if (entry) {
           const c = Array.isArray(entry.flag_country)
             ? entry.flag_country[0]
@@ -179,7 +182,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
    * Synchronously get translation for the provided text.
    * If originalLang is not provided, the language will be detected from the text automatically.
    */
-  const t = (text: string, context?: string, originalLang?: string) => {
+  const l = (text: string, context?: string, originalLang?: string) => {
     const lang = currentLanguage.value
 
     // Skip translation when target and source are identical (explicit) or interface is en and originalLang indicates English
@@ -287,7 +290,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
   // Derive country code for a language entry
   const getCountryFromLang = (langCode: string): string | undefined => {
     if (!availableLanguages.value || !availableLanguages.value.length) return undefined
-    const entry = availableLanguages.value.find((l) => l.code === langCode)
+    const entry = availableLanguages.value.find((l: TranslatorLanguage) => l.code === langCode)
     if (!entry) return undefined
     if (Array.isArray(entry.flag_country) && entry.flag_country.length)
       return entry.flag_country[0].toUpperCase()
@@ -299,7 +302,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
   // Watch for interface language change: refresh languages so ordering adapts
   watch(
     () => currentLanguage.value,
-    async (newLang) => {
+    async (newLang: string) => {
       // Only refetch if we already have languages and newLang differs
       if (!availableLanguages.value || availableLanguages.value.length === 0) return
       const country = getCountryFromLang(newLang)
@@ -358,7 +361,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
     availableLanguages,
     translatorHost,
     translate,
-    t,
+    l,
     getTranslation,
     clearTranslations,
     fetchLanguages,

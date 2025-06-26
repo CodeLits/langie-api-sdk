@@ -58,12 +58,12 @@ const { translate, setLanguage, currentLanguage } = useTranslator()
 <template>
   <div>
     <LanguageSelect />
-    <T>Welcome to our application!</T>
+    <lt>Welcome to our application!</lt>
   </div>
 </template>
 
 <script setup>
-import { LanguageSelect, T } from 'langie-api-sdk/components'
+import { LanguageSelect, lt } from 'langie-api-sdk/components'
 </script>
 ```
 
