@@ -21,6 +21,7 @@
         <div class="multiselect-single-label" v-if="value">
           <img
             v-if="value.code"
+            :key="`${value.code}-${value.flag_country || 'fallback'}`"
             :src="`https://flagcdn.com/${getFlagCode(value)}.svg`"
             class="lang-flag"
             :alt="`${value.name} flag`"
@@ -32,6 +33,7 @@
       <template #option="{ option }">
         <div class="multiselect-option">
           <img
+            :key="`${option.code}-${option.flag_country || 'fallback'}`"
             :src="`https://flagcdn.com/${getFlagCode(option)}.svg`"
             class="lang-flag"
             :alt="`${option.name} flag`"
@@ -62,7 +64,8 @@ import { applyLanguageAlias } from '../search-utils'
 import type { TranslatorLanguage } from '../types'
 
 const getFlagCode = (lang: TranslatorLanguage): string => {
-  return lang.flag_country || lang.code
+  const flagCode = lang.flag_country || lang.code
+  return flagCode
 }
 
 const props = defineProps({

@@ -261,19 +261,21 @@ const simpleLanguages = [
 // Use API languages when available, fallback to simple languages
 const displayLanguages = computed(() => {
   if (availableLanguages.value && availableLanguages.value.length > 0) {
-    return availableLanguages.value.map((lang) => ({
+    const apiLangs = availableLanguages.value.map((lang) => ({
       code: lang.code,
       name: lang.name,
       native_name: lang.native_name,
       flag_country: lang.flag_country
     }))
+    return apiLangs
   }
-  return simpleLanguages.map((lang) => ({
+  const fallbackLangs = simpleLanguages.map((lang) => ({
     code: lang.value,
     name: lang.label,
     native_name: lang.label,
     flag_country: null
   }))
+  return fallbackLangs
 })
 
 const canRetryLanguages = computed(() => {
@@ -292,15 +294,18 @@ watch(
     if (langs.length > 0) {
       if (!interfaceLang.value) {
         const savedInterfaceLangCode = localStorage.getItem('interfaceLanguage') || 'en'
-        interfaceLang.value = findLang(savedInterfaceLangCode)
+        const foundLang = findLang(savedInterfaceLangCode)
+        interfaceLang.value = foundLang
       }
       if (!sourceLang.value) {
         const savedSourceLangCode = localStorage.getItem('sourceLang') || 'en'
-        sourceLang.value = findLang(savedSourceLangCode)
+        const foundLang = findLang(savedSourceLangCode)
+        sourceLang.value = foundLang
       }
       if (!targetLang.value) {
         const savedTargetLangCode = localStorage.getItem('targetLang') || 'es'
-        targetLang.value = findLang(savedTargetLangCode)
+        const foundLang = findLang(savedTargetLangCode)
+        targetLang.value = foundLang
       }
     }
   },
