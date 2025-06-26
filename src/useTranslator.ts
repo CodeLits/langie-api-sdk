@@ -65,7 +65,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
         }
       }
 
-      let url = '/api/languages'
+      let url = '/languages'
       if (countryHint) url += `?country=${countryHint}`
       console.log('[useTranslator] Fetching languages', { country: countryHint, url })
 
@@ -257,7 +257,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
           to_lang: toLang
         }))
       }
-      const resp = await fetch(`${translatorHost}/api/translate`, {
+      const resp = await fetch(`${translatorHost}/translate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

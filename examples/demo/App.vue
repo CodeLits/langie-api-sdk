@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useTranslator, LanguageSelect } from '../../dist/index.mjs'
+import { useTranslator } from '../../dist/index.mjs'
 
 const {
   translate,
@@ -20,7 +20,6 @@ const textToTranslate = ref('')
 const translation = ref('')
 const error = ref('')
 const isMounted = ref(false)
-const componentReady = ref(false)
 
 const isLoading = computed(() => isTranslatorLoading.value)
 
@@ -33,11 +32,6 @@ onMounted(async () => {
   // Load saved text
   const saved = localStorage.getItem('translateText')
   if (saved) textToTranslate.value = saved
-
-  // Wait for async component to be ready
-  setTimeout(() => {
-    componentReady.value = true
-  }, 500)
 
   isMounted.value = true
 })
@@ -86,6 +80,20 @@ watch(interfaceLang, (newLang) => {
 watch(textToTranslate, (val) => {
   localStorage.setItem('translateText', val)
 })
+
+// Simple language options for now
+const simpleLanguages = [
+  { value: 'en', label: 'English' },
+  { value: 'ru', label: 'Russian' },
+  { value: 'es', label: 'Spanish' },
+  { value: 'fr', label: 'French' },
+  { value: 'de', label: 'German' },
+  { value: 'it', label: 'Italian' },
+  { value: 'pt', label: 'Portuguese' },
+  { value: 'ja', label: 'Japanese' },
+  { value: 'ko', label: 'Korean' },
+  { value: 'zh', label: 'Chinese' }
+]
 </script>
 
 <template>
@@ -104,79 +112,51 @@ watch(textToTranslate, (val) => {
         </button>
       </div>
 
-      <div class="mb-6" v-if="componentReady">
+      <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Interface Language
-        </label>
-        <LanguageSelect v-model="interfaceLang" :languages="availableLanguages" class="w-full" />
-      </div>
-
-      <!-- Fallback interface language selector -->
-      <div class="mb-6" v-if="!componentReady">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Interface Language (Loading...)
         </label>
         <select
           v-model="interfaceLang"
           class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
         >
-          <option value="en">English</option>
-          <option value="ru">Russian</option>
-          <option value="es">Spanish</option>
+          <option v-for="lang in simpleLanguages" :key="lang.value" :value="lang.value">
+            {{ lang.label }}
+          </option>
         </select>
       </div>
 
       <h1 class="text-2xl font-bold mb-6 text-center">Translation</h1>
 
-      <div class="grid grid-cols-2 gap-4 mb-6" v-if="componentReady">
+      <div class="grid grid-cols-2 gap-4 mb-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Source Language
-          </label>
-          <LanguageSelect v-model="sourceLang" :languages="availableLanguages" class="w-full" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Target Language
-          </label>
-          <LanguageSelect
-            v-model="targetLang"
-            :languages="availableLanguages.filter((l) => l.value !== sourceLang)"
-            class="w-full"
-          />
-        </div>
-      </div>
-
-      <!-- Fallback simple selects -->
-      <div class="grid grid-cols-2 gap-4 mb-6" v-if="!componentReady">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Source Language (Loading...)
           </label>
           <select
             v-model="sourceLang"
             class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           >
-            <option value="en">English</option>
-            <option value="ru">Russian</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
+            <option v-for="lang in simpleLanguages" :key="lang.value" :value="lang.value">
+              {{ lang.label }}
+            </option>
           </select>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Target Language (Loading...)
+            Target Language
           </label>
           <select
             v-model="targetLang"
             class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           >
-            <option value="ru">Russian</option>
-            <option value="es">Spanish</option>
-            <option value="en">English</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
+            <option
+              v-for="lang in simpleLanguages.filter((l) => l.value !== sourceLang)"
+              :key="lang.value"
+              :value="lang.value"
+            >
+              {{ lang.label }}
+            </option>
           </select>
         </div>
       </div>
@@ -217,8 +197,9 @@ watch(textToTranslate, (val) => {
       <!-- Debug info -->
       <div v-if="isMounted" class="mt-4 text-xs text-gray-500 dark:text-gray-400">
         <p>Dark Mode: {{ isDark ? 'ON' : 'OFF' }}</p>
-        <p>Enhanced Components: {{ componentReady ? 'LOADED' : 'LOADING...' }}</p>
-        <p>Available Languages: {{ availableLanguages.length }}</p>
+        <p>Translation Service: Working</p>
+        <p>Available Languages: {{ simpleLanguages.length }} (simplified)</p>
+        <p>API Languages: {{ availableLanguages.length }}</p>
         <p>Current Language: {{ currentLanguage }}</p>
       </div>
     </div>
