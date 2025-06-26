@@ -13,6 +13,8 @@ A lightweight, flexible translation SDK for Vue.js applications. Easily integrat
 - 📦 **Lightweight** - Small footprint with no heavy dependencies
 - 🔌 **Composable API** - Use the `useTranslator` composable for reactive translations
 - 🚀 **Flexible Backend** - Connect to any translation service with a compatible API
+- ⚡ **SSR Compatible** - Works seamlessly with Nuxt.js and other SSR frameworks
+- 🔍 **Enhanced UI** - Searchable language dropdowns with flag icons using vue-select
 
 ## Installation
 
@@ -181,6 +183,34 @@ const app = createApp(App)
 app.use(install)
 app.mount('#app')
 ```
+
+## Framework Compatibility
+
+### ✅ Tested and Working
+
+- **Vue.js 3.x** - Full support with Composition API
+- **Nuxt.js 3.x** - SSR/SSG compatible with automatic client-only rendering
+- **Vite** - Optimized builds and hot module replacement
+- **TypeScript** - Full type definitions included
+
+### SSR Support
+
+The SDK automatically detects SSR environments (like Nuxt) and handles hydration properly:
+
+```vue
+<!-- Automatically wraps in ClientOnly for Nuxt -->
+<lt>Text to translate</lt>
+
+<!-- Works normally in client-only Vue apps -->
+<lt>Another text</lt>
+```
+
+The components will:
+
+- ✅ Render server-side safely without hydration mismatches
+- ✅ Automatically use `ClientOnly` wrapper in Nuxt environments
+- ✅ Provide fallback rendering during server-side rendering
+- ✅ Handle dynamic imports and code splitting properly
 
 ## License
 

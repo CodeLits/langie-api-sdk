@@ -1,6 +1,6 @@
 {
 	"name": "langie-api-sdk",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Lightweight translation SDK for Vue.js applications",
 	"type": "module",
 	"main": "dist/index.cjs",
@@ -77,6 +77,8 @@
 		"vue": "^3.0.0"
 	},
 	"dependencies": {
-		"client-only": "^0.0.1"
+		"client-only": "^0.0.1",
+		"fuse.js": "^7.1.0",
+		"vue-select": "^3.20.4"
 	}
 }

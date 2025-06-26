@@ -107,6 +107,40 @@ TRANSLATOR_API_KEY=your-api-key
 MIN_LANGUAGE_POPULARITY=0.1
 ```
 
+## SSR and Nuxt.js Support
+
+The SDK automatically detects and handles SSR environments:
+
+```vue
+<!-- In Nuxt.js - automatically uses ClientOnly -->
+<template>
+  <div>
+    <lt>Welcome message</lt>
+    <LanguageSelect />
+  </div>
+</template>
+
+<script setup>
+import { LanguageSelect, lt } from 'langie-api-sdk/components'
+</script>
+```
+
+### Manual SSR Control
+
+If you need manual control over SSR behavior:
+
+```vue
+<script setup>
+import { isNuxtEnvironment, shouldUseClientOnly } from 'langie-api-sdk'
+
+// Check if running in Nuxt
+const isNuxt = isNuxtEnvironment()
+
+// Check if component should be client-only
+const useClientOnly = shouldUseClientOnly()
+</script>
+```
+
 ## Next Steps
 
 - Learn about the [Core API](./core-api.md)

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useTranslator } from '@/useTranslator'
-import LanguageSelect from '@/components/LanguageSelect.vue'
+import { useTranslator } from '../../dist/index.mjs'
+import { LanguageSelect } from '../../dist/components/index.mjs'
 
 const {
   translate,
@@ -9,7 +9,9 @@ const {
   availableLanguages,
   setLanguage,
   isLoading: isTranslatorLoading
-} = useTranslator()
+} = useTranslator({
+  translatorHost: 'http://localhost:8081/v1'
+})
 
 const isDark = ref(false)
 const interfaceLang = ref('en')

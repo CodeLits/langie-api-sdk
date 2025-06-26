@@ -28,6 +28,7 @@
 		"src/**/*.tsx",
 		"src/**/*.vue",
 		"src/components/vue-shims.d.ts",
+		"src/components/vue-select.d.ts",
 		"vite.config.ts"
 	],
 	"exclude": [
