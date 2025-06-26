@@ -1,12 +1,5 @@
 <template>
-  <!-- Only render on client-side if we're in Nuxt -->
-  <ClientOnly v-if="isNuxt">
-    <transition name="fade" mode="out-in">
-      <span :key="translated">{{ translated }}</span>
-    </transition>
-  </ClientOnly>
-  <!-- Render normally for other frameworks -->
-  <transition v-else name="fade" mode="out-in">
+  <transition name="fade" mode="out-in">
     <span :key="translated">{{ translated }}</span>
   </transition>
 </template>
@@ -60,14 +53,12 @@ const keyStr = computed(() => {
 })
 
 const translated = computed(() => {
-  // To prevent SSR hydration mismatches, render the untranslated key on the server.
-  if (typeof window === 'undefined') return keyStr.value
-
-  // For Nuxt, ensure we're on client-side before translating
+  // To prevent SSR hydration mismatches in Nuxt, render the untranslated key on the server
   if (isNuxt.value && typeof window === 'undefined') {
     return keyStr.value
   }
 
+  // For other frameworks, always translate
   return l(keyStr.value, props.ctx, props.orig)
 })
 </script>

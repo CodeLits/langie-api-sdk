@@ -1,10 +1,10 @@
 <template>
   <v-select
-    :key="props.languages?.length || 0"
+    :key="validLanguages.length || 0"
     class="language-select"
     :value="modelValue"
     :reduce="(option) => option.value"
-    :options="props.languages"
+    :options="validLanguages"
     :get-option-label="(option) => displayName(option)"
     :get-option-key="(option) => option.value"
     searchable
@@ -49,7 +49,7 @@
 
 import 'vue-select/dist/vue-select.css'
 import type { PropType } from 'vue'
-import { watch } from 'vue'
+import { watch, computed } from 'vue'
 import vSelect from 'vue-select'
 import Fuse from 'fuse.js'
 import { applyLanguageAlias } from '../composables/search-utils.js'
@@ -70,11 +70,17 @@ const props = defineProps({
   },
   languages: {
     type: Array as PropType<LanguageOption[]>,
-    required: true
+    required: true,
+    default: () => []
   }
 })
 
 const emit = defineEmits(['update:modelValue'])
+
+// Ensure languages array is always valid
+const validLanguages = computed(() => {
+  return Array.isArray(props.languages) ? props.languages : []
+})
 
 // Derive display label robustly handling non-string values
 const displayName = (opt: LanguageOption | null | undefined): string => {
@@ -139,7 +145,7 @@ const fuseSearch = (options: LanguageOption[], search: string): LanguageOption[]
   combined.push(...primary.slice(1))
   combined.push(...secondary.slice(2))
 
-  return combined.length ? combined : options
+  return combined.length ? combined : validLanguages.value
 }
 
 // ---------------------------------------------------------------------------

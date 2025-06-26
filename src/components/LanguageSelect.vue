@@ -1,50 +1,18 @@
 <template>
-  <!-- Use ClientOnly for Nuxt environments -->
-  <ClientOnly v-if="isNuxt">
-    <v-select
-      :value="modelValue"
-      @input="handleChange"
-      :options="searchableLanguages"
-      :filterable="false"
-      :searchable="true"
-      @search="onSearch"
-      :reduce="reduceValue"
-      label="label"
-      placeholder="Select language"
-      class="language-select"
-    >
-      <template #option="option">
-        <div class="flex items-center space-x-2">
-          <span v-if="option.flag" class="text-lg">{{ getFlag(option.flag) }}</span>
-          <span>{{ option.label }}</span>
-        </div>
-      </template>
-      <template #selected-option="option">
-        <div class="flex items-center space-x-2">
-          <span v-if="option.flag" class="text-lg">{{ getFlag(option.flag) }}</span>
-          <span>{{ option.label }}</span>
-        </div>
-      </template>
-    </v-select>
-    <template #fallback>
-      <select
-        :value="modelValue"
-        @change="handleFallbackChange"
-        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-      >
-        <option value="" disabled>Select language</option>
-        <option
-          v-for="language in processedLanguages"
-          :key="language.value"
-          :value="language.value"
-        >
-          {{ language.label }}
-        </option>
-      </select>
-    </template>
-  </ClientOnly>
+  <!-- Show simple select on server-side for Nuxt SSR -->
+  <select
+    v-if="isNuxt && isServerSide"
+    :value="modelValue"
+    @change="handleFallbackChange"
+    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+  >
+    <option value="" disabled>Select language</option>
+    <option v-for="language in processedLanguages" :key="language.value" :value="language.value">
+      {{ language.label }}
+    </option>
+  </select>
 
-  <!-- Render normally for other frameworks -->
+  <!-- Show vue-select on client-side or non-Nuxt environments -->
   <v-select
     v-else
     :value="modelValue"
@@ -127,6 +95,11 @@ const isNuxt = computed(() => {
     return !!(process.env as any).NUXT_SSR_BASE || !!(process.env as any).NUXT_PUBLIC_BASE_URL
   }
   return false
+})
+
+// Check if we're on server-side
+const isServerSide = computed(() => {
+  return typeof window === 'undefined'
 })
 
 const searchTerm = ref('')
