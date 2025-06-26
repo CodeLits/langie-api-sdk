@@ -1,49 +1,47 @@
 <template>
-  <ClientOnly fallback-tag="div">
-    <v-select
-      :key="props.languages?.length || 0"
-      class="language-select"
-      :value="modelValue"
-      :reduce="reduceValue"
-      :options="props.languages"
-      :get-option-label="displayName"
-      :get-option-key="optionKey"
-      searchable
-      :clearable="false"
-      :filter="fuseSearch"
-      @input="handleSelect"
-    >
-      <template #option="option">
-        <div v-if="option" class="flex items-center gap-2">
-          <img
-            v-if="getFlagCode(option, 0)"
-            :src="`https://flagcdn.com/${getFlagCode(option, 0)}.svg`"
-            :alt="option?.native_name"
-            class="w-5 h-4 mr-2 inline-block"
-          />
-          <span>{{ displayName(option) }}</span>
-        </div>
+  <v-select
+    :key="props.languages?.length || 0"
+    class="language-select"
+    :value="modelValue"
+    :reduce="(option) => option.value"
+    :options="props.languages"
+    :get-option-label="(option) => displayName(option)"
+    :get-option-key="(option) => option.value"
+    searchable
+    :clearable="false"
+    :filter="fuseSearch"
+    @input="handleSelect"
+  >
+    <template #option="{ option }">
+      <div v-if="option" class="flex items-center gap-2">
+        <img
+          v-if="getFlagCode(option as LanguageOption, 0)"
+          :src="`https://flagcdn.com/${getFlagCode(option as LanguageOption, 0)}.svg`"
+          :alt="(option as LanguageOption)?.native_name"
+          class="w-5 h-4 mr-2 inline-block"
+        />
+        <span>{{ displayName(option as LanguageOption) }}</span>
+      </div>
+    </template>
+    <template #selected-option="{ option }">
+      <div v-if="option" class="flex items-center gap-2">
+        <img
+          v-if="getFlagCode(option as LanguageOption, 0)"
+          :src="`https://flagcdn.com/${getFlagCode(option as LanguageOption, 0)}.svg`"
+          :alt="(option as LanguageOption)?.native_name"
+          class="w-5 h-4 mr-2 inline-block"
+        />
+        <span>{{ displayName(option as LanguageOption) }}</span>
+      </div>
+    </template>
+    <template #no-options="{ search, searching }">
+      <template v-if="searching">
+        No results found for <em>{{ search }}</em
+        >.
       </template>
-      <template #selected-option="option">
-        <div v-if="option" class="flex items-center gap-2">
-          <img
-            v-if="getFlagCode(option, 0)"
-            :src="`https://flagcdn.com/${getFlagCode(option, 0)}.svg`"
-            :alt="option?.native_name"
-            class="w-5 h-4 mr-2 inline-block"
-          />
-          <span>{{ displayName(option) }}</span>
-        </div>
-      </template>
-      <template #no-options="{ search, searching }">
-        <template v-if="searching">
-          No results found for <em>{{ search }}</em
-          >.
-        </template>
-        <em v-else style="opacity: 0.5">Start typing to search for a language.</em>
-      </template>
-    </v-select>
-  </ClientOnly>
+      <em v-else style="opacity: 0.5">Start typing to search for a language.</em>
+    </template>
+  </v-select>
 </template>
 
 <script lang="ts" setup>
@@ -112,27 +110,30 @@ const fuseSearch = (options: LanguageOption[], search: string): LanguageOption[]
   const aliasTerms = Array.isArray(aliasResult) ? aliasResult : [aliasResult]
 
   // Build separate result sets for raw term and alias terms
-  const fuse = new Fuse(options, {
+  const fuse = new Fuse(options as any[], {
     keys: ['native_name', 'name', 'label'],
     shouldSort: true
   })
 
   // Primary results from raw input
-  const primary = rawLower ? fuse.search(rawLower).map(({ item }) => item) : []
+  const primary = rawLower ? fuse.search(rawLower).map(({ item }) => item as LanguageOption) : []
 
   // Secondary results from alias terms (deduplicated)
-  const secondarySet = new Map()
+  const secondarySet = new Map<string, LanguageOption>()
   for (const term of aliasTerms) {
     if (!term || term === rawLower) continue
     fuse.search(term).forEach(({ item }) => {
+      const languageItem = item as LanguageOption
       // Skip if already in primary list
-      if (!primary.find((p) => p.value === item.value)) secondarySet.set(item.value, item)
+      if (!primary.find((p) => p.value === languageItem.value)) {
+        secondarySet.set(languageItem.value, languageItem)
+      }
     })
   }
   const secondary = Array.from(secondarySet.values())
 
   // Interleave: primary top result + up to 2 secondary alias hits, then rest of primary, then remaining secondary
-  const combined = []
+  const combined: LanguageOption[] = []
   if (primary.length) combined.push(primary[0])
   combined.push(...secondary.slice(0, 2))
   combined.push(...primary.slice(1))
@@ -140,12 +141,6 @@ const fuseSearch = (options: LanguageOption[], search: string): LanguageOption[]
 
   return combined.length ? combined : options
 }
-
-// ---------------------------------------------------------------------------
-// Helper callbacks typed to satisfy TypeScript in template
-
-const reduceValue = (option: LanguageOption): string => option.value
-const optionKey = (option: LanguageOption): string => option.value
 
 // ---------------------------------------------------------------------------
 // Developer aid: surface language / translation loading issues in the console
