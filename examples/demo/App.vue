@@ -3,8 +3,8 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { useTranslator, DEV_API_HOST } from '../../dist/index.mjs'
 // Import the component directly from source for demo
 import lt from '../../src/components/lt.vue'
-// Import the new LanguageSelect component
-import LanguageSelect from './components/LanguageSelect.vue'
+// Import LanguageSelect from the main package
+import LanguageSelect from '../../src/components/LanguageSelect.vue'
 
 const {
   translate,

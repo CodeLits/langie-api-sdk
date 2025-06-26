@@ -6,7 +6,7 @@
       "dependencies": {
         "client-only": "^0.0.1",
         "fuse.js": "^7.1.0",
-        "vue-select": "^3.20.4",
+        "vue3-select-component": "^0.11.7",
       },
       "devDependencies": {
         "@testing-library/vue": "^8.1.0",
@@ -820,7 +820,7 @@
 
     "vue-eslint-parser": ["vue-eslint-parser@9.4.3", "", { "dependencies": { "debug": "^4.3.4", "eslint-scope": "^7.1.1", "eslint-visitor-keys": "^3.3.0", "espree": "^9.3.1", "esquery": "^1.4.0", "lodash": "^4.17.21", "semver": "^7.3.6" }, "peerDependencies": { "eslint": ">=6.0.0" } }, "sha512-2rYRLWlIpaiN8xbPiDyXZXRgLGOtWxERV7ND5fFAv5qo1D2N9Fu9MNajBNc6o13lZ+24DAWCkQCvj4klgmcITg=="],
 
-    "vue-select": ["vue-select@3.20.4", "", { "peerDependencies": { "vue": "2.x" } }, "sha512-pXIsDUnBR1075qHNEM7mKgX7YnHI3MfCO+7VmXSA1Hywplpqi52jOa0j6EHWQU6MnaW/mBZPuaQtgp3yvks2Kw=="],
+    "vue3-select-component": ["vue3-select-component@0.11.7", "", { "peerDependencies": { "vue": "^3.5.0" } }, "sha512-t0Ca2tu1S9haee9w1SZVEPOuEHulPvQHjy2s0JB8TaClpLesDf2C4MuQDEY5FOqqi+WAzlPLdXat6dguOfZt9Q=="],
 
     "w3c-xmlserializer": ["w3c-xmlserializer@5.0.0", "", { "dependencies": { "xml-name-validator": "^5.0.0" } }, "sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA=="],
 

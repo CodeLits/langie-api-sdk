@@ -11,7 +11,8 @@ const ALIAS_TABLE: AliasEntry[] = [
   {
     lang: 'english',
     match: [
-      'english',
+      'eng',
+      'en', // Language code and abbreviation
       'united states',
       'united states of america',
       'usa',
@@ -27,18 +28,150 @@ const ALIAS_TABLE: AliasEntry[] = [
       'uk'
     ]
   },
-  { lang: 'spanish', match: ['spain', 'español', 'mexico', 'mexican'] },
-  { lang: 'french', match: ['france', 'français', 'canada', 'canadian', 'quebec'] },
+  {
+    lang: 'spanish',
+    match: [
+      'spa',
+      'es', // Language code and abbreviation
+      'spain',
+      'español',
+      'mexico',
+      'mexican'
+    ]
+  },
+  {
+    lang: 'french',
+    match: [
+      'fra',
+      'fr', // Language code and abbreviation
+      'france',
+      'français',
+      'canada',
+      'canadian',
+      'quebec'
+    ]
+  },
   {
     lang: 'german',
-    match: ['germany', 'deutsch', 'austria', 'austrian', 'switzerland', 'swiss german']
+    match: [
+      'ger',
+      'de', // Language code and abbreviation
+      'germany',
+      'deutsch',
+      'austria',
+      'austrian',
+      'switzerland',
+      'swiss german'
+    ]
   },
-  { lang: 'italian', match: ['italy', 'italiano', 'swiss italian'] },
-  { lang: 'portuguese', match: ['portugal', 'brazil', 'brazilian', 'braz'] },
-  { lang: 'russian', match: ['russia', 'belarus', 'kazakhstan', 'ukraine'] },
-  { lang: 'chinese', match: ['china', 'mandarin', 'zhongwen'] },
-  { lang: 'japanese', match: ['japan', 'nihongo'] },
-  { lang: 'korean', match: ['korea', 'hangul'] }
+  {
+    lang: 'italian',
+    match: [
+      'ita',
+      'it', // Language code and abbreviation
+      'italy',
+      'italiano',
+      'swiss italian'
+    ]
+  },
+  {
+    lang: 'portuguese',
+    match: [
+      'por',
+      'pt', // Language code and abbreviation
+      'portugal',
+      'brazil',
+      'brazilian',
+      'braz'
+    ]
+  },
+  {
+    lang: 'russian',
+    match: [
+      'rus',
+      'ru', // Language code and abbreviation
+      'russia',
+      'belarus',
+      'kazakhstan',
+      'ukraine'
+    ]
+  },
+  {
+    lang: 'chinese',
+    match: [
+      'chi',
+      'zh',
+      'zh-cn',
+      'cn', // Language codes and abbreviations
+      'china',
+      'mandarin',
+      'zhongwen'
+    ]
+  },
+  {
+    lang: 'japanese',
+    match: [
+      'jpn',
+      'ja',
+      'jp', // Language codes and abbreviations
+      'japan',
+      'nihongo'
+    ]
+  },
+  {
+    lang: 'korean',
+    match: [
+      'kor',
+      'ko',
+      'kr', // Language codes and abbreviations
+      'korea',
+      'hangul'
+    ]
+  },
+  {
+    lang: 'dutch',
+    match: [
+      'dut',
+      'nl', // Language code and abbreviation
+      'netherlands',
+      'holland'
+    ]
+  },
+  {
+    lang: 'polish',
+    match: [
+      'pol',
+      'pl', // Language code and abbreviation
+      'poland'
+    ]
+  },
+  {
+    lang: 'turkish',
+    match: [
+      'tur',
+      'tr', // Language code and abbreviation
+      'turkey'
+    ]
+  },
+  {
+    lang: 'arabic',
+    match: [
+      'ara',
+      'ar', // Language code and abbreviation
+      'arab',
+      'saudi',
+      'egypt'
+    ]
+  },
+  {
+    lang: 'hindi',
+    match: [
+      'hin',
+      'hi', // Language code and abbreviation
+      'india',
+      'indian'
+    ]
+  }
 ]
 
 export function applyLanguageAlias(term = ''): string | string[] {
