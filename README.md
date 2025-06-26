@@ -9,14 +9,11 @@ A lightweight, flexible translation SDK for Vue.js applications. Easily integrat
 
 **[Try the live demo →](https://langie-demo.netlify.app/)**
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/VivaProgress/langie-api-sdk)
-
 Experience all features including:
 
 - Language selection with flags and native names
 - Real-time translation
 - Search functionality with intelligent aliases
-- Dark/light theme toggle
 - Responsive design
 
 ## Features
