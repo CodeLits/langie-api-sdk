@@ -91,7 +91,7 @@ const ALIAS_TABLE: AliasEntry[] = [
       'ru', // Language code and abbreviation
       'russia',
       'belarus',
-      'kazakhstan'
+      'kazakh'
     ]
   },
   {
