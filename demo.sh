@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Langie API SDK Demo Launcher
-# This script builds the package and starts the demo application
+# This script starts the demo application in development mode.
+# It relies on Vite to handle source files directly for hot-reloading.
 
 set -e
 
@@ -14,9 +15,10 @@ if [ ! -f "package.json" ]; then
     exit 1
 fi
 
-# Build the package
-echo "📦 Building package..."
-bun run build
+# In dev mode, we no longer need to build the package first.
+# Vite will resolve dependencies from the source files.
+# echo "📦 Building package..."
+# bun run build
 
 # Navigate to demo directory
 cd examples/demo
