@@ -2,47 +2,58 @@
 
 🚀 **Live Demo: [https://langie-demo.netlify.app/](https://langie-demo.netlify.app/)**
 
-Это демо-приложение для демонстрации всех возможностей Langie API SDK в браузере.
+This demo application showcases all the capabilities of the Langie API SDK in a browser environment.
 
-## Как запустить
+## How to Run Locally
 
-### С помощью Node.js (рекомендуется)
+### Using Bun (Recommended)
+
+```bash
+# From project root
+./demo.sh
+```
+
+This will start the development server at http://localhost:5174
+
+### Manual Setup
 
 ```bash
 cd examples/demo
-npx serve .
+bun install
+bun run dev
 ```
 
-Затем откройте браузер на http://localhost:3000
-
-### Альтернативный способ
+### Using Node.js
 
 ```bash
 cd examples/demo
-npx http-server .
+npm install
+npm run dev
 ```
 
-### С помощью Live Server (VS Code)
+### Production Build
 
-1. Установите расширение "Live Server" в VS Code
-2. Откройте файл `index.html`
-3. Нажмите правой кнопкой и выберите "Open with Live Server"
+```bash
+cd examples/demo
+bun run build
+bun run preview
+```
 
-## Возможности демо
+## Demo Features
 
-- **Полнофункциональный переводчик** с реальным API (https://api.langie.uk/v1/)
-- **Выбор языка интерфейса** с поиском и флагами стран
-- **184+ языка** включая редкие языки (казахский, узбекский, татарский и др.)
-- **Умный поиск языков** с алиасами и синонимами
-- **Обмен языков** одним кликом
-- **Темная/светлая тема** с автоматическим определением системных настроек
-- **Адаптивный дизайн** для мобильных устройств
-- **Сохранение настроек** в localStorage
-- **Индикатор статуса API** и обработка ошибок
+- **Full-featured translator** with real API (https://api.langie.uk/v1/)
+- **Interface language selection** with search and country flags
+- **184+ languages** including rare languages (Kazakh, Uzbek, Tatar, etc.)
+- **Smart language search** with aliases and synonyms
+- **Language swapping** with one click
+- **Dark/light theme** with automatic system preference detection
+- **Responsive design** for mobile devices
+- **Settings persistence** in localStorage
+- **API status indicator** and error handling
 
-## Тестовые фразы
+## Test Phrases
 
-Попробуйте перевести эти фразы с помощью реального API:
+Try translating these phrases using the real API:
 
 - "Hello, how are you today?"
 - "Welcome to our application"
@@ -50,13 +61,13 @@ npx http-server .
 - "The weather is beautiful today"
 - "Thank you for using our service"
 
-Все переводы выполняются через продакшн API с поддержкой 184+ языков.
+All translations are performed through the production API with support for 184+ languages.
 
-## Архитектура демо
+## Demo Architecture
 
-Демо-приложение автоматически определяет окружение:
+The demo application automatically detects the environment:
 
-- **Development** (`npm run dev`): использует `http://localhost:8081/v1`
-- **Production** (Netlify): использует `https://api.langie.uk/v1/`
+- **Development** (`bun run dev`): uses `http://localhost:8081/v1`
+- **Production** (Netlify): uses `https://api.langie.uk/v1/`
 
-Это позволяет разработчикам тестировать с локальным API, а пользователям пользоваться продакшн версией.
+This allows developers to test with a local API while users experience the production version.
