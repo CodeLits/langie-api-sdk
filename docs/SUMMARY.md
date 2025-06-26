@@ -15,6 +15,7 @@ The documentation is organized into the following sections:
 5. **[Advanced Usage](./advanced-usage.md)** - Advanced patterns and techniques
 6. **[Backend Integration](./backend-integration.md)** - Setting up a translation service
 7. **[TypeScript Support](./typescript.md)** - Using the SDK with TypeScript
+8. **[Contributing](./contributing.md)** - Development and contribution guidelines
 
 ## Key Features
 
@@ -56,7 +57,7 @@ const { translate } = useTranslator({
 
 ## Contributing
 
-We welcome contributions to the Langie API SDK! Please see the [Contributing Guide](/CONTRIBUTING.md) for more information.
+We welcome contributions to the Langie API SDK! Please see the [Contributing Guide](./contributing.md) for more information.
 
 ## License
 
