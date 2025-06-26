@@ -10,7 +10,7 @@
     searchable
     :clearable="false"
     :filterable="true"
-    :filterBy="filterByFn"
+    :filter="filterFn"
   >
     <template #option="{ option }">
       <div v-if="option" class="flex items-center gap-2">
@@ -50,6 +50,7 @@
 import 'vue-select/dist/vue-select.css'
 import type { PropType } from 'vue'
 import { computed } from 'vue'
+import Fuse from 'fuse.js'
 import { applyLanguageAlias } from '../composables/search-utils.js'
 
 interface LanguageOption {
@@ -57,6 +58,7 @@ interface LanguageOption {
   name?: string
   native_name?: string
   label?: string
+  code?: string
   flag?: string | string[]
 }
 
@@ -88,7 +90,7 @@ const selectedValue = computed({
 
 // Functions for vue3-select-component
 const getOptionValueFn = (option: LanguageOption): string => {
-  return option?.value || ''
+  return option?.value || option?.code || ''
 }
 
 const getOptionLabelFn = (option: LanguageOption): string => {
@@ -117,21 +119,73 @@ const getFlagCode = (option: LanguageOption | null | undefined): string => {
   return ''
 }
 
-// Simple filter function for vue3-select-component
-const filterByFn = (option: LanguageOption, search: string): boolean => {
-  if (!search) return true
+// Filter function using both Fuse.js and search-utils.js
+const filterFn = (options: LanguageOption[], search: string): LanguageOption[] => {
+  if (!search || !Array.isArray(options)) return options
 
   try {
+    // Use applyLanguageAlias to get canonical language names or aliases
     const aliasResult = applyLanguageAlias(search)
-    const searchTerms = Array.isArray(aliasResult) ? aliasResult : [aliasResult]
-    searchTerms.push(search) // Add original search term
+    let searchTerms: string[] = []
 
-    const optionText = getOptionLabelFn(option).toLowerCase()
+    if (Array.isArray(aliasResult)) {
+      searchTerms = aliasResult
+    } else {
+      searchTerms = [aliasResult]
+    }
 
-    return searchTerms.some((term) => term && optionText.includes(term.toLowerCase()))
+    // Also include the original search term
+    searchTerms.push(search)
+
+    // Create Fuse instance for fuzzy searching with all possible fields
+    const fuse = new Fuse(options, {
+      keys: ['native_name', 'name', 'label', 'code', 'value'],
+      threshold: 0.4, // Slightly more permissive
+      includeScore: true,
+      shouldSort: true,
+      includeMatches: false,
+      ignoreLocation: true, // Ignore position of match within string
+      minMatchCharLength: 2 // Allow shorter matches
+    })
+
+    // Collect results from all search terms
+    const resultMap = new Map<string, { option: LanguageOption; score: number }>()
+
+    for (const term of searchTerms) {
+      if (!term) continue
+
+      // Perform fuzzy search with Fuse.js
+      const fuseResults = fuse.search(term)
+
+      for (const result of fuseResults) {
+        const option = result.item
+        const optionKey = getOptionValueFn(option)
+        const score = result.score || 0
+
+        // Keep the best (lowest) score for each option
+        if (!resultMap.has(optionKey) || score < resultMap.get(optionKey)!.score) {
+          resultMap.set(optionKey, { option, score })
+        }
+      }
+    }
+
+    // Convert map to array and sort by score (lower is better)
+    const finalResults = Array.from(resultMap.values())
+      .sort((a, b) => a.score - b.score)
+      .map((item) => item.option)
+
+    // Return results or fallback to simple text search if no fuzzy matches
+    return finalResults.length > 0
+      ? finalResults
+      : options.filter((option) =>
+          getOptionLabelFn(option).toLowerCase().includes(search.toLowerCase())
+        )
   } catch (error) {
     console.warn('[LanguageSelect] Search error:', error)
-    return getOptionLabelFn(option).toLowerCase().includes(search.toLowerCase())
+    // Fallback to simple text matching
+    return options.filter((option) =>
+      getOptionLabelFn(option).toLowerCase().includes(search.toLowerCase())
+    )
   }
 }
 </script>
