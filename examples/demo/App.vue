@@ -271,20 +271,6 @@ watch(textToTranslate, (val) => {
   localStorage.setItem('translateText', val)
 })
 
-// Fallback language options when API languages aren't loaded
-const simpleLanguages = [
-  { value: 'en', label: 'English' },
-  { value: 'ru', label: 'Russian' },
-  { value: 'es', label: 'Spanish' },
-  { value: 'fr', label: 'French' },
-  { value: 'de', label: 'German' },
-  { value: 'it', label: 'Italian' },
-  { value: 'pt', label: 'Portuguese' },
-  { value: 'ja', label: 'Japanese' },
-  { value: 'ko', label: 'Korean' },
-  { value: 'zh', label: 'Chinese' }
-]
-
 // Use API languages when available, fallback to simple languages
 const displayLanguages = computed(() => {
   if (availableLanguages.value && availableLanguages.value.length > 0) {
@@ -294,15 +280,25 @@ const displayLanguages = computed(() => {
       native_name: lang.native_name,
       flag_country: lang.flag_country
     }))
+
+    // Check for Kazakh language
+    const kazakhLang = apiLangs.find(
+      (lang) =>
+        lang.code === 'kk' ||
+        lang.name?.toLowerCase().includes('kazakh') ||
+        lang.native_name?.toLowerCase().includes('қазақ')
+    )
+    if (kazakhLang) {
+      console.log('🇰🇿 Found Kazakh:', kazakhLang)
+    } else {
+      console.log('❌ Kazakh not found in API languages')
+      console.log('Available language codes:', apiLangs.map((l) => l.code).sort())
+    }
+
     return apiLangs
   }
-  const fallbackLangs = simpleLanguages.map((lang) => ({
-    code: lang.value,
-    name: lang.label,
-    native_name: lang.label,
-    flag_country: null
-  }))
-  return fallbackLangs
+  // Return empty array when API languages aren't loaded yet
+  return []
 })
 
 const canRetryLanguages = computed(() => {
@@ -323,27 +319,19 @@ const targetLanguageOptions = computed(() => {
 
 watch(
   displayLanguages,
-  (langs, oldLangs) => {
+  (langs) => {
     if (langs.length > 0) {
-      // Check if we're switching from fallback to API languages
-      const switchingToApi =
-        availableLanguages.value &&
-        availableLanguages.value.length > 0 &&
-        oldLangs &&
-        oldLangs.length > 0 &&
-        !oldLangs[0].flag_country
-
-      if (!interfaceLang.value || switchingToApi) {
+      if (!interfaceLang.value) {
         const savedInterfaceLangCode = localStorage.getItem('interfaceLanguage') || 'en'
         const foundLang = findLang(savedInterfaceLangCode)
         interfaceLang.value = foundLang
       }
-      if (!sourceLang.value || switchingToApi) {
+      if (!sourceLang.value) {
         const savedSourceLangCode = localStorage.getItem('sourceLang') || 'en'
         const foundLang = findLang(savedSourceLangCode)
         sourceLang.value = foundLang
       }
-      if (!targetLang.value || switchingToApi) {
+      if (!targetLang.value) {
         const savedTargetLangCode = localStorage.getItem('targetLang') || 'es'
         const foundLang = findLang(savedTargetLangCode)
         targetLang.value = foundLang
