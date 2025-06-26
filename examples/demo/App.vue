@@ -152,6 +152,7 @@ const handleTranslate = async () => {
       sourceLang.value?.code,
       targetLang.value?.code
     )
+
     if (Array.isArray(result) && result.length > 0) {
       translation.value = result[0].text
     } else if (typeof result === 'string') {
@@ -160,7 +161,7 @@ const handleTranslate = async () => {
       translation.value = 'Translation returned an unexpected format.'
     }
   } catch (err) {
-    console.error('Translation error:', err)
+    console.error('❌ Translation error:', err)
 
     if (
       err.message?.includes('429') ||
@@ -209,6 +210,12 @@ const retryFetchLanguages = async () => {
   }
 }
 
+const swapLanguages = () => {
+  const temp = sourceLang.value
+  sourceLang.value = targetLang.value
+  targetLang.value = temp
+}
+
 watch(
   interfaceLang,
   (newLang) => {
@@ -225,6 +232,16 @@ watch(
   (newLang) => {
     if (newLang && newLang.code) {
       localStorage.setItem('sourceLang', newLang.code)
+
+      // If target language is the same as source, change it to a different one
+      if (targetLang.value && targetLang.value.code === newLang.code) {
+        const alternativeLang = displayLanguages.value.find(
+          (lang) => lang.code !== newLang.code && lang.code !== 'auto'
+        )
+        if (alternativeLang) {
+          targetLang.value = alternativeLang
+        }
+      }
     }
   },
   { deep: true }
@@ -287,6 +304,12 @@ const canRetryLanguages = computed(() => {
 })
 
 const findLang = (code) => displayLanguages.value.find((l) => l.code === code) || null
+
+const targetLanguageOptions = computed(() => {
+  return displayLanguages.value.filter(
+    (lang) => !sourceLang.value || lang.code !== sourceLang.value.code
+  )
+})
 
 watch(
   displayLanguages,
@@ -392,30 +415,54 @@ watch(
         <lt orig="en">Translation</lt>
       </h2>
 
-      <div class="grid grid-cols-2 gap-4 mb-6">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            <lt orig="en">Source Language</lt>
-          </label>
-          <LanguageSelect
-            v-model="sourceLang"
-            placeholder="Source Language"
-            :disabled="isLoading"
-            :is-dark="isDark"
-            :languages="displayLanguages"
-          />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            <lt orig="en">Target Language</lt>
-          </label>
-          <LanguageSelect
-            v-model="targetLang"
-            placeholder="Target Language"
-            :disabled="isLoading"
-            :is-dark="isDark"
-            :languages="displayLanguages.filter((l) => l.code !== sourceLang)"
-          />
+      <div class="mb-6">
+        <div class="grid grid-cols-5 gap-4 items-end">
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <lt orig="en">Source Language</lt>
+            </label>
+            <LanguageSelect
+              v-model="sourceLang"
+              placeholder="Source Language"
+              :disabled="isLoading"
+              :is-dark="isDark"
+              :languages="displayLanguages"
+            />
+          </div>
+          <div class="col-span-1 flex justify-center">
+            <button
+              @click="swapLanguages"
+              :disabled="isLoading || !sourceLang || !targetLang"
+              class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+              :title="l('Swap languages')"
+            >
+              <svg
+                class="w-5 h-5 text-gray-600 dark:text-gray-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m0-4l4-4"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <lt orig="en">Target Language</lt>
+            </label>
+            <LanguageSelect
+              v-model="targetLang"
+              placeholder="Target Language"
+              :disabled="isLoading"
+              :is-dark="isDark"
+              :languages="targetLanguageOptions"
+            />
+          </div>
         </div>
       </div>
 
