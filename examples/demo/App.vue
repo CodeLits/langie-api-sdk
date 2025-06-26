@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useTranslator, DEV_API_HOST } from '../../dist/index.mjs'
+import { useTranslator, DEV_API_HOST } from '@/index'
 // Import the component directly from source for demo
-import lt from '../../src/components/lt.vue'
+import lt from '@/components/lt.vue'
 // Import LanguageSelect from the main package
-import LanguageSelect from '../../src/components/LanguageSelect.vue'
+import LanguageSelect from '@/components/LanguageSelect.vue'
 
 const {
   translate,
@@ -376,19 +376,6 @@ const canRetryLanguages = computed(() => {
         class="mt-6 p-4 bg-red-50 text-red-700 dark:bg-red-900 dark:text-red-300 rounded-md"
       >
         {{ error }}
-      </div>
-
-      <!-- Debug info -->
-      <div v-if="isMounted" class="mt-4 text-xs text-gray-500 dark:text-gray-400">
-        <p>Dark Mode: {{ isDark ? 'ON' : 'OFF' }}</p>
-        <p>Translation Service: {{ serviceStatus }}</p>
-        <p>
-          Display Languages: {{ displayLanguages.length }}
-          {{ availableLanguages.length > 0 ? '(from API)' : '(fallback)' }}
-        </p>
-        <p>API Languages: {{ availableLanguages.length }}</p>
-        <p>Current Language: {{ currentLanguage }}</p>
-        <p v-if="rateLimited">Rate Limited: {{ !isRateLimitExpired ? 'Active' : 'Expired' }}</p>
       </div>
     </div>
   </div>

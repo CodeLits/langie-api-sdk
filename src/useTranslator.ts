@@ -9,6 +9,9 @@ const translations: { [key: string]: string } = reactive({})
 const uiTranslations: { [key: string]: string } = reactive({})
 const currentLanguage: Ref<string> = ref('en')
 
+// Global state for the translator host
+let _translatorHost: string = DEFAULT_API_HOST
+
 // Prevent repeated auto-selection of interface language
 let _autoSelected = false
 
@@ -17,7 +20,13 @@ let _languagesCache: TranslatorLanguage[] | null = null
 let _languagesPromise: Promise<TranslatorLanguage[]> | null = null
 
 export function useTranslator(options: TranslatorOptions = {}) {
-  const translatorHost = options.translatorHost || DEFAULT_API_HOST
+  // If a host is provided in options, it overrides the global host for all instances.
+  // This ensures that the first initialization (e.g., from App.vue) sets the host correctly.
+  if (options.translatorHost) {
+    _translatorHost = options.translatorHost
+  }
+
+  const translatorHost = _translatorHost // Use the shared host
   const defaultLanguage = options.defaultLanguage || 'en'
   const fallbackLanguage = options.fallbackLanguage || 'en'
 

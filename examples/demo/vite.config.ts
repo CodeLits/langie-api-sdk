@@ -6,8 +6,17 @@ import { resolve } from 'path'
 export default defineConfig({
   plugins: [vue()],
   root: resolve(__dirname),
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, '../../src')
+    }
+  },
   server: {
-    port: 5174
+    port: 5174,
+    fs: {
+      // Allow serving files from the project root
+      allow: ['../..']
+    }
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
