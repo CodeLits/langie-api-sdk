@@ -6,7 +6,15 @@
 	<meta name="viewport"
 		content="width=device-width, initial-scale=1.0">
 	<title>Langie API SDK Demo</title>
+	<!-- Using Tailwind CDN for demo purposes only - use proper installation in production -->
 	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		// Initialize dark mode before Vue loads to prevent flash
+		const darkMode = localStorage.getItem('darkMode') === 'true';
+		if (darkMode) {
+			document.documentElement.classList.add('dark');
+		}
+	</script>
 	<style>
 		/* Dark mode styles */
 		.dark {
@@ -19,7 +27,6 @@
 			border: 1px solid #d1d5db;
 			border-radius: 0.375rem;
 			padding: 0.2rem;
-			/* Adjusted padding */
 		}
 
 		.dark .vs__dropdown-toggle {
@@ -31,6 +38,41 @@
 		.dark .vs__search,
 		.dark .vs__selected {
 			color: white;
+		}
+
+		.dark .vs__dropdown-menu {
+			background: #374151;
+			border-color: #4b5563;
+		}
+
+		.dark .vs__option {
+			color: white;
+		}
+
+		.dark .vs__option--highlight {
+			background: #4b5563;
+		}
+
+		/* Loading placeholder styles */
+		.loading-placeholder {
+			background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+			background-size: 200% 100%;
+			animation: loading 1.5s infinite;
+		}
+
+		.dark .loading-placeholder {
+			background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+			background-size: 200% 100%;
+		}
+
+		@keyframes loading {
+			0% {
+				background-position: 200% 0;
+			}
+
+			100% {
+				background-position: -200% 0;
+			}
 		}
 	</style>
 </head>
