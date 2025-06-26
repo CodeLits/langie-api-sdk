@@ -3,6 +3,8 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { useTranslator, DEV_API_HOST } from '../../dist/index.mjs'
 // Import the component directly from source for demo
 import lt from '../../src/components/lt.vue'
+// Import the new LanguageSelect component
+import LanguageSelect from './components/LanguageSelect.vue'
 
 const {
   translate,
@@ -228,10 +230,18 @@ const displayLanguages = computed(() => {
   if (availableLanguages.value && availableLanguages.value.length > 0) {
     return availableLanguages.value.map((lang) => ({
       value: lang.value || lang.code,
-      label: lang.native_name || lang.name || lang.label || lang.value || lang.code
+      label: lang.native_name || lang.name || lang.label || lang.value || lang.code,
+      name: lang.name,
+      native_name: lang.native_name,
+      flag: lang.flag
     }))
   }
-  return simpleLanguages
+  return simpleLanguages.map((lang) => ({
+    ...lang,
+    name: lang.label,
+    native_name: lang.label,
+    flag: lang.value // Use language code as flag code for simple languages
+  }))
 })
 
 const canRetryLanguages = computed(() => {
@@ -305,14 +315,7 @@ const canRetryLanguages = computed(() => {
             <lt orig="en">Load API Languages</lt>
           </button>
         </div>
-        <select
-          v-model="interfaceLang"
-          class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-        >
-          <option v-for="lang in displayLanguages" :key="lang.value" :value="lang.value">
-            {{ lang.label }}
-          </option>
-        </select>
+        <LanguageSelect v-model="interfaceLang" :languages="displayLanguages" />
       </div>
 
       <h2 class="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-gray-200">
@@ -324,31 +327,16 @@ const canRetryLanguages = computed(() => {
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             <lt orig="en">Source Language</lt>
           </label>
-          <select
-            v-model="sourceLang"
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-          >
-            <option v-for="lang in displayLanguages" :key="lang.value" :value="lang.value">
-              {{ lang.label }}
-            </option>
-          </select>
+          <LanguageSelect v-model="sourceLang" :languages="displayLanguages" />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             <lt orig="en">Target Language</lt>
           </label>
-          <select
+          <LanguageSelect
             v-model="targetLang"
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-          >
-            <option
-              v-for="lang in displayLanguages.filter((l) => l.value !== sourceLang)"
-              :key="lang.value"
-              :value="lang.value"
-            >
-              {{ lang.label }}
-            </option>
-          </select>
+            :languages="displayLanguages.filter((l) => l.value !== sourceLang)"
+          />
         </div>
       </div>
 
