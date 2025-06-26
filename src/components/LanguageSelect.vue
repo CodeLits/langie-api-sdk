@@ -110,7 +110,10 @@ const fuse = computed(() => {
 const selectedLanguage = computed({
   get: () => props.modelValue,
   set: (value) => {
-    emit('update:modelValue', value)
+    console.log('LanguageSelect new value:', value)
+    if (value) {
+      emit('update:modelValue', value)
+    }
   }
 })
 

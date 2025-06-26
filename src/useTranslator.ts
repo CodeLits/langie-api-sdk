@@ -306,21 +306,6 @@ export function useTranslator(options: TranslatorOptions = {}) {
     return undefined
   }
 
-  // Watch for interface language change: refresh languages so ordering adapts
-  watch(
-    () => currentLanguage.value,
-    async (newLang: string) => {
-      // Only refetch if we already have languages and newLang differs
-      if (!availableLanguages.value || availableLanguages.value.length === 0) return
-      const country = getCountryFromLang(newLang)
-      console.log('[useTranslator] Interface language changed, refetching languages', {
-        newLang,
-        country
-      })
-      await fetchLanguages({ force: true, country })
-    }
-  )
-
   // Watch for interface language change to clear caches
   watch(
     () => currentLanguage.value,

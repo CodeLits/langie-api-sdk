@@ -24,8 +24,7 @@ const ALIAS_TABLE: AliasEntry[] = [
       'britain',
       'british',
       'england',
-      'united kingdom',
-      'uk'
+      'united kingdom'
     ]
   },
   {
@@ -92,8 +91,7 @@ const ALIAS_TABLE: AliasEntry[] = [
       'ru', // Language code and abbreviation
       'russia',
       'belarus',
-      'kazakhstan',
-      'ukraine'
+      'kazakhstan'
     ]
   },
   {
@@ -171,6 +169,10 @@ const ALIAS_TABLE: AliasEntry[] = [
       'india',
       'indian'
     ]
+  },
+  {
+    lang: 'ukrainian',
+    match: ['ukr', 'uk', 'ukraine']
   }
 ]
 

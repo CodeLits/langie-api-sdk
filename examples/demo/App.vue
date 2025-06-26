@@ -94,24 +94,26 @@ onMounted(async () => {
   // Check service health first
   await checkServiceHealth()
 
-  // Only try to fetch languages if service is online and not rate limited
-  if (serviceStatus.value.includes('✅') && !rateLimited.value) {
-    try {
-      await fetchLanguages({ force: true })
-    } catch (err) {
-      console.warn('Failed to fetch languages on mount:', err)
-      // Trigger rate limiting on any fetch failure that could indicate rate limiting
-      if (
-        err.message?.includes('429') ||
-        err.message?.includes('Too Many Requests') ||
-        err.message?.includes('Failed to fetch') ||
-        err.message?.includes('CORS')
-      ) {
-        handleRateLimit()
-        console.log('Rate limiting triggered due to API errors')
-      }
-    }
-  }
+  // The useTranslator composable now handles the initial fetch automatically.
+  // This explicit call is redundant and causes a double-fetch.
+  //
+  // if (serviceStatus.value.includes('✅') && !rateLimited.value) {
+  //   try {
+  //     await fetchLanguages({ force: true })
+  //   } catch (err) {
+  //     console.warn('Failed to fetch languages on mount:', err)
+  //     // Trigger rate limiting on any fetch failure that could indicate rate limiting
+  //     if (
+  //       err.message?.includes('429') ||
+  //       err.message?.includes('Too Many Requests') ||
+  //       err.message?.includes('Failed to fetch') ||
+  //       err.message?.includes('CORS')
+  //     ) {
+  //       handleRateLimit()
+  //       console.log('Rate limiting triggered due to API errors')
+  //     }
+  //   }
+  // }
 
   isMounted.value = true
 })
