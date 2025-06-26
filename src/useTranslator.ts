@@ -88,31 +88,25 @@ export function useTranslator(options: TranslatorOptions = {}) {
         : response.languages || []
 
       // normalise to expected structure
-      const mapped = rawList.map((lang) => {
-        let flags: string[] = []
-        if (Array.isArray(lang.flag_country)) flags = lang.flag_country
-        else if (typeof lang.flag_country === 'string')
-          flags = (lang.flag_country as string)
-            .split(',')
-            .map((c) => c.trim())
-            .filter(Boolean)
+      const mapped: TranslatorLanguage[] = rawList.map((lang: any) => {
+        let flag = lang.flag_country || lang.code
+        if (Array.isArray(flag)) {
+          flag = flag[0]
+        }
         return {
+          ...lang,
           value: lang.code,
-          name: lang.name,
-          native_name: lang.native_name,
-          flag: flags,
-          flag_country: flags,
-          code: lang.code
+          flag_country: flag
         }
       })
 
       // Keep only desired Serbian variants
-      const filtered: TranslatorLanguage[] = mapped.filter((l: any) => {
-        if (l.value.startsWith('sr')) {
-          return l.value === 'sr-latn' || l.value === 'sr-cyrl'
+      const filtered: TranslatorLanguage[] = mapped.filter((l) => {
+        if (l.code.startsWith('sr')) {
+          return l.code === 'sr-latn' || l.code === 'sr-cyrl'
         }
         return true
-      }) as any
+      })
 
       availableLanguages.value = filtered
 
@@ -125,7 +119,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
         const browserCode = locale.split('-')[0]
         console.log('[useTranslator] Browser code', browserCode)
         if (browserCode) {
-          let pick: any = null
+          let pick: TranslatorLanguage | undefined = undefined
           if (browserCode === 'sr') {
             const isLatin = /latn/i.test(locale) || locale === 'sr'
             const target = isLatin ? 'sr-latn' : 'sr-cyrl'
@@ -133,12 +127,12 @@ export function useTranslator(options: TranslatorOptions = {}) {
           } else if (browserCode === 'sh') {
             pick =
               mapped.find((l) => l.value === 'sr-latn') ||
-              mapped.find((l) => l.value.startsWith('sr'))
+              mapped.find((l) => l.code.startsWith('sr'))
           } else {
             pick = mapped.find((l) => l.value === browserCode)
-            if (!pick) pick = mapped.find((l) => l.value.startsWith(browserCode))
+            if (!pick) pick = mapped.find((l) => l.code.startsWith(browserCode))
           }
-          if (pick) setLanguage(pick.value)
+          if (pick && pick.value) setLanguage(pick.value)
         }
         _autoSelected = true
       }
@@ -356,31 +350,38 @@ export function useTranslator(options: TranslatorOptions = {}) {
 
   // ------------------------------------------------------------------
   // Define translate wrapper simplified
-  translate = async (text: string, sourceLang?: string, targetLang?: string, context = 'ui') => {
-    const toLang = targetLang || currentLanguage.value
-    const fromLang = sourceLang === undefined || sourceLang === null ? '' : sourceLang
+  translate = async (
+    text: string | string[],
+    fromLang?: string,
+    toLang?: string
+  ): Promise<string | any[]> => {
+    const texts = Array.isArray(text) ? text : [text]
+    const translations = await fetchAndCacheBatch(
+      texts.map((t) => ({ text: t })),
+      fromLang,
+      toLang || currentLanguage.value
+    )
+    const result = texts.map((t) => translations[t] || t)
+    return Array.isArray(text) ? result : result[0]
+  }
 
-    // If translating to same language, just return text
-    if (fromLang && fromLang === toLang) return text
-
-    const res = await fetchAndCacheBatch([{ text, context }], fromLang, toLang)
-    if (Array.isArray(res) && res.length > 0) {
-      return (res[0] as any).translated || (res[0] as any).t || (res[0] as any).translation || text
-    }
-    return text
+  // Auto-fetch languages on initialization if not already cached/loading
+  if (!_languagesCache && !_languagesPromise) {
+    fetchLanguages()
   }
 
   return {
+    setLanguage,
+    fetchLanguages,
     availableLanguages,
-    translatorHost,
-    translate,
+    currentLanguage,
+    translations,
+    uiTranslations,
     l,
+    getCountryFromLang,
     getTranslation,
     clearTranslations,
-    fetchLanguages,
-    fetchBatchTranslations,
-    currentLanguage,
-    setLanguage,
+    translate,
     isLoading
   }
 }

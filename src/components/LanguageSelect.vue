@@ -5,6 +5,9 @@
       v-model="selectedLanguage"
       :options="filteredLanguages"
       :searchable="true"
+      :canClear="false"
+      :allow-empty="false"
+      :object="true"
       :placeholder="placeholder"
       :disabled="props.disabled"
       :loading="isLoading"
@@ -64,7 +67,7 @@ const getFlagCode = (lang: TranslatorLanguage): string => {
 
 const props = defineProps({
   modelValue: {
-    type: String,
+    type: Object as PropType<TranslatorLanguage | null>,
     default: null
   },
   languages: {

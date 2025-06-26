@@ -19,9 +19,9 @@ const {
 })
 
 const isDark = ref(false)
-const interfaceLang = ref('en')
-const sourceLang = ref('en')
-const targetLang = ref('es')
+const interfaceLang = ref(null)
+const sourceLang = ref(null)
+const targetLang = ref(null)
 const textToTranslate = ref('Welcome to the application!')
 const translation = ref('')
 const error = ref('')
@@ -84,11 +84,12 @@ onMounted(async () => {
   const saved = localStorage.getItem('translateText')
   if (saved) textToTranslate.value = saved
 
-  const savedInterfaceLang = localStorage.getItem('interfaceLanguage')
-  if (savedInterfaceLang) {
-    interfaceLang.value = savedInterfaceLang
-    setLanguage(savedInterfaceLang)
-  }
+  // We will set the language via the watcher once languages are loaded
+  // const savedInterfaceLang = localStorage.getItem('interfaceLanguage')
+  // if (savedInterfaceLang) {
+  //   interfaceLang.value = savedInterfaceLang
+  //   setLanguage(savedInterfaceLang)
+  // }
 
   // Check service health first
   await checkServiceHealth()
@@ -144,7 +145,11 @@ const handleTranslate = async () => {
   translation.value = ''
 
   try {
-    const result = await translate(textToTranslate.value, sourceLang.value, targetLang.value)
+    const result = await translate(
+      textToTranslate.value,
+      sourceLang.value?.code,
+      targetLang.value?.code
+    )
     if (Array.isArray(result) && result.length > 0) {
       translation.value = result[0].text
     } else if (typeof result === 'string') {
@@ -202,10 +207,16 @@ const retryFetchLanguages = async () => {
   }
 }
 
-watch(interfaceLang, (newLang) => {
-  setLanguage(newLang)
-  localStorage.setItem('interfaceLanguage', newLang)
-})
+watch(
+  interfaceLang,
+  (newLang) => {
+    if (newLang && newLang.code) {
+      setLanguage(newLang.code)
+      localStorage.setItem('interfaceLanguage', newLang.code)
+    }
+  },
+  { deep: true }
+)
 
 watch(textToTranslate, (val) => {
   localStorage.setItem('translateText', val)
@@ -250,6 +261,27 @@ const canRetryLanguages = computed(() => {
     (!rateLimited.value || isRateLimitExpired.value)
   )
 })
+
+const findLang = (code) => displayLanguages.value.find((l) => l.code === code) || null
+
+watch(
+  displayLanguages,
+  (langs) => {
+    if (langs.length > 0) {
+      if (!interfaceLang.value) {
+        const savedInterfaceLangCode = localStorage.getItem('interfaceLanguage') || 'en'
+        interfaceLang.value = findLang(savedInterfaceLangCode)
+      }
+      if (!sourceLang.value) {
+        sourceLang.value = findLang('en')
+      }
+      if (!targetLang.value) {
+        targetLang.value = findLang('es')
+      }
+    }
+  },
+  { immediate: true, deep: true }
+)
 </script>
 
 <template>

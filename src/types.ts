@@ -11,6 +11,7 @@ export interface TranslatorLanguage {
   native_name: string
   popularity?: number
   flag_country?: string
+  value?: string
 }
 
 /**
