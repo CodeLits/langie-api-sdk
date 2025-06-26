@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useTranslator } from '../../dist/index.mjs'
+import { useTranslator, DEV_API_HOST } from '../../dist/index.mjs'
 
 const {
   translate,
@@ -9,7 +9,7 @@ const {
   setLanguage,
   isLoading: isTranslatorLoading
 } = useTranslator({
-  translatorHost: 'http://localhost:8081/v1'
+  translatorHost: DEV_API_HOST
 })
 
 const isDark = ref(false)
@@ -20,8 +20,23 @@ const textToTranslate = ref('Welcome to the application!')
 const translation = ref('')
 const error = ref('')
 const isMounted = ref(false)
+const serviceStatus = ref('Checking...')
 
 const isLoading = computed(() => isTranslatorLoading.value)
+
+const checkServiceHealth = async () => {
+  try {
+    const response = await fetch(`${DEV_API_HOST}/health`)
+    if (response.ok) {
+      const data = await response.json()
+      serviceStatus.value = data.status === 'ok' ? '✅ Online' : '⚠️ Issues'
+    } else {
+      serviceStatus.value = '❌ Offline'
+    }
+  } catch (error) {
+    serviceStatus.value = '❌ Offline'
+  }
+}
 
 onMounted(async () => {
   // Initialize dark mode first
@@ -32,6 +47,9 @@ onMounted(async () => {
   // Load saved text
   const saved = localStorage.getItem('translateText')
   if (saved) textToTranslate.value = saved
+
+  // Check service health
+  await checkServiceHealth()
 
   isMounted.value = true
 })
@@ -197,7 +215,7 @@ const simpleLanguages = [
       <!-- Debug info -->
       <div v-if="isMounted" class="mt-4 text-xs text-gray-500 dark:text-gray-400">
         <p>Dark Mode: {{ isDark ? 'ON' : 'OFF' }}</p>
-        <p>Translation Service: Working</p>
+        <p>Translation Service: {{ serviceStatus }}</p>
         <p>Available Languages: {{ simpleLanguages.length }} (simplified)</p>
         <p>API Languages: {{ availableLanguages.length }}</p>
         <p>Current Language: {{ currentLanguage }}</p>
