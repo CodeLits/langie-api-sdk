@@ -290,19 +290,27 @@ const findLang = (code) => displayLanguages.value.find((l) => l.code === code) |
 
 watch(
   displayLanguages,
-  (langs) => {
+  (langs, oldLangs) => {
     if (langs.length > 0) {
-      if (!interfaceLang.value) {
+      // Check if we're switching from fallback to API languages
+      const switchingToApi =
+        availableLanguages.value &&
+        availableLanguages.value.length > 0 &&
+        oldLangs &&
+        oldLangs.length > 0 &&
+        !oldLangs[0].flag_country
+
+      if (!interfaceLang.value || switchingToApi) {
         const savedInterfaceLangCode = localStorage.getItem('interfaceLanguage') || 'en'
         const foundLang = findLang(savedInterfaceLangCode)
         interfaceLang.value = foundLang
       }
-      if (!sourceLang.value) {
+      if (!sourceLang.value || switchingToApi) {
         const savedSourceLangCode = localStorage.getItem('sourceLang') || 'en'
         const foundLang = findLang(savedSourceLangCode)
         sourceLang.value = foundLang
       }
-      if (!targetLang.value) {
+      if (!targetLang.value || switchingToApi) {
         const savedTargetLangCode = localStorage.getItem('targetLang') || 'es'
         const foundLang = findLang(savedTargetLangCode)
         targetLang.value = foundLang

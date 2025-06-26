@@ -2,6 +2,7 @@
   <div class="language-select" :class="{ 'is-dark': isDark }">
     <Multiselect
       v-if="!isLoading && validLanguages.length"
+      :key="multiselectKey"
       v-model="selectedLanguage"
       :options="filteredLanguages"
       :searchable="true"
@@ -21,7 +22,7 @@
         <div class="multiselect-single-label" v-if="value">
           <img
             v-if="value.code"
-            :key="`${value.code}-${value.flag_country || 'fallback'}`"
+            :key="selectedLanguageKey"
             :src="`https://flagcdn.com/${getFlagCode(value)}.svg`"
             class="lang-flag"
             :alt="`${value.name} flag`"
@@ -108,6 +109,18 @@ const fuse = computed(() => {
     threshold: 0.3,
     isCaseSensitive: false
   })
+})
+
+const multiselectKey = computed(() => {
+  // Create a key that changes when the language data structure changes
+  const hasApiData = props.languages.length > 0 && props.languages[0].flag_country !== null
+  return hasApiData ? 'api-data' : 'fallback-data'
+})
+
+const selectedLanguageKey = computed(() => {
+  if (!props.modelValue) return 'no-selection'
+  const key = `${props.modelValue.code}-${props.modelValue.flag_country || 'fallback'}`
+  return key
 })
 
 const selectedLanguage = computed({
