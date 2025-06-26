@@ -133,13 +133,16 @@ const selectedLanguage = computed({
 })
 
 const filteredLanguages = computed(() => {
-  if (!fuse.value) return []
   const query = searchQuery.value.trim()
 
   let results
   if (!query) {
+    // When no search query, return all valid languages (bypass Fuse.js)
     results = validLanguages.value
   } else {
+    // Only use Fuse.js when there's an actual search query
+    if (!fuse.value) return []
+
     // Get the most likely alias or the original term
     const aliasResult = applyLanguageAlias(query)
     const searchTerm = Array.isArray(aliasResult) ? aliasResult[0] : aliasResult
@@ -149,7 +152,11 @@ const filteredLanguages = computed(() => {
   }
 
   // Remove the currently selected language from the options
-  return results.filter((lang) => !props.modelValue || lang.code !== props.modelValue.code)
+  const filtered = results.filter(
+    (lang) => !props.modelValue || lang.code !== props.modelValue.code
+  )
+
+  return filtered
 })
 
 function handleSearch(query: string) {

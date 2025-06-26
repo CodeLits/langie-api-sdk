@@ -281,20 +281,6 @@ const displayLanguages = computed(() => {
       flag_country: lang.flag_country
     }))
 
-    // Check for Kazakh language
-    const kazakhLang = apiLangs.find(
-      (lang) =>
-        lang.code === 'kk' ||
-        lang.name?.toLowerCase().includes('kazakh') ||
-        lang.native_name?.toLowerCase().includes('қазақ')
-    )
-    if (kazakhLang) {
-      console.log('🇰🇿 Found Kazakh:', kazakhLang)
-    } else {
-      console.log('❌ Kazakh not found in API languages')
-      console.log('Available language codes:', apiLangs.map((l) => l.code).sort())
-    }
-
     return apiLangs
   }
   // Return empty array when API languages aren't loaded yet
