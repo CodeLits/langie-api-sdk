@@ -183,8 +183,8 @@ export function applyLanguageAlias(term = ''): string | string[] {
     if (input === alias) return true // exact match
     // Input fully contains the alias (and alias has 3+ chars) → e.g., "germ" vs "german"
     if (alias.length >= 3 && input.length >= alias.length && input.startsWith(alias)) return true
-    // Alias contains the input (user typed prefix, at least 3 chars) → e.g., "kaz" → "kazakhstan"
-    if (input.length >= 3 && alias.startsWith(input)) return true
+    // Alias contains the input (user typed prefix, at least 2 chars) → e.g., "ge" → "german"
+    if (input.length >= 2 && alias.startsWith(input)) return true
     return false
   }
 

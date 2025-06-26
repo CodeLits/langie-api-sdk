@@ -211,6 +211,17 @@ watch(textToTranslate, (val) => {
   localStorage.setItem('translateText', val)
 })
 
+watch(
+  availableLanguages,
+  (newVal) => {
+    console.log('[DEBUG] availableLanguages updated:', JSON.parse(JSON.stringify(newVal)))
+    if (!newVal || newVal.length === 0) {
+      console.log('[DEBUG] availableLanguages is empty or invalid. Using fallback list.')
+    }
+  },
+  { deep: true, immediate: true }
+)
+
 // Fallback language options when API languages aren't loaded
 const simpleLanguages = [
   { value: 'en', label: 'English' },
@@ -229,20 +240,31 @@ const simpleLanguages = [
 const displayLanguages = computed(() => {
   if (availableLanguages.value && availableLanguages.value.length > 0) {
     return availableLanguages.value.map((lang) => ({
-      value: lang.value || lang.code,
-      label: lang.native_name || lang.name || lang.label || lang.value || lang.code,
+      code: lang.code,
       name: lang.name,
-      native_name: lang.native_name,
-      flag: lang.flag
+      native_name: lang.native_name
     }))
   }
   return simpleLanguages.map((lang) => ({
-    ...lang,
+    code: lang.value,
     name: lang.label,
-    native_name: lang.label,
-    flag: lang.value // Use language code as flag code for simple languages
+    native_name: lang.label
   }))
 })
+
+watch(
+  displayLanguages,
+  (newVal) => {
+    console.log('[DEBUG] displayLanguages updated:', JSON.parse(JSON.stringify(newVal)))
+    if (newVal && newVal.length > 0) {
+      console.log(
+        '[DEBUG] First language in displayLanguages:',
+        JSON.parse(JSON.stringify(newVal[0]))
+      )
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 const canRetryLanguages = computed(() => {
   return (
@@ -277,12 +299,22 @@ const canRetryLanguages = computed(() => {
             </a>
           </p>
         </div>
-        <button
-          @click="toggleTheme"
-          class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
-        >
-          {{ isDark ? '☀️' : '🌙' }}
-        </button>
+        <div class="flex items-center space-x-2">
+          <button
+            @click="toggleTheme"
+            class="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900"
+          >
+            <span v-if="isDark">☀️</span>
+            <span v-else>🌙</span>
+          </button>
+          <LanguageSelect
+            v-model="interfaceLang"
+            placeholder="UI Language"
+            :disabled="isLoading"
+            :is-dark="isDark"
+            :languages="displayLanguages"
+          />
+        </div>
       </div>
 
       <!-- API Issues warning -->
@@ -315,7 +347,14 @@ const canRetryLanguages = computed(() => {
             <lt orig="en">Load API Languages</lt>
           </button>
         </div>
-        <LanguageSelect v-model="interfaceLang" :languages="displayLanguages" />
+        <div class="flex items-center space-x-4">
+          <LanguageSelect
+            v-model="interfaceLang"
+            :languages="displayLanguages"
+            :is-dark="isDark"
+            placeholder="UI Language"
+          />
+        </div>
       </div>
 
       <h2 class="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-gray-200">
@@ -327,7 +366,13 @@ const canRetryLanguages = computed(() => {
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             <lt orig="en">Source Language</lt>
           </label>
-          <LanguageSelect v-model="sourceLang" :languages="displayLanguages" />
+          <LanguageSelect
+            v-model="sourceLang"
+            placeholder="Source Language"
+            :disabled="isLoading"
+            :is-dark="isDark"
+            :languages="displayLanguages"
+          />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -335,7 +380,10 @@ const canRetryLanguages = computed(() => {
           </label>
           <LanguageSelect
             v-model="targetLang"
-            :languages="displayLanguages.filter((l) => l.value !== sourceLang)"
+            placeholder="Target Language"
+            :disabled="isLoading"
+            :is-dark="isDark"
+            :languages="displayLanguages.filter((l) => l.code !== sourceLang)"
           />
         </div>
       </div>
