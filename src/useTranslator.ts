@@ -7,6 +7,7 @@ import { DEFAULT_API_HOST } from './constants'
 const availableLanguages: Ref<TranslatorLanguage[]> = ref([])
 const translations: { [key: string]: string } = reactive({})
 const uiTranslations: { [key: string]: string } = reactive({})
+const currentLanguage: Ref<string> = ref('en')
 
 // Prevent repeated auto-selection of interface language
 let _autoSelected = false
@@ -21,9 +22,11 @@ export function useTranslator(options: TranslatorOptions = {}) {
   const fallbackLanguage = options.fallbackLanguage || 'en'
 
   const isLoading = ref(false)
-  const availableLanguages = ref<TranslatorLanguage[]>([])
 
-  const currentLanguage = ref(defaultLanguage)
+  // Initialize shared currentLanguage with default if not already set
+  if (currentLanguage.value === 'en' && defaultLanguage !== 'en') {
+    currentLanguage.value = defaultLanguage
+  }
 
   const setLanguage = (lang: string) => {
     currentLanguage.value = lang
@@ -187,7 +190,6 @@ export function useTranslator(options: TranslatorOptions = {}) {
 
     // Skip translation when target and source are identical (explicit) or interface is en and originalLang indicates English
     if ((originalLang && originalLang === lang) || (!originalLang && lang === 'en')) {
-      console.log('[l] Same language, returning original:', { text, originalLang, lang })
       return text
     }
 

@@ -78,9 +78,15 @@ onMounted(async () => {
   isDark.value = darkMode
   updateTheme()
 
-  // Load saved text
+  // Load saved text and interface language
   const saved = localStorage.getItem('translateText')
   if (saved) textToTranslate.value = saved
+
+  const savedInterfaceLang = localStorage.getItem('interfaceLanguage')
+  if (savedInterfaceLang) {
+    interfaceLang.value = savedInterfaceLang
+    setLanguage(savedInterfaceLang)
+  }
 
   // Check service health first
   await checkServiceHealth()
@@ -196,6 +202,7 @@ const retryFetchLanguages = async () => {
 
 watch(interfaceLang, (newLang) => {
   setLanguage(newLang)
+  localStorage.setItem('interfaceLanguage', newLang)
 })
 
 watch(textToTranslate, (val) => {
