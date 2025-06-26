@@ -231,13 +231,15 @@ const displayLanguages = computed(() => {
     return availableLanguages.value.map((lang) => ({
       code: lang.code,
       name: lang.name,
-      native_name: lang.native_name
+      native_name: lang.native_name,
+      flag_country: lang.flag_country
     }))
   }
   return simpleLanguages.map((lang) => ({
     code: lang.value,
     name: lang.label,
-    native_name: lang.label
+    native_name: lang.label,
+    flag_country: lang.value === 'en' ? 'gb' : lang.value // Fallback for simple list
   }))
 })
 

@@ -15,10 +15,10 @@
       @search-change="handleSearch"
     >
       <template #singlelabel="{ value }">
-        <div class="multiselect-single-label">
+        <div class="multiselect-single-label" v-if="value">
           <img
-            v-if="value && value.code"
-            :src="getFlagUrl(value.code)"
+            v-if="value.code"
+            :src="`https://flagcdn.com/${getFlagCode(value)}.svg`"
             class="lang-flag"
             :alt="`${value.name} flag`"
             @error="onFlagError"
@@ -29,7 +29,7 @@
       <template #option="{ option }">
         <div class="multiselect-option">
           <img
-            :src="getFlagUrl(option.code)"
+            :src="`https://flagcdn.com/${getFlagCode(option)}.svg`"
             class="lang-flag"
             :alt="`${option.name} flag`"
             @error="onFlagError"
@@ -57,6 +57,10 @@ import Multiselect from '@vueform/multiselect'
 import Fuse from 'fuse.js'
 import { applyLanguageAlias } from '../search-utils'
 import type { TranslatorLanguage } from '../types'
+
+const getFlagCode = (lang: TranslatorLanguage): string => {
+  return lang.flag_country || lang.code
+}
 
 const props = defineProps({
   modelValue: {
@@ -125,12 +129,6 @@ const filteredLanguages = computed(() => {
 
 function handleSearch(query: string) {
   searchQuery.value = query
-}
-
-const getFlagUrl = (code: string) => {
-  if (!code) return ''
-  const countryCode = code.split('-')[0].toLowerCase()
-  return `https://flagcdn.com/w20/${countryCode}.png`
 }
 
 const onFlagError = (event: Event) => {
