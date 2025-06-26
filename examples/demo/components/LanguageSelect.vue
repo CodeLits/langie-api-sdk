@@ -1,38 +1,38 @@
 <template>
   <v-select
     v-if="validLanguages.length > 0"
-    :key="validLanguages.length"
+    :key="validLanguages?.length || 0"
     class="language-select"
-    :value="modelValue || ''"
-    :reduce="(option: LanguageOption) => (option ? option.value : '')"
+    :value="props.modelValue"
+    :reduce="reduceOption"
     :options="validLanguages"
-    :get-option-label="(option: LanguageOption) => (option ? displayName(option) : '')"
-    :get-option-key="(option: LanguageOption) => (option ? option.value : '')"
+    :get-option-label="getOptionLabelFn"
+    :get-option-key="getOptionKeyFn"
     searchable
     :clearable="false"
-    :filter="fuseSearch"
+    :filter="fuseSearchFn"
     @input="handleSelect"
   >
-    <template #option="{ option }">
+    <template #option="option">
       <div v-if="option" class="flex items-center gap-2">
         <img
-          v-if="getFlagCode(option as LanguageOption, 0)"
-          :src="`https://flagcdn.com/${getFlagCode(option as LanguageOption, 0)}.svg`"
-          :alt="(option as LanguageOption)?.native_name"
+          v-if="getFlagCode(option, 0)"
+          :src="`https://flagcdn.com/${getFlagCode(option, 0)}.svg`"
+          :alt="option?.native_name"
           class="w-5 h-4 mr-2 inline-block"
         />
-        <span>{{ displayName(option as LanguageOption) }}</span>
+        <span>{{ getOptionLabelFn(option) }}</span>
       </div>
     </template>
-    <template #selected-option="{ option }">
+    <template #selected-option="option">
       <div v-if="option" class="flex items-center gap-2">
         <img
-          v-if="getFlagCode(option as LanguageOption, 0)"
-          :src="`https://flagcdn.com/${getFlagCode(option as LanguageOption, 0)}.svg`"
-          :alt="(option as LanguageOption)?.native_name"
+          v-if="getFlagCode(option, 0)"
+          :src="`https://flagcdn.com/${getFlagCode(option, 0)}.svg`"
+          :alt="option?.native_name"
           class="w-5 h-4 mr-2 inline-block"
         />
-        <span>{{ displayName(option as LanguageOption) }}</span>
+        <span>{{ getOptionLabelFn(option) }}</span>
       </div>
     </template>
     <template #no-options="{ search, searching }">
@@ -53,8 +53,8 @@
 
 import 'vue-select/dist/vue-select.css'
 import type { PropType } from 'vue'
-import { watch, computed } from 'vue'
-import vSelect from 'vue-select'
+import { computed } from 'vue'
+import VueSelect from 'vue-select'
 import Fuse from 'fuse.js'
 import { applyLanguageAlias } from '../composables/search-utils.js'
 
@@ -65,6 +65,9 @@ interface LanguageOption {
   label?: string
   flag?: string | string[]
 }
+
+// Register the component locally
+const vSelect = VueSelect
 
 const props = defineProps({
   modelValue: {
@@ -86,92 +89,93 @@ const validLanguages = computed(() => {
   return Array.isArray(props.languages) ? props.languages : []
 })
 
-// Derive display label robustly handling non-string values
-const displayName = (opt: LanguageOption | null | undefined): string => {
-  if (!opt) return ''
-  const candidate = opt.native_name || opt.name || opt.label
+// Handle select event
+const handleSelect = (value: string) => {
+  emit('update:modelValue', value)
+}
+
+// Functions for vue-select props
+const reduceOption = (option: LanguageOption): string => {
+  return option?.value || ''
+}
+
+const getOptionKeyFn = (option: LanguageOption): string => {
+  return option?.value || ''
+}
+
+const getOptionLabelFn = (option: LanguageOption): string => {
+  if (!option) return ''
+  const candidate = option.native_name || option.name || option.label
   if (typeof candidate === 'string') return candidate
   if (candidate && typeof candidate === 'object') {
     // pick first string value
     const val = Object.values(candidate).find((v) => typeof v === 'string')
     if (val) return val
   }
-  return String(candidate)
+  return String(candidate || '')
 }
 
 // Function to get the flag code from region code
 const getFlagCode = (option: LanguageOption | null | undefined, index = 0): string => {
   if (!option) return ''
   if (typeof option.flag === 'string') {
-    const match = option.flag.match(/flagcdn\.com\/(\w{2})\.svg/) // extract code
+    const match = option.flag.match(/flagcdn\.com\/(\w{2})\.svg/)
     if (match) return match[1].toLowerCase()
     return option.flag.toLowerCase()
   }
-  return option?.flag?.[index]?.toLowerCase() || ''
-}
-
-const handleSelect = (value: string | null | undefined): void => {
-  if (value !== null && value !== undefined) {
-    emit('update:modelValue', value)
+  if (Array.isArray(option.flag) && option.flag.length > index) {
+    return option.flag[index]?.toLowerCase() || ''
   }
+  return ''
 }
 
-const fuseSearch = (options: LanguageOption[], search: string): LanguageOption[] => {
-  const aliasResult = applyLanguageAlias(search)
-  const rawLower = search.toLowerCase()
-  const aliasTerms = Array.isArray(aliasResult) ? aliasResult : [aliasResult]
+// Filter function for vue-select
+const fuseSearchFn = (options: LanguageOption[], search: string): LanguageOption[] => {
+  if (!search || !Array.isArray(options)) {
+    return options || []
+  }
 
-  // Build separate result sets for raw term and alias terms
-  const fuse = new Fuse(options as any[], {
-    keys: ['native_name', 'name', 'label'],
-    shouldSort: true
-  })
+  try {
+    const aliasResult = applyLanguageAlias(search)
+    const rawLower = search.toLowerCase()
+    const aliasTerms = Array.isArray(aliasResult) ? aliasResult : [aliasResult]
 
-  // Primary results from raw input
-  const primary = rawLower ? fuse.search(rawLower).map(({ item }) => item as LanguageOption) : []
-
-  // Secondary results from alias terms (deduplicated)
-  const secondarySet = new Map<string, LanguageOption>()
-  for (const term of aliasTerms) {
-    if (!term || term === rawLower) continue
-    fuse.search(term).forEach(({ item }) => {
-      const languageItem = item as LanguageOption
-      // Skip if already in primary list
-      if (!primary.find((p) => p.value === languageItem.value)) {
-        secondarySet.set(languageItem.value, languageItem)
-      }
+    // Build separate result sets for raw term and alias terms
+    const fuse = new Fuse(options, {
+      keys: ['native_name', 'name', 'label'],
+      shouldSort: true,
+      threshold: 0.3
     })
+
+    // Primary results from raw input
+    const primary = rawLower ? fuse.search(rawLower).map(({ item }) => item) : []
+
+    // Secondary results from alias terms (deduplicated)
+    const secondarySet = new Map<string, LanguageOption>()
+    for (const term of aliasTerms) {
+      if (!term || term === rawLower) continue
+      fuse.search(term).forEach(({ item }) => {
+        // Skip if already in primary list
+        if (!primary.find((p) => p.value === item.value)) {
+          secondarySet.set(item.value, item)
+        }
+      })
+    }
+    const secondary = Array.from(secondarySet.values())
+
+    // Combine results
+    const combined: LanguageOption[] = []
+    if (primary.length) combined.push(primary[0])
+    combined.push(...secondary.slice(0, 2))
+    combined.push(...primary.slice(1))
+    combined.push(...secondary.slice(2))
+
+    return combined.length ? combined : options
+  } catch (error) {
+    console.warn('[LanguageSelect] Search error:', error)
+    return options || []
   }
-  const secondary = Array.from(secondarySet.values())
-
-  // Interleave: primary top result + up to 2 secondary alias hits, then rest of primary, then remaining secondary
-  const combined: LanguageOption[] = []
-  if (primary.length) combined.push(primary[0])
-  combined.push(...secondary.slice(0, 2))
-  combined.push(...primary.slice(1))
-  combined.push(...secondary.slice(2))
-
-  return combined.length ? combined : validLanguages.value
 }
-
-// ---------------------------------------------------------------------------
-// Developer aid: surface language / translation loading issues in the console
-
-const logLanguagesState = (list: unknown, phase = 'init') => {
-  if (!Array.isArray(list) || list.length === 0) {
-    console.error(
-      `[LanguageSelect] No languages available during ${phase}. This usually indicates a translation-service error.`
-    )
-  }
-}
-
-watch(
-  () => props.languages,
-  (newVal) => {
-    logLanguagesState(newVal, 'update')
-  },
-  { deep: false }
-)
 </script>
 
 <style scoped>
