@@ -240,7 +240,23 @@ const canRetryLanguages = computed(() => {
     <div
       class="p-8 rounded-lg shadow-md w-full max-w-2xl transition-colors bg-white dark:bg-gray-800"
     >
-      <div class="flex justify-end mb-4">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Langie API SDK - Demo App
+          </h1>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            Real API:
+            <a
+              href="https://api.langie.uk"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline"
+            >
+              https://api.langie.uk
+            </a>
+          </p>
+        </div>
         <button
           @click="toggleTheme"
           class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
@@ -289,7 +305,9 @@ const canRetryLanguages = computed(() => {
         </select>
       </div>
 
-      <h1 class="text-2xl font-bold mb-6 text-center">Translation</h1>
+      <h2 class="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-gray-200">
+        Translation
+      </h2>
 
       <div class="grid grid-cols-2 gap-4 mb-6">
         <div>
