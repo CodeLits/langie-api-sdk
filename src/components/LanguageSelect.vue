@@ -110,7 +110,6 @@ const fuse = computed(() => {
 const selectedLanguage = computed({
   get: () => props.modelValue,
   set: (value) => {
-    console.log('LanguageSelect new value:', value)
     if (value) {
       emit('update:modelValue', value)
     }
@@ -120,17 +119,21 @@ const selectedLanguage = computed({
 const filteredLanguages = computed(() => {
   if (!fuse.value) return []
   const query = searchQuery.value.trim()
+
+  let results
   if (!query) {
-    return validLanguages.value
+    results = validLanguages.value
+  } else {
+    // Get the most likely alias or the original term
+    const aliasResult = applyLanguageAlias(query)
+    const searchTerm = Array.isArray(aliasResult) ? aliasResult[0] : aliasResult
+
+    const fuseResults = fuse.value.search(searchTerm)
+    results = fuseResults.map((result) => result.item)
   }
 
-  // Get the most likely alias or the original term
-  const aliasResult = applyLanguageAlias(query)
-  const searchTerm = Array.isArray(aliasResult) ? aliasResult[0] : aliasResult
-
-  const results = fuse.value.search(searchTerm)
-
-  return results.map((result) => result.item)
+  // Remove the currently selected language from the options
+  return results.filter((lang) => !props.modelValue || lang.code !== props.modelValue.code)
 })
 
 function handleSearch(query: string) {

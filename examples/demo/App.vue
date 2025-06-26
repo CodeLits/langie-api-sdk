@@ -252,7 +252,7 @@ const displayLanguages = computed(() => {
     code: lang.value,
     name: lang.label,
     native_name: lang.label,
-    flag_country: lang.value === 'en' ? 'gb' : lang.value // Fallback for simple list
+    flag_country: lang.value
   }))
 })
 
