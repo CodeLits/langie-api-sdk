@@ -15,6 +15,10 @@ export type { TranslateRequestBody, TranslateServiceResponse, TranslatorLanguage
 
 // Export utility functions
 export { isClientOnly, isNuxtEnvironment, shouldUseClientOnly } from './utils/client-only'
+export { applyLanguageAlias } from './search-utils'
+
+// Export language aliases
+export { LANGUAGE_ALIAS_TABLE } from './language-aliases'
 
 // Export components
 export { LanguageSelect, lt } from './components'

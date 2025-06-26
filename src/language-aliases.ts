@@ -91,7 +91,7 @@ export const LANGUAGE_ALIAS_TABLE: AliasEntry[] = [
   {
     lang: 'russian',
     match: ['rus', 'ru', 'russia', 'belarus'],
-    suggest: ['kazakh', 'belarus', 'tatar', 'moldavian', 'moldova', 'tajik', 'uzbek']
+    suggest: ['kazakh', 'tatar', 'belarusian', 'tajik', 'uzbek', 'moldovan']
   },
   {
     lang: 'ukrainian',

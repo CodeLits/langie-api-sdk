@@ -149,24 +149,48 @@ const filteredLanguages = computed(() => {
       ? aliasResult.primary[0]
       : aliasResult.primary
 
-    const fuseResults = fuse.value.search(searchTerm)
-    results = fuseResults.map((result) => result.item)
+    // If we have an exact alias match, prioritize it differently
+    const hasExactAliasMatch = searchTerm !== query
 
-    // Add suggested languages to results
-    if (aliasResult.suggestions.length > 0) {
-      const suggestedLanguages = validLanguages.value.filter((lang) =>
-        aliasResult.suggestions.some(
-          (suggestion) =>
-            lang.name.toLowerCase().includes(suggestion.toLowerCase()) ||
-            lang.code.toLowerCase() === suggestion.toLowerCase()
-        )
+    if (hasExactAliasMatch) {
+      // For exact alias matches, find the primary language first
+      const primaryLang = validLanguages.value.find(
+        (lang) => lang.name.toLowerCase() === searchTerm.toLowerCase()
       )
-      // Add suggestions to results, avoiding duplicates
-      suggestedLanguages.forEach((sugLang) => {
-        if (!results.some((r) => r.code === sugLang.code)) {
-          results.push(sugLang)
-        }
-      })
+      results = primaryLang ? [primaryLang] : []
+
+      // Add suggested languages in order, maintaining the suggest array order
+      if (aliasResult.suggestions.length > 0) {
+        aliasResult.suggestions.forEach((suggestion) => {
+          const suggestedLang = validLanguages.value.find((lang) => {
+            const langName = lang.name.toLowerCase()
+            const suggestion_lower = suggestion.toLowerCase()
+
+            // Try multiple matching strategies
+            return (
+              langName === suggestion_lower || // Exact match
+              langName.includes(suggestion_lower) || // Contains match
+              lang.code.toLowerCase() === suggestion_lower || // Code match
+              langName.startsWith(suggestion_lower) || // Starts with match
+              // Handle common variations
+              (suggestion_lower === 'tatar' && langName.includes('tatar')) ||
+              (suggestion_lower === 'belarusian' &&
+                (langName.includes('belarus') || langName.includes('belarusian'))) ||
+              (suggestion_lower === 'moldovan' &&
+                (langName.includes('moldov') || langName.includes('moldova')))
+            )
+          })
+          if (suggestedLang && !results.some((r) => r.code === suggestedLang.code)) {
+            results.push(suggestedLang)
+          }
+        })
+      }
+    } else {
+      // For non-alias searches, use Fuse.js but with stricter matching
+      const fuseResults = fuse.value.search(searchTerm)
+      results = fuseResults
+        .filter((result) => result.score! < 0.4) // Stricter threshold for direct searches
+        .map((result) => result.item)
     }
   }
 
