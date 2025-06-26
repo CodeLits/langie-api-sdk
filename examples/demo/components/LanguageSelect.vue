@@ -1,12 +1,13 @@
 <template>
   <v-select
-    :key="validLanguages.length || 0"
+    v-if="validLanguages.length > 0"
+    :key="validLanguages.length"
     class="language-select"
-    :value="modelValue"
-    :reduce="(option) => option.value"
+    :value="modelValue || ''"
+    :reduce="(option: LanguageOption) => (option ? option.value : '')"
     :options="validLanguages"
-    :get-option-label="(option) => displayName(option)"
-    :get-option-key="(option) => option.value"
+    :get-option-label="(option: LanguageOption) => (option ? displayName(option) : '')"
+    :get-option-key="(option: LanguageOption) => (option ? option.value : '')"
     searchable
     :clearable="false"
     :filter="fuseSearch"
@@ -42,6 +43,9 @@
       <em v-else style="opacity: 0.5">Start typing to search for a language.</em>
     </template>
   </v-select>
+
+  <!-- Fallback while loading -->
+  <div v-else class="h-10 bg-gray-100 dark:bg-gray-700 rounded animate-pulse"></div>
 </template>
 
 <script lang="ts" setup>
@@ -106,8 +110,10 @@ const getFlagCode = (option: LanguageOption | null | undefined, index = 0): stri
   return option?.flag?.[index]?.toLowerCase() || ''
 }
 
-const handleSelect = (value: string | null): void => {
-  emit('update:modelValue', value || '')
+const handleSelect = (value: string | null | undefined): void => {
+  if (value !== null && value !== undefined) {
+    emit('update:modelValue', value)
+  }
 }
 
 const fuseSearch = (options: LanguageOption[], search: string): LanguageOption[] => {
