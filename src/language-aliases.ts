@@ -120,7 +120,7 @@ export const LANGUAGE_ALIAS_TABLE: AliasEntry[] = [
   },
   {
     lang: 'serbian',
-    match: ['srp', 'sr', 'serbia'],
+    match: ['srp', 'sr', 'ser', 'serbia', 'serbian', 'srpski', 'србија', 'српски'],
     suggest: ['croatian', 'bosnian', 'montenegrin']
   },
   {

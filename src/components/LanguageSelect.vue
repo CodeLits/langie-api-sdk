@@ -149,48 +149,45 @@ const filteredLanguages = computed(() => {
       ? aliasResult.primary[0]
       : aliasResult.primary
 
-    // If we have an exact alias match, prioritize it differently
-    const hasExactAliasMatch = searchTerm !== query
+    // Always use Fuse.js for the main search (both original query and alias result)
+    const fuseResults = fuse.value.search(searchTerm)
+    results = fuseResults.map((result) => result.item)
 
-    if (hasExactAliasMatch) {
-      // For exact alias matches, find the primary language first
-      const primaryLang = validLanguages.value.find(
-        (lang) => lang.name.toLowerCase() === searchTerm.toLowerCase()
-      )
-      results = primaryLang ? [primaryLang] : []
+    // If the search term is different from query (alias was applied), also search the original query
+    if (searchTerm !== query) {
+      const originalResults = fuse.value.search(query)
+      originalResults.forEach((result) => {
+        if (!results.some((r) => r.code === result.item.code)) {
+          results.push(result.item)
+        }
+      })
+    }
 
-      // Add suggested languages in order, maintaining the suggest array order
-      if (aliasResult.suggestions.length > 0) {
-        aliasResult.suggestions.forEach((suggestion) => {
-          const suggestedLang = validLanguages.value.find((lang) => {
-            const langName = lang.name.toLowerCase()
-            const suggestion_lower = suggestion.toLowerCase()
+    // Add suggested languages to expand the results
+    if (aliasResult.suggestions.length > 0) {
+      aliasResult.suggestions.forEach((suggestion) => {
+        const suggestedLang = validLanguages.value.find((lang) => {
+          const langName = lang.name.toLowerCase()
+          const suggestion_lower = suggestion.toLowerCase()
 
-            // Try multiple matching strategies
-            return (
-              langName === suggestion_lower || // Exact match
-              langName.includes(suggestion_lower) || // Contains match
-              lang.code.toLowerCase() === suggestion_lower || // Code match
-              langName.startsWith(suggestion_lower) || // Starts with match
-              // Handle common variations
-              (suggestion_lower === 'tatar' && langName.includes('tatar')) ||
-              (suggestion_lower === 'belarusian' &&
-                (langName.includes('belarus') || langName.includes('belarusian'))) ||
-              (suggestion_lower === 'moldovan' &&
-                (langName.includes('moldov') || langName.includes('moldova')))
-            )
-          })
-          if (suggestedLang && !results.some((r) => r.code === suggestedLang.code)) {
-            results.push(suggestedLang)
-          }
+          // Try multiple matching strategies
+          return (
+            langName === suggestion_lower || // Exact match
+            langName.includes(suggestion_lower) || // Contains match
+            lang.code.toLowerCase() === suggestion_lower || // Code match
+            langName.startsWith(suggestion_lower) || // Starts with match
+            // Handle common variations
+            (suggestion_lower === 'tatar' && langName.includes('tatar')) ||
+            (suggestion_lower === 'belarusian' &&
+              (langName.includes('belarus') || langName.includes('belarusian'))) ||
+            (suggestion_lower === 'moldovan' &&
+              (langName.includes('moldov') || langName.includes('moldova')))
+          )
         })
-      }
-    } else {
-      // For non-alias searches, use Fuse.js but with stricter matching
-      const fuseResults = fuse.value.search(searchTerm)
-      results = fuseResults
-        .filter((result) => result.score! < 0.4) // Stricter threshold for direct searches
-        .map((result) => result.item)
+        if (suggestedLang && !results.some((r) => r.code === suggestedLang.code)) {
+          results.push(suggestedLang)
+        }
+      })
     }
   }
 
