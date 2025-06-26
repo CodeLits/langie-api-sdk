@@ -5,6 +5,7 @@
 interface AliasEntry {
   lang: string
   match: string[]
+  suggest?: string[]
 }
 
 const ALIAS_TABLE: AliasEntry[] = [
@@ -90,9 +91,14 @@ const ALIAS_TABLE: AliasEntry[] = [
       'rus',
       'ru', // Language code and abbreviation
       'russia',
-      'belarus',
-      'kazakh'
-    ]
+      'belarus'
+    ],
+    suggest: ['kazakh', 'belarus', 'tatar', 'moldavian', 'moldova', 'tajik', 'uzbek']
+  },
+  {
+    lang: 'kazakh',
+    match: ['kaz', 'kk', 'kazakh'],
+    suggest: ['russian']
   },
   {
     lang: 'chinese',
@@ -176,9 +182,12 @@ const ALIAS_TABLE: AliasEntry[] = [
   }
 ]
 
-export function applyLanguageAlias(term = ''): string | string[] {
+export function applyLanguageAlias(term = ''): {
+  primary: string | string[]
+  suggestions: string[]
+} {
   const s = term.toLowerCase().trim()
-  if (!s) return term
+  if (!s) return { primary: term, suggestions: [] }
 
   // Helper decides whether a candidate alias matches the typed search string
   const isMatch = (alias: string, input: string): boolean => {
@@ -191,14 +200,29 @@ export function applyLanguageAlias(term = ''): string | string[] {
   }
 
   const hits = new Set<string>()
+  const suggestions = new Set<string>()
 
-  for (const { lang, match } of ALIAS_TABLE) {
+  for (const { lang, match, suggest } of ALIAS_TABLE) {
+    // Check primary matches
     for (const m of match) {
-      if (isMatch(m, s)) hits.add(lang)
+      if (isMatch(m, s)) {
+        hits.add(lang)
+        // If this language has suggestions, add them
+        if (suggest) {
+          suggest.forEach((sug) => suggestions.add(sug))
+        }
+      }
     }
   }
 
-  if (hits.size === 0) return term
-  if (hits.size === 1) return [...hits][0]
-  return [...hits] // multiple potential languages
+  let primary: string | string[]
+  if (hits.size === 0) {
+    primary = term
+  } else if (hits.size === 1) {
+    primary = [...hits][0]
+  } else {
+    primary = [...hits]
+  }
+
+  return { primary, suggestions: [...suggestions] }
 }

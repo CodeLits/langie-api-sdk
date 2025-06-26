@@ -135,7 +135,7 @@ const selectedLanguage = computed({
 const filteredLanguages = computed(() => {
   const query = searchQuery.value.trim()
 
-  let results
+  let results: TranslatorLanguage[]
   if (!query) {
     // When no search query, return all valid languages (bypass Fuse.js)
     results = validLanguages.value
@@ -145,10 +145,29 @@ const filteredLanguages = computed(() => {
 
     // Get the most likely alias or the original term
     const aliasResult = applyLanguageAlias(query)
-    const searchTerm = Array.isArray(aliasResult) ? aliasResult[0] : aliasResult
+    const searchTerm = Array.isArray(aliasResult.primary)
+      ? aliasResult.primary[0]
+      : aliasResult.primary
 
     const fuseResults = fuse.value.search(searchTerm)
     results = fuseResults.map((result) => result.item)
+
+    // Add suggested languages to results
+    if (aliasResult.suggestions.length > 0) {
+      const suggestedLanguages = validLanguages.value.filter((lang) =>
+        aliasResult.suggestions.some(
+          (suggestion) =>
+            lang.name.toLowerCase().includes(suggestion.toLowerCase()) ||
+            lang.code.toLowerCase() === suggestion.toLowerCase()
+        )
+      )
+      // Add suggestions to results, avoiding duplicates
+      suggestedLanguages.forEach((sugLang) => {
+        if (!results.some((r) => r.code === sugLang.code)) {
+          results.push(sugLang)
+        }
+      })
+    }
   }
 
   // Remove the currently selected language from the options
