@@ -220,6 +220,26 @@ watch(
   { deep: true }
 )
 
+watch(
+  sourceLang,
+  (newLang) => {
+    if (newLang && newLang.code) {
+      localStorage.setItem('sourceLang', newLang.code)
+    }
+  },
+  { deep: true }
+)
+
+watch(
+  targetLang,
+  (newLang) => {
+    if (newLang && newLang.code) {
+      localStorage.setItem('targetLang', newLang.code)
+    }
+  },
+  { deep: true }
+)
+
 watch(textToTranslate, (val) => {
   localStorage.setItem('translateText', val)
 })
@@ -275,10 +295,12 @@ watch(
         interfaceLang.value = findLang(savedInterfaceLangCode)
       }
       if (!sourceLang.value) {
-        sourceLang.value = findLang('en')
+        const savedSourceLangCode = localStorage.getItem('sourceLang') || 'en'
+        sourceLang.value = findLang(savedSourceLangCode)
       }
       if (!targetLang.value) {
-        targetLang.value = findLang('es')
+        const savedTargetLangCode = localStorage.getItem('targetLang') || 'es'
+        targetLang.value = findLang(savedTargetLangCode)
       }
     }
   },
