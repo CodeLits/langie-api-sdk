@@ -7,6 +7,7 @@ const {
   currentLanguage,
   availableLanguages,
   setLanguage,
+  fetchLanguages,
   isLoading: isTranslatorLoading
 } = useTranslator({
   translatorHost: DEV_API_HOST
@@ -15,7 +16,7 @@ const {
 const isDark = ref(false)
 const interfaceLang = ref('en')
 const sourceLang = ref('en')
-const targetLang = ref('ru')
+const targetLang = ref('es')
 const textToTranslate = ref('Welcome to the application!')
 const translation = ref('')
 const error = ref('')
@@ -48,8 +49,8 @@ onMounted(async () => {
   const saved = localStorage.getItem('translateText')
   if (saved) textToTranslate.value = saved
 
-  // Check service health
-  await checkServiceHealth()
+  // Check service health and fetch languages
+  await Promise.all([checkServiceHealth(), fetchLanguages({ force: true })])
 
   isMounted.value = true
 })
@@ -99,7 +100,7 @@ watch(textToTranslate, (val) => {
   localStorage.setItem('translateText', val)
 })
 
-// Simple language options for now
+// Fallback language options when API languages aren't loaded
 const simpleLanguages = [
   { value: 'en', label: 'English' },
   { value: 'ru', label: 'Russian' },
@@ -112,6 +113,17 @@ const simpleLanguages = [
   { value: 'ko', label: 'Korean' },
   { value: 'zh', label: 'Chinese' }
 ]
+
+// Use API languages when available, fallback to simple languages
+const displayLanguages = computed(() => {
+  if (availableLanguages.value && availableLanguages.value.length > 0) {
+    return availableLanguages.value.map((lang) => ({
+      value: lang.value || lang.code,
+      label: lang.native_name || lang.name || lang.label || lang.value || lang.code
+    }))
+  }
+  return simpleLanguages
+})
 </script>
 
 <template>
@@ -138,7 +150,7 @@ const simpleLanguages = [
           v-model="interfaceLang"
           class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
         >
-          <option v-for="lang in simpleLanguages" :key="lang.value" :value="lang.value">
+          <option v-for="lang in displayLanguages" :key="lang.value" :value="lang.value">
             {{ lang.label }}
           </option>
         </select>
@@ -155,7 +167,7 @@ const simpleLanguages = [
             v-model="sourceLang"
             class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           >
-            <option v-for="lang in simpleLanguages" :key="lang.value" :value="lang.value">
+            <option v-for="lang in displayLanguages" :key="lang.value" :value="lang.value">
               {{ lang.label }}
             </option>
           </select>
@@ -169,7 +181,7 @@ const simpleLanguages = [
             class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           >
             <option
-              v-for="lang in simpleLanguages.filter((l) => l.value !== sourceLang)"
+              v-for="lang in displayLanguages.filter((l) => l.value !== sourceLang)"
               :key="lang.value"
               :value="lang.value"
             >
@@ -216,7 +228,10 @@ const simpleLanguages = [
       <div v-if="isMounted" class="mt-4 text-xs text-gray-500 dark:text-gray-400">
         <p>Dark Mode: {{ isDark ? 'ON' : 'OFF' }}</p>
         <p>Translation Service: {{ serviceStatus }}</p>
-        <p>Available Languages: {{ simpleLanguages.length }} (simplified)</p>
+        <p>
+          Display Languages: {{ displayLanguages.length }}
+          {{ availableLanguages.length > 0 ? '(from API)' : '(fallback)' }}
+        </p>
         <p>API Languages: {{ availableLanguages.length }}</p>
         <p>Current Language: {{ currentLanguage }}</p>
       </div>
