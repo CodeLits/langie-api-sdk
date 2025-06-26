@@ -58,8 +58,20 @@ const isRateLimitExpired = computed(() => {
 })
 
 onMounted(async () => {
-  // Initialize dark mode first
-  const darkMode = localStorage.getItem('darkMode') === 'true'
+  // Initialize dark mode first - check localStorage then system preference
+  const savedDarkMode = localStorage.getItem('darkMode')
+  let darkMode = false
+
+  if (savedDarkMode !== null) {
+    // User has explicitly set a preference
+    darkMode = savedDarkMode === 'true'
+  } else {
+    // No saved preference, use system preference
+    darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+    // Save the detected system preference
+    localStorage.setItem('darkMode', darkMode.toString())
+  }
+
   isDark.value = darkMode
   updateTheme()
 

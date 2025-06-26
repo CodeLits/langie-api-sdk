@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport"
 		content="width=device-width, initial-scale=1.0">
-	<title>Langie API SDK Demo</title>
+	<title>Langie API SDK - Demo App</title>
 	<!-- 
 		⚠️  DEVELOPMENT ONLY - Using Tailwind CDN for demo purposes
 		For production, install Tailwind CSS properly: https://tailwindcss.com/docs/installation
@@ -19,7 +19,18 @@
 		}
 
 		// Initialize dark mode before Vue loads to prevent flash
-		const darkMode = localStorage.getItem('darkMode') === 'true';
+		// Check localStorage first, then fall back to system preference
+		const savedDarkMode = localStorage.getItem('darkMode');
+		let darkMode = false;
+
+		if (savedDarkMode !== null) {
+			// User has explicitly set a preference
+			darkMode = savedDarkMode === 'true';
+		} else {
+			// No saved preference, use system preference
+			darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+		}
+
 		if (darkMode) {
 			document.documentElement.classList.add('dark');
 		}
