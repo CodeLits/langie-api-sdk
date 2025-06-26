@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useTranslator, DEV_API_HOST, lt } from '../../dist/index.mjs'
+import { useTranslator, DEV_API_HOST } from '../../dist/index.mjs'
+// Import the component directly from source for demo
+import lt from '../../src/components/lt.vue'
 
 const {
   translate,
@@ -232,14 +234,6 @@ const canRetryLanguages = computed(() => {
     (!rateLimited.value || isRateLimitExpired.value)
   )
 })
-</script>
-
-<script>
-export default {
-  components: {
-    lt
-  }
-}
 </script>
 
 <template>

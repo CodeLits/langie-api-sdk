@@ -187,6 +187,7 @@ export function useTranslator(options: TranslatorOptions = {}) {
 
     // Skip translation when target and source are identical (explicit) or interface is en and originalLang indicates English
     if ((originalLang && originalLang === lang) || (!originalLang && lang === 'en')) {
+      console.log('[l] Same language, returning original:', { text, originalLang, lang })
       return text
     }
 
