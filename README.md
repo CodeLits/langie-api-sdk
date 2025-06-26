@@ -7,9 +7,9 @@ A lightweight, flexible translation SDK for Vue.js applications. Easily integrat
 
 ## 🚀 Live Demo
 
-**[Try the live demo →](https://langie-api-sdk-demo.netlify.app)**
+**[Try the live demo →](https://langie-demo.netlify.app/)**
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/your-username/langie-api-sdk)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/VivaProgress/langie-api-sdk)
 
 Experience all features including:
 

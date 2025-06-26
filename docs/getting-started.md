@@ -2,6 +2,21 @@
 
 This guide will help you get started with Vue Translator SDK in your Vue.js application.
 
+## 🚀 Live Demo
+
+Before diving into the installation, you can try the live demo to see all features in action:
+
+**[https://langie-demo.netlify.app/](https://langie-demo.netlify.app/)**
+
+The demo showcases:
+
+- Language selection with flags and native names
+- Real-time translation using production API
+- Search functionality with intelligent aliases
+- Dark/light theme toggle
+- Responsive design
+- All 184+ supported languages
+
 ## Installation
 
 ```bash
