@@ -22,6 +22,8 @@ const translation = ref('')
 const error = ref('')
 const isMounted = ref(false)
 const serviceStatus = ref('Checking...')
+const rateLimited = ref(false)
+const lastRateLimitTime = ref(null)
 
 const isLoading = computed(() => isTranslatorLoading.value)
 
@@ -39,6 +41,22 @@ const checkServiceHealth = async () => {
   }
 }
 
+const handleRateLimit = () => {
+  rateLimited.value = true
+  lastRateLimitTime.value = Date.now()
+
+  // Reset rate limit after 1 minute
+  setTimeout(() => {
+    rateLimited.value = false
+    lastRateLimitTime.value = null
+  }, 60000)
+}
+
+const isRateLimitExpired = computed(() => {
+  if (!lastRateLimitTime.value) return true
+  return Date.now() - lastRateLimitTime.value > 60000
+})
+
 onMounted(async () => {
   // Initialize dark mode first
   const darkMode = localStorage.getItem('darkMode') === 'true'
@@ -49,8 +67,20 @@ onMounted(async () => {
   const saved = localStorage.getItem('translateText')
   if (saved) textToTranslate.value = saved
 
-  // Check service health and fetch languages
-  await Promise.all([checkServiceHealth(), fetchLanguages({ force: true })])
+  // Check service health first
+  await checkServiceHealth()
+
+  // Only try to fetch languages if service is online and not rate limited
+  if (serviceStatus.value.includes('✅') && !rateLimited.value) {
+    try {
+      await fetchLanguages({ force: true })
+    } catch (err) {
+      console.warn('Failed to fetch languages on mount:', err)
+      if (err.message?.includes('429') || err.message?.includes('Too Many Requests')) {
+        handleRateLimit()
+      }
+    }
+  }
 
   isMounted.value = true
 })
@@ -74,6 +104,12 @@ const handleTranslate = async () => {
     error.value = 'Please enter text to translate'
     return
   }
+
+  if (rateLimited.value && !isRateLimitExpired.value) {
+    error.value = 'API rate limit exceeded. Please wait a moment before trying again.'
+    return
+  }
+
   error.value = ''
   translation.value = ''
 
@@ -88,7 +124,41 @@ const handleTranslate = async () => {
     }
   } catch (err) {
     console.error('Translation error:', err)
-    error.value = err.message || 'Translation failed'
+
+    if (err.message?.includes('429') || err.message?.includes('Too Many Requests')) {
+      handleRateLimit()
+      error.value =
+        'API rate limit exceeded. Please wait a moment before trying again. The API has limits to prevent abuse.'
+    } else if (
+      err.message?.includes('CORS') ||
+      err.message?.includes('Access-Control-Allow-Origin')
+    ) {
+      error.value = 'CORS error: The translation API needs to allow requests from this domain.'
+    } else if (err.message?.includes('Failed to fetch')) {
+      error.value =
+        'Network error: Unable to connect to the translation service. Please check if the API server is running.'
+    } else {
+      error.value = err.message || 'Translation failed'
+    }
+  }
+}
+
+const retryFetchLanguages = async () => {
+  if (rateLimited.value && !isRateLimitExpired.value) {
+    error.value = 'Please wait before retrying due to rate limits.'
+    return
+  }
+
+  try {
+    error.value = ''
+    await fetchLanguages({ force: true })
+  } catch (err) {
+    if (err.message?.includes('429') || err.message?.includes('Too Many Requests')) {
+      handleRateLimit()
+      error.value = 'API rate limit exceeded. Languages will use fallback list.'
+    } else {
+      error.value = 'Failed to fetch languages from API. Using fallback list.'
+    }
   }
 }
 
@@ -124,6 +194,14 @@ const displayLanguages = computed(() => {
   }
   return simpleLanguages
 })
+
+const canRetryLanguages = computed(() => {
+  return (
+    serviceStatus.value.includes('✅') &&
+    availableLanguages.value.length === 0 &&
+    (!rateLimited.value || isRateLimitExpired.value)
+  )
+})
 </script>
 
 <template>
@@ -142,10 +220,36 @@ const displayLanguages = computed(() => {
         </button>
       </div>
 
+      <!-- Rate limit warning -->
+      <div
+        v-if="rateLimited && !isRateLimitExpired"
+        class="mb-6 p-4 bg-yellow-50 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300 rounded-md border border-yellow-200 dark:border-yellow-700"
+      >
+        <div class="flex items-center">
+          <span class="text-lg mr-2">⚠️</span>
+          <div>
+            <h3 class="font-semibold">API Rate Limit Reached</h3>
+            <p class="text-sm mt-1">
+              The translation API has rate limits to prevent abuse. Please wait a moment before
+              making more requests. Using fallback language list for now.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Interface Language
-        </label>
+        <div class="flex items-center justify-between mb-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Interface Language
+          </label>
+          <button
+            v-if="canRetryLanguages"
+            @click="retryFetchLanguages"
+            class="text-xs text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            Load API Languages
+          </button>
+        </div>
         <select
           v-model="interfaceLang"
           class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
@@ -204,11 +308,14 @@ const displayLanguages = computed(() => {
       </div>
 
       <button
-        :disabled="!isMounted || isLoading || !textToTranslate"
+        :disabled="
+          !isMounted || isLoading || !textToTranslate || (rateLimited && !isRateLimitExpired)
+        "
         class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
         @click="handleTranslate"
       >
         <span v-if="isLoading">Translating...</span>
+        <span v-else-if="rateLimited && !isRateLimitExpired">Rate Limited - Please Wait</span>
         <span v-else>Translate</span>
       </button>
 
@@ -234,6 +341,7 @@ const displayLanguages = computed(() => {
         </p>
         <p>API Languages: {{ availableLanguages.length }}</p>
         <p>Current Language: {{ currentLanguage }}</p>
+        <p v-if="rateLimited">Rate Limited: {{ !isRateLimitExpired ? 'Active' : 'Expired' }}</p>
       </div>
     </div>
   </div>
