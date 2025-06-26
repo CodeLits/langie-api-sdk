@@ -6,7 +6,7 @@
       "dependencies": {
         "fuse.js": "^7.1.0",
         "vue": "^3.4.0",
-        "vue-select": "^4.0.0-beta.6",
+        "vue3-select-component": "^0.11.7",
       },
       "devDependencies": {
         "@vitejs/plugin-vue": "^5.0.0",
@@ -161,6 +161,6 @@
 
     "vue": ["vue@3.5.17", "", { "dependencies": { "@vue/compiler-dom": "3.5.17", "@vue/compiler-sfc": "3.5.17", "@vue/runtime-dom": "3.5.17", "@vue/server-renderer": "3.5.17", "@vue/shared": "3.5.17" }, "peerDependencies": { "typescript": "*" }, "optionalPeers": ["typescript"] }, "sha512-LbHV3xPN9BeljML+Xctq4lbz2lVHCR6DtbpTf5XIO6gugpXUN49j2QQPcMj086r9+AkJ0FfUT8xjulKKBkkr9g=="],
 
-    "vue-select": ["vue-select@4.0.0-beta.6", "", { "peerDependencies": { "vue": "3.x" } }, "sha512-K+zrNBSpwMPhAxYLTCl56gaMrWZGgayoWCLqe5rWwkB8aUbAUh7u6sXjIR7v4ckp2WKC7zEEUY27g6h1MRsIHw=="],
+    "vue3-select-component": ["vue3-select-component@0.11.7", "", { "peerDependencies": { "vue": "^3.5.0" } }, "sha512-t0Ca2tu1S9haee9w1SZVEPOuEHulPvQHjy2s0JB8TaClpLesDf2C4MuQDEY5FOqqi+WAzlPLdXat6dguOfZt9Q=="],
   }
 }

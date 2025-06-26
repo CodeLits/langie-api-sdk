@@ -1,48 +1,44 @@
 <template>
-  <v-select
+  <VueSelect
     v-if="validLanguages.length > 0"
     :key="validLanguages?.length || 0"
     class="language-select"
-    :value="props.modelValue"
-    :reduce="reduceOption"
+    v-model="selectedValue"
     :options="validLanguages"
     :get-option-label="getOptionLabelFn"
-    :get-option-key="getOptionKeyFn"
+    :get-option-value="getOptionValueFn"
     searchable
     :clearable="false"
-    :filter="fuseSearchFn"
-    @input="handleSelect"
+    :filterable="true"
+    :filterBy="filterByFn"
   >
-    <template #option="option">
+    <template #option="{ option }">
       <div v-if="option" class="flex items-center gap-2">
         <img
-          v-if="getFlagCode(option, 0)"
-          :src="`https://flagcdn.com/${getFlagCode(option, 0)}.svg`"
+          v-if="getFlagCode(option)"
+          :src="`https://flagcdn.com/${getFlagCode(option)}.svg`"
           :alt="option?.native_name"
           class="w-5 h-4 mr-2 inline-block"
         />
         <span>{{ getOptionLabelFn(option) }}</span>
       </div>
     </template>
-    <template #selected-option="option">
+    <template #selected-option="{ option }">
       <div v-if="option" class="flex items-center gap-2">
         <img
-          v-if="getFlagCode(option, 0)"
-          :src="`https://flagcdn.com/${getFlagCode(option, 0)}.svg`"
+          v-if="getFlagCode(option)"
+          :src="`https://flagcdn.com/${getFlagCode(option)}.svg`"
           :alt="option?.native_name"
           class="w-5 h-4 mr-2 inline-block"
         />
         <span>{{ getOptionLabelFn(option) }}</span>
       </div>
     </template>
-    <template #no-options="{ search, searching }">
-      <template v-if="searching">
-        No results found for <em>{{ search }}</em
-        >.
-      </template>
+    <template #no-options="{ search }">
+      <em v-if="search" style="opacity: 0.5"> No results found for "{{ search }}". </em>
       <em v-else style="opacity: 0.5">Start typing to search for a language.</em>
     </template>
-  </v-select>
+  </VueSelect>
 
   <!-- Fallback while loading -->
   <div v-else class="h-10 bg-gray-100 dark:bg-gray-700 rounded animate-pulse"></div>
@@ -54,8 +50,6 @@
 import 'vue-select/dist/vue-select.css'
 import type { PropType } from 'vue'
 import { computed } from 'vue'
-import VueSelect from 'vue-select'
-import Fuse from 'fuse.js'
 import { applyLanguageAlias } from '../composables/search-utils.js'
 
 interface LanguageOption {
@@ -65,9 +59,6 @@ interface LanguageOption {
   label?: string
   flag?: string | string[]
 }
-
-// Register the component locally
-const vSelect = VueSelect
 
 const props = defineProps({
   modelValue: {
@@ -89,17 +80,14 @@ const validLanguages = computed(() => {
   return Array.isArray(props.languages) ? props.languages : []
 })
 
-// Handle select event
-const handleSelect = (value: string) => {
-  emit('update:modelValue', value)
-}
+// v-model computed property
+const selectedValue = computed({
+  get: () => props.modelValue || '',
+  set: (value: string) => emit('update:modelValue', value)
+})
 
-// Functions for vue-select props
-const reduceOption = (option: LanguageOption): string => {
-  return option?.value || ''
-}
-
-const getOptionKeyFn = (option: LanguageOption): string => {
+// Functions for vue3-select-component
+const getOptionValueFn = (option: LanguageOption): string => {
   return option?.value || ''
 }
 
@@ -116,111 +104,61 @@ const getOptionLabelFn = (option: LanguageOption): string => {
 }
 
 // Function to get the flag code from region code
-const getFlagCode = (option: LanguageOption | null | undefined, index = 0): string => {
+const getFlagCode = (option: LanguageOption | null | undefined): string => {
   if (!option) return ''
   if (typeof option.flag === 'string') {
     const match = option.flag.match(/flagcdn\.com\/(\w{2})\.svg/)
     if (match) return match[1].toLowerCase()
     return option.flag.toLowerCase()
   }
-  if (Array.isArray(option.flag) && option.flag.length > index) {
-    return option.flag[index]?.toLowerCase() || ''
+  if (Array.isArray(option.flag) && option.flag.length > 0) {
+    return option.flag[0]?.toLowerCase() || ''
   }
   return ''
 }
 
-// Filter function for vue-select
-const fuseSearchFn = (options: LanguageOption[], search: string): LanguageOption[] => {
-  if (!search || !Array.isArray(options)) {
-    return options || []
-  }
+// Simple filter function for vue3-select-component
+const filterByFn = (option: LanguageOption, search: string): boolean => {
+  if (!search) return true
 
   try {
     const aliasResult = applyLanguageAlias(search)
-    const rawLower = search.toLowerCase()
-    const aliasTerms = Array.isArray(aliasResult) ? aliasResult : [aliasResult]
+    const searchTerms = Array.isArray(aliasResult) ? aliasResult : [aliasResult]
+    searchTerms.push(search) // Add original search term
 
-    // Build separate result sets for raw term and alias terms
-    const fuse = new Fuse(options, {
-      keys: ['native_name', 'name', 'label'],
-      shouldSort: true,
-      threshold: 0.3
-    })
+    const optionText = getOptionLabelFn(option).toLowerCase()
 
-    // Primary results from raw input
-    const primary = rawLower ? fuse.search(rawLower).map(({ item }) => item) : []
-
-    // Secondary results from alias terms (deduplicated)
-    const secondarySet = new Map<string, LanguageOption>()
-    for (const term of aliasTerms) {
-      if (!term || term === rawLower) continue
-      fuse.search(term).forEach(({ item }) => {
-        // Skip if already in primary list
-        if (!primary.find((p) => p.value === item.value)) {
-          secondarySet.set(item.value, item)
-        }
-      })
-    }
-    const secondary = Array.from(secondarySet.values())
-
-    // Combine results
-    const combined: LanguageOption[] = []
-    if (primary.length) combined.push(primary[0])
-    combined.push(...secondary.slice(0, 2))
-    combined.push(...primary.slice(1))
-    combined.push(...secondary.slice(2))
-
-    return combined.length ? combined : options
+    return searchTerms.some((term) => term && optionText.includes(term.toLowerCase()))
   } catch (error) {
     console.warn('[LanguageSelect] Search error:', error)
-    return options || []
+    return getOptionLabelFn(option).toLowerCase().includes(search.toLowerCase())
   }
 }
 </script>
 
 <style scoped>
-/* Light mode overrides (apply when no .dark ancestor) */
-:deep(.language-select) {
-  /* Control (input) */
-  --vs-controls-color: #334155; /* slate-700 */
-  --vs-border-color: #cbd5e1; /* slate-300 */
-
-  /* Dropdown panel */
-  --vs-dropdown-bg: #ffffff; /* white */
-  --vs-dropdown-color: #0f172a; /* slate-900 */
-  --vs-dropdown-option-color: #0f172a;
-
-  /* Selected option (pill) */
-  --vs-selected-bg: #e2e8f0; /* slate-200 */
-  --vs-selected-color: #0f172a; /* slate-900 */
-
-  /* Search input inside dropdown */
+/* Custom styles for vue3-select-component */
+.language-select {
+  --vs-controls-color: #334155;
+  --vs-border-color: #cbd5e1;
+  --vs-dropdown-bg: #ffffff;
+  --vs-dropdown-color: #0f172a;
+  --vs-selected-bg: #e2e8f0;
+  --vs-selected-color: #0f172a;
   --vs-search-input-color: #0f172a;
-
-  /* Active / highlighted option */
-  --vs-dropdown-option--active-bg: #db2777; /* pink-600 */
+  --vs-dropdown-option--active-bg: #db2777;
   --vs-dropdown-option--active-color: #ffffff;
 }
-/* Dark mode overrides for vue-select (tailored colors) */
-.dark :deep(.language-select) {
-  /* Control (input) */
-  --vs-controls-color: #e2e8f0; /* slate-200 */
-  --vs-border-color: #334155; /* slate-700 */
 
-  /* Dropdown panel */
-  --vs-dropdown-bg: #1e293b; /* slate-800 */
-  --vs-dropdown-color: #e2e8f0; /* slate-200 */
-  --vs-dropdown-option-color: #e2e8f0;
-
-  /* Selected option (pill) */
-  --vs-selected-bg: #334155; /* slate-700 */
+.dark .language-select {
+  --vs-controls-color: #e2e8f0;
+  --vs-border-color: #334155;
+  --vs-dropdown-bg: #1e293b;
+  --vs-dropdown-color: #e2e8f0;
+  --vs-selected-bg: #334155;
   --vs-selected-color: #e2e8f0;
-
-  /* Search input inside dropdown */
   --vs-search-input-color: #e2e8f0;
-
-  /* Active / highlighted option */
-  --vs-dropdown-option--active-bg: #db2777; /* pink-600 */
+  --vs-dropdown-option--active-bg: #db2777;
   --vs-dropdown-option--active-color: #ffffff;
 }
 </style>
