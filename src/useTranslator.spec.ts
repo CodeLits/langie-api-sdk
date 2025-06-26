@@ -36,20 +36,25 @@ describe('useTranslator', () => {
     const mockLangs: TranslatorLanguage[] = [
       { code: 'en', name: 'English', native_name: 'English' }
     ]
-    vi.mocked(core.fetchAvailableLanguages).mockResolvedValue(mockLangs)
+
+    // Mock global fetch instead of core.fetchAvailableLanguages
+    const mockFetch = vi.fn().mockResolvedValue({
+      json: () => Promise.resolve(mockLangs)
+    })
+    global.fetch = mockFetch
 
     const translator = useTranslatorFresh()
     const langs = await translator.fetchLanguages()
 
-    expect(core.fetchAvailableLanguages).toHaveBeenCalledTimes(1)
+    expect(mockFetch).toHaveBeenCalledTimes(1)
     expect(langs).toEqual(expect.arrayContaining(mockLangs))
   })
 
-  it('returns original text when calling t() initially', () => {
+  it('returns original text when calling l() initially', () => {
     const translator = useTranslatorFresh()
     translator.setLanguage('es')
 
-    const result = translator.t('hello')
+    const result = translator.l('hello')
     expect(result).toBe('hello') // Should return original text initially
   })
 })

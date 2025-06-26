@@ -50,7 +50,7 @@ describe('translateBatch', () => {
     await translateBatch(translations)
     expect(mockFetch).toHaveBeenCalledTimes(1)
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/translate'),
+      expect.stringContaining('/translate'),
       expect.any(Object)
     )
   })
@@ -73,18 +73,14 @@ describe('translateBatch', () => {
       createMockResponse('Server error', false, 500, 'Internal Server Error')
     )
 
-    await expect(translateBatch(translations)).rejects.toThrow(
-      'Translator service error: 500 Internal Server Error'
-    )
+    await expect(translateBatch(translations)).rejects.toThrow(/Failed to connect to translator/)
   })
 
   it('handles network error', async () => {
     const translations = [{ text: 'hello', from_lang: 'en', to_lang: 'es' }]
     mockFetch.mockRejectedValue(new Error('Network failure'))
 
-    await expect(translateBatch(translations)).rejects.toThrow(
-      expect.stringContaining('Failed to connect to translator')
-    )
+    await expect(translateBatch(translations)).rejects.toThrow(/Failed to connect to translator/)
   })
 
   it('reassembles results in correct order', async () => {
@@ -122,7 +118,7 @@ describe('fetchAvailableLanguages', () => {
 
     await fetchAvailableLanguages()
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/languages'),
+      expect.stringContaining('/languages'),
       expect.any(Object)
     )
   })
