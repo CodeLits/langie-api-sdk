@@ -1,10 +1,13 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useTranslator, DEV_API_HOST } from '@/index'
+import { useTranslator, DEFAULT_API_HOST, DEV_API_HOST } from '@/index'
 // Import the component directly from source for demo
 import lt from '@/components/lt.vue'
 // Import LanguageSelect from the main package
 import LanguageSelect from '@/components/LanguageSelect.vue'
+
+// Use production API in production, dev API in development
+const API_HOST = import.meta.env.PROD ? DEFAULT_API_HOST : DEV_API_HOST
 
 const {
   translate,
@@ -15,7 +18,7 @@ const {
   l,
   isLoading: isTranslatorLoading
 } = useTranslator({
-  translatorHost: DEV_API_HOST
+  translatorHost: API_HOST
 })
 
 const isDark = ref(false)
@@ -34,7 +37,7 @@ const isLoading = computed(() => isTranslatorLoading.value)
 
 const checkServiceHealth = async () => {
   try {
-    const response = await fetch(`${DEV_API_HOST}/health`)
+    const response = await fetch(`${API_HOST}/health`)
     if (response.ok) {
       const data = await response.json()
       serviceStatus.value = data.status === 'ok' ? '✅ Online' : '⚠️ Issues'
@@ -338,15 +341,20 @@ watch(
       <div class="flex justify-between items-center mb-6">
         <div class="flex items-center space-x-4">
           <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Langie API SDK</h1>
-          <span
-            class="px-2 py-1 text-xs font-semibold rounded-full"
-            :class="{
-              'bg-green-100 text-green-800': serviceStatus.includes('✅'),
-              'bg-yellow-100 text-yellow-800': serviceStatus.includes('⚠️'),
-              'bg-red-100 text-red-800': serviceStatus.includes('❌')
-            }"
-            >{{ serviceStatus }}</span
-          >
+          <div class="flex flex-col">
+            <span
+              class="px-2 py-1 text-xs font-semibold rounded-full"
+              :class="{
+                'bg-green-100 text-green-800': serviceStatus.includes('✅'),
+                'bg-yellow-100 text-yellow-800': serviceStatus.includes('⚠️'),
+                'bg-red-100 text-red-800': serviceStatus.includes('❌')
+              }"
+              >{{ serviceStatus }}</span
+            >
+            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {{ API_HOST }}
+            </span>
+          </div>
         </div>
         <div class="flex items-center space-x-2">
           <button
