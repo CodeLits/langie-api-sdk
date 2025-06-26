@@ -341,12 +341,22 @@ export function useTranslator(options: TranslatorOptions = {}) {
     toLang?: string
   ): Promise<string | any[]> => {
     const texts = Array.isArray(text) ? text : [text]
-    const translations = await fetchAndCacheBatch(
+    const translationResults = await fetchAndCacheBatch(
       texts.map((t) => ({ text: t })),
       fromLang,
       toLang || currentLanguage.value
     )
-    const result = texts.map((t) => translations[t] || t)
+
+    // Extract translated text from the API response
+    const result = texts.map((originalText, index) => {
+      const translationItem = Array.isArray(translationResults) ? translationResults[index] : null
+      if (translationItem && translationItem.translated) {
+        return translationItem.translated
+      }
+      // Fallback to original text if translation not found
+      return originalText
+    })
+
     return Array.isArray(text) ? result : result[0]
   }
 

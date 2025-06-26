@@ -153,12 +153,22 @@ const handleTranslate = async () => {
       targetLang.value?.code
     )
 
-    if (Array.isArray(result) && result.length > 0) {
-      translation.value = result[0].text
+    if (
+      result &&
+      result.translations &&
+      Array.isArray(result.translations) &&
+      result.translations.length > 0
+    ) {
+      // API returns: { translations: [{ text: "original", translated: "translation" }] }
+      translation.value = result.translations[0].translated
+    } else if (Array.isArray(result) && result.length > 0) {
+      // Fallback for array format
+      translation.value = result[0].text || result[0].translated || result[0]
     } else if (typeof result === 'string') {
       translation.value = result
     } else {
       translation.value = 'Translation returned an unexpected format.'
+      console.log('❌ Unexpected translation result:', result)
     }
   } catch (err) {
     console.error('❌ Translation error:', err)
