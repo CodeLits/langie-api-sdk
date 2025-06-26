@@ -60,6 +60,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import type { PropType } from 'vue'
 import Multiselect from '@vueform/multiselect'
+import '@vueform/multiselect/themes/default.css'
 import Fuse from 'fuse.js'
 import { applyLanguageAlias } from '../search-utils'
 import type { TranslatorLanguage } from '../types'
@@ -224,8 +225,6 @@ watch(
   { immediate: true }
 )
 </script>
-
-<style src="@vueform/multiselect/themes/default.css"></style>
 
 <style scoped>
 .language-select {
