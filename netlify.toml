@@ -1,6 +1,6 @@
 [build]
   base = "examples/demo"
-  publish = "examples/demo/dist"
+  publish = "dist"
   command = "bun install && bun run build"
 
 [build.environment]
