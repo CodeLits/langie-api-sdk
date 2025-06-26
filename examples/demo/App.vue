@@ -252,7 +252,7 @@ const displayLanguages = computed(() => {
     code: lang.value,
     name: lang.label,
     native_name: lang.label,
-    flag_country: lang.value
+    flag_country: null
   }))
 })
 

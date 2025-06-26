@@ -200,7 +200,7 @@ watch(
   --ms-border-color: #d1d5db;
   --ms-border-width: 1px;
   --ms-radius: 4px;
-  --ms-py: 0.5rem;
+  --ms-py: 0.3rem;
   --ms-px: 0.875rem;
   --ms-ring-width: 3px;
   --ms-ring-color: #10b98130;
@@ -208,8 +208,8 @@ watch(
 
   /* Options */
   --ms-option-font-size: 1rem;
-  --ms-option-line-height: 1.5;
-  --ms-option-py: 0.5rem;
+  --ms-option-line-height: 1;
+  --ms-option-py: 0.35rem;
   --ms-option-px: 0.875rem;
   --ms-option-bg-pointed: #f3f4f6;
   --ms-option-color-pointed: #1f2937;
