@@ -1,0 +1,37 @@
+[build]
+  base = "examples/demo"
+  publish = "examples/demo/dist"
+  command = "bun install && bun run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Redirect all routes to index.html for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for better performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Build settings for different contexts
+[context.production]
+  command = "bun install && bun run build"
+
+[context.deploy-preview]
+  command = "bun install && bun run build"
+
+[context.branch-deploy]
+  command = "bun install && bun run build" 

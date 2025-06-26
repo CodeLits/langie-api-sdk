@@ -5,6 +5,20 @@
 
 A lightweight, flexible translation SDK for Vue.js applications. Easily integrate multilingual support into your Vue projects with minimal configuration.
 
+## 🚀 Live Demo
+
+**[Try the live demo →](https://langie-api-sdk-demo.netlify.app)**
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/your-username/langie-api-sdk)
+
+Experience all features including:
+
+- Language selection with flags and native names
+- Real-time translation
+- Search functionality with intelligent aliases
+- Dark/light theme toggle
+- Responsive design
+
 ## Features
 
 - 🌍 **Language Detection** - Automatically detect user's preferred language
