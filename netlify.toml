@@ -1,7 +1,7 @@
 [build]
   base = "examples/demo"
   publish = "dist"
-  command = "bun install && bun run build"
+  command = "cd ../.. && bun install && cd examples/demo && bun install && bun run build"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -28,10 +28,10 @@
 
 # Build settings for different contexts
 [context.production]
-  command = "bun install && bun run build"
+  command = "cd ../.. && bun install && cd examples/demo && bun install && bun run build"
 
 [context.deploy-preview]
-  command = "bun install && bun run build"
+  command = "cd ../.. && bun install && cd examples/demo && bun install && bun run build"
 
 [context.branch-deploy]
-  command = "bun install && bun run build" 
+  command = "cd ../.. && bun install && cd examples/demo && bun install && bun run build" 
