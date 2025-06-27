@@ -91,13 +91,15 @@ import { LanguageSelect } from 'langie-api-sdk/components'
 
 #### `<lt>`
 
-The simplest way to add translations to your Vue templates:
+The simplest way to add translations to your Vue templates. Works immediately without any setup:
 
 ```vue
 <lt>Hello world!</lt>
 <lt>Hello {{ username }}!</lt>
 <lt v-html="'<b>Bold</b> text'"></lt>
 ```
+
+> **Note:** The `<lt>` component is exported as a synchronous component for immediate use in your templates.
 
 #### `<LanguageSelect />`
 
