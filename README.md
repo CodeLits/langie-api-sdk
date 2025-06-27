@@ -35,7 +35,23 @@ npm install langie-api-sdk
 
 ## Quick Start
 
-### Basic Usage
+### Using the `<lt>` Component
+
+```vue
+<script setup>
+import { lt } from 'langie-api-sdk/components'
+</script>
+
+<template>
+  <div>
+    <lt>Welcome to our application!</lt>
+    <lt>Hello {{ username }}!</lt>
+    <lt v-html="'<b>Bold</b> text'"></lt>
+  </div>
+</template>
+```
+
+### Using the `translate` Function
 
 ```vue
 <script setup>
@@ -55,26 +71,60 @@ const { translate, currentLanguage } = useLangie({
 </template>
 ```
 
-### Using Components
+### Language Selection
 
 ```vue
 <script setup>
-import { LanguageSelect, lt } from 'langie-api-sdk/components'
+import { LanguageSelect } from 'langie-api-sdk/components'
 </script>
 
 <template>
   <div>
     <LanguageSelect />
-    <lt>Welcome to our application!</lt>
   </div>
 </template>
 ```
 
 ## API Reference
 
+### Components
+
+#### `<lt>`
+
+The simplest way to add translations to your Vue templates:
+
+```vue
+<lt>Hello world!</lt>
+<lt>Hello {{ username }}!</lt>
+<lt v-html="'<b>Bold</b> text'"></lt>
+```
+
+#### `<LanguageSelect />`
+
+Dropdown component for language selection with flags and native names:
+
+```vue
+<LanguageSelect :show-flags="true" :show-native-names="true" class="my-custom-class" />
+```
+
+### Composables
+
+#### `useLangie(options)`
+
+Main composable for reactive translations:
+
+```js
+const { translate, currentLanguage, setLanguage, availableLanguages, isLoading } = useLangie({
+  translatorHost: 'https://your-translator-api.com',
+  defaultLanguage: 'en'
+})
+```
+
 ### Core Functions
 
 #### `translateBatch(translations, options)`
+
+Batch translate multiple texts in a single request:
 
 ```js
 import { translateBatch } from 'langie-api-sdk'
@@ -93,6 +143,8 @@ const results = await translateBatch(
 
 #### `fetchAvailableLanguages(options)`
 
+Fetch available languages from the translation service:
+
 ```js
 import { fetchAvailableLanguages } from 'langie-api-sdk'
 
@@ -101,33 +153,6 @@ const languages = await fetchAvailableLanguages({
   minPopularity: 0.1, // Filter by minimum popularity
   country: 'US' // Optional country filter
 })
-```
-
-### Composables
-
-#### `useLangie(options)`
-
-```js
-const { translate, currentLanguage, setLanguage, availableLanguages, isLoading } = useLangie({
-  translatorHost: 'https://your-translator-api.com',
-  defaultLanguage: 'en'
-})
-```
-
-### Components
-
-#### `<LanguageSelect />`
-
-```vue
-<LanguageSelect :show-flags="true" :show-native-names="true" class="my-custom-class" />
-```
-
-#### `<lt>`
-
-```vue
-<lt>Hello world!</lt>
-<lt>Hello {{ username }}!</lt>
-<lt v-html="'<b>Bold</b> text'"></lt>
 ```
 
 ## Configuration
