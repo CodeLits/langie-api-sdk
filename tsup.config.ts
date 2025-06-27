@@ -14,7 +14,8 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   dts: {
     entry: {
-      index: 'src/index.ts'
+      index: 'src/index.ts',
+      'components/index': 'src/components/index.ts'
     },
     compilerOptions: {
       skipLibCheck: true

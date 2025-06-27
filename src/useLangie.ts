@@ -1,6 +1,5 @@
 import { ref, watch, reactive } from 'vue'
 import type { Ref } from 'vue'
-import { translateBatch, fetchAvailableLanguages } from './core'
 import type { TranslatorOptions, TranslatorLanguage } from './types'
 import { DEFAULT_API_HOST } from './constants'
 
@@ -28,7 +27,6 @@ export function useLangie(options: TranslatorOptions = {}) {
 
   const translatorHost = _translatorHost // Use the shared host
   const defaultLanguage = options.defaultLanguage || 'en'
-  const fallbackLanguage = options.fallbackLanguage || 'en'
 
   const isLoading = ref(false)
 
@@ -144,9 +142,6 @@ export function useLangie(options: TranslatorOptions = {}) {
       return []
     }
   }
-
-  // Thin wrapper: reuse translateBatch for single-string translations, removing duplicated request logic
-  let translate: any // forward-declared to be defined after translateBatch
 
   /**
    * Synchronously get translation for the provided key.
@@ -330,35 +325,7 @@ export function useLangie(options: TranslatorOptions = {}) {
     queueMap.clear()
   }
 
-  // Expose the batch translation method
-  const fetchBatchTranslations = fetchAndCacheBatch
-
-  // ------------------------------------------------------------------
-  // Define translate wrapper simplified
-  translate = async (
-    text: string | string[],
-    fromLang?: string,
-    toLang?: string
-  ): Promise<string | any[]> => {
-    const texts = Array.isArray(text) ? text : [text]
-    const translationResults = await fetchAndCacheBatch(
-      texts.map((t) => ({ text: t })),
-      fromLang,
-      toLang || currentLanguage.value
-    )
-
-    // Extract translated text from the API response
-    const result = texts.map((originalText, index) => {
-      const translationItem = Array.isArray(translationResults) ? translationResults[index] : null
-      if (translationItem && translationItem.translated) {
-        return translationItem.translated
-      }
-      // Fallback to original text if translation not found
-      return originalText
-    })
-
-    return Array.isArray(text) ? result : result[0]
-  }
+  const translate = l
 
   // Auto-fetch languages on initialization if not already cached/loading
   if (!_languagesCache && !_languagesPromise) {
@@ -373,10 +340,11 @@ export function useLangie(options: TranslatorOptions = {}) {
     translations,
     uiTranslations,
     l,
+    translate,
     getCountryFromLang,
     getTranslation,
     clearTranslations,
-    translate,
+    fetchAndCacheBatch,
     isLoading
   }
 }

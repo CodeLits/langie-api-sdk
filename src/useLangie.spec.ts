@@ -9,11 +9,9 @@ vi.mock('./core', () => ({
 
 describe('useLangie', () => {
   let useLangieFresh: typeof import('./useLangie').useLangie
-  let core: typeof import('./core')
 
   beforeEach(async () => {
     vi.resetModules()
-    core = await import('./core')
     useLangieFresh = (await import('./useLangie')).useLangie
     vi.clearAllMocks()
   })

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import LanguageSelect from '../LanguageSelect.vue'
 
@@ -40,7 +40,7 @@ describe('LanguageSelect', () => {
   })
 
   it('displays flag for selected language', async () => {
-    const { findByRole, container } = render(LanguageSelect, {
+    const { container } = render(LanguageSelect, {
       props: {
         modelValue: 'ru',
         languages: mockLanguages
