@@ -1,6 +1,6 @@
 import { ref, watch, reactive } from 'vue'
 import type { Ref } from 'vue'
-import type { TranslatorOptions, TranslatorLanguage } from './types'
+import type { TranslatorOptions, TranslatorLanguage, TranslateServiceResponse } from './types'
 import { DEFAULT_API_HOST } from './constants'
 
 const availableLanguages: Ref<TranslatorLanguage[]> = ref([])
@@ -270,10 +270,10 @@ export function useLangie(options: TranslatorOptions = {}) {
       const translatedItems = resp.translations || []
 
       // Populate cache
-      translatedItems.forEach((item: any, index: number) => {
+      translatedItems.forEach((item: TranslateServiceResponse, index: number) => {
         const originalText = item.text || (items[index] && items[index].text) || ''
         const ctx = (items[index] && items[index].context) || 'ui'
-        const translatedText = item.translated || item.t || item.translation || originalText
+        const translatedText = item.translated || item.t || originalText
         const ck = `${originalText}_${toLang}_${ctx}`
         translations[ck] = translatedText
         uiTranslations[ck] = translatedText

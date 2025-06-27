@@ -96,7 +96,7 @@ export async function translateBatch(
         throw new Error(`Translator service error: ${resp.status} ${resp.statusText}`)
       }
 
-      let parsed: any
+      let parsed: { translations?: TranslateServiceResponse[]; t?: string } | null
       try {
         parsed = await resp.clone().json()
       } catch (jsonErr) {
@@ -117,8 +117,8 @@ export async function translateBatch(
         : data.t
           ? [{ text: serviceTranslations[0].text, translated: data.t }]
           : []
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         const message = `[translator-sdk] Translator request to ${translatorHost} timed out after 5 seconds.`
         console.error(message)
         throw new Error(message)
@@ -136,8 +136,7 @@ export async function translateBatch(
     if (from === to) return { text: tr.text, translated: tr.text }
 
     const svcIdx = indexMap.indexOf(idx)
-    if (svcIdx !== -1)
-      return (serviceResults[svcIdx] as any) || { text: tr.text, translated: tr.text }
+    if (svcIdx !== -1) return serviceResults[svcIdx] || { text: tr.text, translated: tr.text }
     return { text: tr.text, translated: tr.text }
   })
 
