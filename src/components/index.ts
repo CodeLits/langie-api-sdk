@@ -1,11 +1,9 @@
 /**
  * Vue components for translation
  */
-import { defineAsyncComponent } from 'vue'
 import ltComponent from './lt.vue'
+import LanguageSelectComponent from './LanguageSelect.vue'
 
-// Export lt as a regular synchronous component for immediate use
+// Export both components as synchronous components for immediate use
 export const lt = ltComponent
-
-// Export LanguageSelect as async component since it has more dependencies
-export const LanguageSelect = defineAsyncComponent(() => import('./LanguageSelect.vue'))
+export const LanguageSelect = LanguageSelectComponent

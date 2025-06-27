@@ -183,6 +183,56 @@ Your translation service needs these endpoints:
 - `POST /translate` - For translating text
 - `GET /languages` - For fetching available languages
 
+## Troubleshooting
+
+### Component Resolution Issues
+
+If you see errors like `Failed to resolve component: lt` or `Component is missing template or render function`, try these solutions:
+
+#### 1. **Correct Import Path**
+
+```vue
+<script setup>
+// ✅ Correct - Import from components
+import { lt } from 'langie-api-sdk/components'
+
+// ❌ Wrong - Don't import from main package
+// import { lt } from 'langie-api-sdk'
+</script>
+```
+
+#### 2. **Global Registration** (Alternative)
+
+```js
+// main.js
+import { createApp } from 'vue'
+import { lt, LanguageSelect } from 'langie-api-sdk/components'
+
+const app = createApp(App)
+app.component('lt', lt)
+app.component('LanguageSelect', LanguageSelect)
+```
+
+#### 3. **Direct Import** (For Build Issues)
+
+```vue
+<script setup>
+// If the above doesn't work, try direct import
+import lt from 'langie-api-sdk/dist/components/lt.vue'
+</script>
+```
+
+#### 4. **Vite Configuration** (If using Vite)
+
+```js
+// vite.config.js
+export default {
+  optimizeDeps: {
+    include: ['langie-api-sdk']
+  }
+}
+```
+
 ## Framework Compatibility
 
 ### ✅ Supported Frameworks

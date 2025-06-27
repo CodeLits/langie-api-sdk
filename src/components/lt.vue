@@ -9,6 +9,11 @@
 import { computed, useSlots } from 'vue'
 import { useLangie } from '../useLangie'
 
+// Define component name for better debugging
+defineOptions({
+  name: 'LangieTranslate'
+})
+
 // Detect if we're running in Nuxt
 const isNuxt = computed(() => {
   if (typeof window !== 'undefined') {
