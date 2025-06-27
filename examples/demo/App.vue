@@ -1,10 +1,14 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useLangie, DEFAULT_API_HOST, DEV_API_HOST } from '@/index'
-// Import the component directly from source for demo
-import lt from '@/components/lt.vue'
-// Import LanguageSelect from the main package
-import LanguageSelect from '@/components/LanguageSelect.vue'
+import { useLangie, DEFAULT_API_HOST, DEV_API_HOST, lt, LanguageSelect } from '@/index'
+import { ArrowPathIcon } from '@heroicons/vue/24/outline'
+import {
+  SunIcon,
+  MoonIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  XCircleIcon
+} from '@heroicons/vue/24/solid'
 
 // Use production API in production, dev API in development
 const API_HOST = import.meta.env.PROD ? DEFAULT_API_HOST : DEV_API_HOST
@@ -35,17 +39,29 @@ const lastRateLimitTime = ref(null)
 
 const isLoading = computed(() => isTranslatorLoading.value)
 
+const serviceStatusIcon = computed(() => {
+  if (serviceStatus.value.includes('Online')) return CheckCircleIcon
+  if (serviceStatus.value.includes('Issues')) return ExclamationTriangleIcon
+  return XCircleIcon
+})
+
+const serviceStatusText = computed(() => {
+  if (serviceStatus.value.includes('Online')) return 'Online'
+  if (serviceStatus.value.includes('Issues')) return 'Issues'
+  return 'Offline'
+})
+
 const checkServiceHealth = async () => {
   try {
     const response = await fetch(`${API_HOST}/health`)
     if (response.ok) {
       const data = await response.json()
-      serviceStatus.value = data.status === 'ok' ? '✅ Online' : '⚠️ Issues'
+      serviceStatus.value = data.status === 'ok' ? 'Online' : 'Issues'
     } else {
-      serviceStatus.value = '❌ Offline'
+      serviceStatus.value = 'Offline'
     }
   } catch (error) {
-    serviceStatus.value = '❌ Offline'
+    serviceStatus.value = 'Offline'
   }
 }
 
@@ -100,7 +116,7 @@ onMounted(async () => {
   // The useLangie composable now handles the initial fetch automatically.
   // This explicit call is redundant and causes a double-fetch.
   //
-  // if (serviceStatus.value.includes('✅') && !rateLimited.value) {
+  // if (serviceStatus.value.includes('Online') && !rateLimited.value) {
   //   try {
   //     await fetchLanguages({ force: true })
   //   } catch (err) {
@@ -171,10 +187,10 @@ const handleTranslate = async () => {
       translation.value = result
     } else {
       translation.value = 'Translation returned an unexpected format.'
-      console.log('❌ Unexpected translation result:', result)
+      console.log('Unexpected translation result:', result)
     }
   } catch (err) {
-    console.error('❌ Translation error:', err)
+    console.error('Translation error:', err)
 
     if (
       err.message?.includes('429') ||
@@ -292,7 +308,7 @@ const displayLanguages = computed(() => {
 
 const canRetryLanguages = computed(() => {
   return (
-    serviceStatus.value.includes('✅') &&
+    serviceStatus.value.includes('Online') &&
     availableLanguages.value.length === 0 &&
     (!rateLimited.value || isRateLimitExpired.value)
   )
@@ -342,15 +358,19 @@ watch(
         <div class="flex items-center space-x-4">
           <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Langie API SDK</h1>
           <div class="flex flex-col">
-            <span
-              class="px-2 py-1 text-xs font-semibold rounded-full"
-              :class="{
-                'bg-green-100 text-green-800': serviceStatus.includes('✅'),
-                'bg-yellow-100 text-yellow-800': serviceStatus.includes('⚠️'),
-                'bg-red-100 text-red-800': serviceStatus.includes('❌')
-              }"
-              >{{ serviceStatus }}</span
-            >
+            <div class="flex items-center gap-2">
+              <span
+                class="px-2 py-1 text-xs font-semibold rounded-full flex items-center gap-1"
+                :class="{
+                  'bg-green-100 text-green-800': serviceStatus.includes('Online'),
+                  'bg-yellow-100 text-yellow-800': serviceStatus.includes('Issues'),
+                  'bg-red-100 text-red-800': serviceStatus.includes('Offline')
+                }"
+              >
+                <component :is="serviceStatusIcon" class="w-4 h-4" />
+                {{ serviceStatusText }}
+              </span>
+            </div>
             <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {{ API_HOST }}
             </span>
@@ -359,35 +379,45 @@ watch(
         <div class="flex items-center space-x-2">
           <button
             @click="toggleTheme"
-            class="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900"
+            class="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            <span v-if="isDark">☀️</span>
-            <span v-else>🌙</span>
+            <SunIcon v-if="isDark" class="w-7 h-7 text-yellow-500" />
+            <MoonIcon v-else class="w-7 h-7 text-blue-400" />
           </button>
         </div>
       </div>
 
       <!-- API Issues warning -->
       <div
-        v-if="serviceStatus.includes('❌') || rateLimited"
-        class="p-4 mb-4 text-sm rounded-lg"
+        v-if="serviceStatus.includes('Offline') || rateLimited"
+        class="p-4 mb-4 text-sm rounded-lg flex items-start gap-2"
         :class="{
-          'bg-red-100 text-red-700 dark:bg-red-200 dark:text-red-800': serviceStatus.includes('❌'),
+          'bg-red-100 text-red-700 dark:bg-red-200 dark:text-red-800':
+            serviceStatus.includes('Offline'),
           'bg-yellow-100 text-yellow-700 dark:bg-yellow-200 dark:text-yellow-800': rateLimited
         }"
         role="alert"
       >
-        <span class="font-medium">
-          <lt v-if="serviceStatus.includes('❌')" orig="en">API Offline</lt>
-          <lt v-else orig="en">Rate Limit</lt>
-        </span>
-        <lt v-if="serviceStatus.includes('❌')" orig="en"
-          >The translation service is currently offline. Using a fallback list of languages.</lt
-        >
-        <lt v-else orig="en"
-          >API rate limit may have been reached. Language list may be incomplete. Please wait a
-          moment.</lt
-        >
+        <XCircleIcon
+          v-if="serviceStatus.includes('Offline')"
+          class="w-6 h-6 mt-0.5 flex-shrink-0"
+        />
+        <ExclamationTriangleIcon v-else class="w-6 h-6 mt-0.5 flex-shrink-0" />
+        <div>
+          <span class="font-medium">
+            <lt v-if="serviceStatus.includes('Offline')" orig="en">API Offline</lt>
+            <lt v-else orig="en">Rate Limit</lt>
+          </span>
+          <div class="mt-1">
+            <lt v-if="serviceStatus.includes('Offline')" orig="en"
+              >The translation service is currently offline. Using a fallback list of languages.</lt
+            >
+            <lt v-else orig="en"
+              >API rate limit may have been reached. Language list may be incomplete. Please wait a
+              moment.</lt
+            >
+          </div>
+        </div>
       </div>
 
       <div class="mb-6">
@@ -428,19 +458,7 @@ watch(
               class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
               :title="l('Swap languages')"
             >
-              <svg
-                class="w-5 h-5 text-gray-600 dark:text-gray-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m0-4l4-4"
-                ></path>
-              </svg>
+              <ArrowPathIcon class="w-7 h-7 text-gray-600 dark:text-gray-300" />
             </button>
           </div>
           <div class="col-span-2">
