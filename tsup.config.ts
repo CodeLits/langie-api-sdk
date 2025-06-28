@@ -9,7 +9,8 @@ const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
-    'components/index': 'src/components/index.ts'
+    'components/index': 'src/components/index.ts',
+    teleport: 'src/styles/teleport.css'
   },
   format: ['esm', 'cjs'],
   dts: {

@@ -222,6 +222,7 @@ The `LanguageSelect` component will look broken without these styles!
 ```js
 // main.js
 import '@vueform/multiselect/themes/default.css'
+import 'langie-api-sdk/dist/teleport.css' // For proper flag & option styling
 ```
 
 **Option B: Component-level import**
@@ -229,6 +230,7 @@ import '@vueform/multiselect/themes/default.css'
 ```vue
 <script setup>
 import '@vueform/multiselect/themes/default.css'
+import 'langie-api-sdk/dist/teleport.css'
 import { LanguageSelect } from 'langie-api-sdk/components'
 </script>
 ```
@@ -238,6 +240,7 @@ import { LanguageSelect } from 'langie-api-sdk/components'
 ```css
 /* In your main CSS file */
 @import '@vueform/multiselect/themes/default.css';
+@import 'langie-api-sdk/dist/teleport.css';
 ```
 
 #### 3. **Provide Languages Data**
