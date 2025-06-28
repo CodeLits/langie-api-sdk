@@ -39,6 +39,33 @@
         </div>
       </div>
 
+      <!-- InterfaceLanguageSelect Demo -->
+      <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
+          <lt orig="en">InterfaceLanguageSelect</lt>
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <lt orig="en">
+            Features: Auto API integration, browser language detection, excludes selected language
+          </lt>
+        </p>
+        <div class="max-w-md">
+          <InterfaceLanguageSelect
+            placeholder="Choose interface language..."
+            :is-dark="isDark"
+            @update:model-value="handleInterfaceLanguageChange"
+          />
+        </div>
+        <div v-if="selectedInterfaceLang" class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+          <lt orig="en">Selected:</lt> {{ selectedInterfaceLang.name }} ({{
+            selectedInterfaceLang.code
+          }})
+          <span v-if="selectedInterfaceLang.native_name">
+            - {{ selectedInterfaceLang.native_name }}</span
+          >
+        </div>
+      </div>
+
       <!-- Simple LanguageSelect Demo -->
       <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
@@ -77,6 +104,10 @@
             >
           </div>
           <div>
+            <strong><lt orig="en">InterfaceLanguageSelect:</lt></strong>
+            <lt orig="en">For interface language selection with automatic API integration</lt>
+          </div>
+          <div>
             <strong><lt orig="en">SimpleLanguageSelect:</lt></strong>
             <lt orig="en">When you want minimal dependencies and a native dropdown</lt>
           </div>
@@ -88,7 +119,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { LanguageSelect, SimpleLanguageSelect, lt } from '@/index'
+import { LanguageSelect, SimpleLanguageSelect, InterfaceLanguageSelect, lt } from '@/index'
 
 defineProps({
   languages: Array,
@@ -99,4 +130,10 @@ defineProps({
 const showDemo = ref(false)
 const demoLangAdvanced = ref(null)
 const demoLangSimple = ref(null)
+const selectedInterfaceLang = ref(null)
+
+function handleInterfaceLanguageChange(language) {
+  selectedInterfaceLang.value = language
+  console.log('Interface language changed to:', language)
+}
 </script>

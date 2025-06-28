@@ -32,13 +32,17 @@ import { lt } from 'langie-api-sdk/components'
 
 ```vue
 <script setup>
-import { LanguageSelect } from 'langie-api-sdk/components'
+import { LanguageSelect, InterfaceLanguageSelect } from 'langie-api-sdk/components'
 import '@vueform/multiselect/themes/default.css'
 import 'langie-api-sdk/dist/index.css'
 </script>
 
 <template>
+  <!-- Manual language selection -->
   <LanguageSelect v-model="selectedLang" :languages="languages" />
+
+  <!-- Automatic interface language selection -->
+  <InterfaceLanguageSelect />
 </template>
 ```
 
@@ -74,6 +78,7 @@ import 'langie-api-sdk/dist/index.css'
 
 - `<lt>` - Translate text inline
 - `<LanguageSelect>` - Language dropdown with flags
+- `<InterfaceLanguageSelect>` - Automatic interface language selection with API integration
 - `<SimpleLanguageSelect>` - Basic HTML select (no dependencies)
 
 ### Composables

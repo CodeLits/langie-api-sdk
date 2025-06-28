@@ -5,7 +5,7 @@ import {
   DEFAULT_API_HOST,
   DEV_API_HOST,
   lt,
-  LanguageSelect,
+  InterfaceLanguageSelect,
   translateBatch
 } from '@/index'
 import { SunIcon, MoonIcon } from '@heroicons/vue/24/solid'
@@ -25,8 +25,6 @@ const API_HOST = import.meta.env.PROD ? DEFAULT_API_HOST : DEV_API_HOST
 
 const {
   availableLanguages,
-  setLanguage,
-  fetchLanguages,
   l,
   isLoading: isTranslatorLoading
 } = useLangie({
@@ -37,7 +35,6 @@ const {
 const { isDark, toggleTheme, initTheme } = useTheme()
 
 // State
-const interfaceLang = ref(null)
 const sourceLang = ref(null)
 const targetLang = ref(null)
 const textToTranslate = ref('Welcome to the application!')
@@ -146,17 +143,6 @@ const findLang = (code) => displayLanguages.value.find((l) => l.code === code) |
 
 // Watchers
 watch(
-  interfaceLang,
-  (newLang) => {
-    if (newLang?.code) {
-      setLanguage(newLang.code)
-      localStorage.setItem('interfaceLanguage', newLang.code)
-    }
-  },
-  { deep: true }
-)
-
-watch(
   sourceLang,
   (newLang) => {
     if (newLang?.code) {
@@ -189,10 +175,6 @@ watch(
   displayLanguages,
   (langs) => {
     if (langs.length > 0) {
-      if (!interfaceLang.value) {
-        const savedCode = localStorage.getItem('interfaceLanguage') || 'en'
-        interfaceLang.value = findLang(savedCode)
-      }
       if (!sourceLang.value) {
         const savedCode = localStorage.getItem('sourceLang') || 'en'
         sourceLang.value = findLang(savedCode)
@@ -226,8 +208,8 @@ watch(
         </div>
         <div class="flex items-center space-x-2">
           <button
-            @click="toggleTheme"
             class="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            @click="toggleTheme"
           >
             <SunIcon v-if="isDark" class="w-7 h-7 text-yellow-500" />
             <MoonIcon v-else class="w-7 h-7 text-blue-400" />
@@ -241,13 +223,7 @@ watch(
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           <lt orig="en">Interface Language</lt>
         </label>
-        <LanguageSelect
-          v-model="interfaceLang"
-          placeholder="UI Language"
-          :disabled="isLoading"
-          :is-dark="isDark"
-          :languages="displayLanguages"
-        />
+        <InterfaceLanguageSelect placeholder="UI Language" :is-dark="isDark" />
       </div>
 
       <h2 class="text-2xl font-semibold text-center text-gray-800 dark:text-gray-200 mb-6">

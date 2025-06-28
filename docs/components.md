@@ -14,6 +14,71 @@ import { LanguageSelect, T } from 'langie-api-sdk/components'
 
 The `LanguageSelect` component provides a dropdown menu for selecting a language.
 
+## InterfaceLanguageSelect
+
+The `InterfaceLanguageSelect` component is a specialized version of `LanguageSelect` that automatically manages interface language selection. It integrates with the `useLangie` composable to automatically fetch available languages from the API and detect the browser language. The currently selected language is automatically excluded from the dropdown options.
+
+### Key Features
+
+- **Automatic API Integration**: Languages are fetched automatically from your translation API
+- **Browser Language Detection**: Automatically selects the appropriate language based on browser settings
+- **Auto-exclusion**: Currently selected language is automatically removed from dropdown options
+- **Persistent State**: Uses `useLangie` composable to maintain language state across the application
+
+### Props
+
+| Prop          | Type      | Default                       | Description                                   |
+| ------------- | --------- | ----------------------------- | --------------------------------------------- |
+| `placeholder` | `String`  | `'Select interface language'` | Placeholder text when no language is selected |
+| `disabled`    | `Boolean` | `false`                       | Whether the select is disabled                |
+| `isDark`      | `Boolean` | `false`                       | Whether to use dark theme styling             |
+
+### Events
+
+| Event               | Payload              | Description                                |
+| ------------------- | -------------------- | ------------------------------------------ |
+| `update:modelValue` | `TranslatorLanguage` | Emitted when the selected language changes |
+
+### Basic Usage
+
+```vue
+<template>
+  <div>
+    <InterfaceLanguageSelect />
+  </div>
+</template>
+
+<script setup>
+import { InterfaceLanguageSelect } from 'langie-api-sdk/components'
+</script>
+```
+
+### With Event Handling
+
+```vue
+<template>
+  <div>
+    <InterfaceLanguageSelect @update:modelValue="handleLanguageChange" :is-dark="isDarkMode" />
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { InterfaceLanguageSelect } from 'langie-api-sdk/components'
+
+const isDarkMode = ref(false)
+
+function handleLanguageChange(language) {
+  console.log(`Interface language changed to: ${language.name} (${language.code})`)
+}
+</script>
+```
+
+### Difference from LanguageSelect
+
+- **LanguageSelect**: Requires languages to be passed as props, suitable for general language selection
+- **InterfaceLanguageSelect**: Automatically manages languages and integrates with the global language state, specifically designed for interface language selection
+
 ### Props
 
 | Prop              | Type      | Default             | Description                                                  |

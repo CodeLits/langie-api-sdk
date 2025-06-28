@@ -20,7 +20,15 @@ export type ltProps = {
   orig?: string
 }
 
+export type InterfaceLanguageSelectProps = {
+  placeholder?: string
+  disabled?: boolean
+  isDark?: boolean
+  class?: string
+}
+
 // Component declarations
 export declare const LanguageSelect: DefineComponent<LanguageSelectProps>
 export declare const SimpleLanguageSelect: DefineComponent<SimpleLanguageSelectProps>
+export declare const InterfaceLanguageSelect: DefineComponent<InterfaceLanguageSelectProps>
 export declare const lt: DefineComponent<ltProps>

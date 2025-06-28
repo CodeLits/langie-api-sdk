@@ -12,6 +12,12 @@ export { DEFAULT_API_HOST, DEFAULT_TRANSLATOR_OPTIONS, DEV_API_HOST } from './co
 
 // Export types
 export type { TranslateRequestBody, TranslateServiceResponse, TranslatorLanguage } from './types'
+export type {
+  LanguageSelectProps,
+  SimpleLanguageSelectProps,
+  InterfaceLanguageSelectProps,
+  ltProps
+} from './components'
 
 // Export utility functions
 export { isClientOnly, isNuxtEnvironment, shouldUseClientOnly } from './utils/client-only'
@@ -21,7 +27,7 @@ export { applyLanguageAlias } from './search-utils'
 export { LANGUAGE_ALIAS_TABLE } from './language-aliases'
 
 // Export components
-export { LanguageSelect, SimpleLanguageSelect, lt } from './components'
+export { LanguageSelect, SimpleLanguageSelect, InterfaceLanguageSelect, lt } from './components'
 
 // Import teleport styles to ensure flag styling works out of the box
 import './styles/teleport.css'
