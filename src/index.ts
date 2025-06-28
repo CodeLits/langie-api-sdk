@@ -22,3 +22,6 @@ export { LANGUAGE_ALIAS_TABLE } from './language-aliases'
 
 // Export components
 export { LanguageSelect, SimpleLanguageSelect, lt } from './components'
+
+// Import teleport styles to ensure flag styling works out of the box
+import './styles/teleport.css'
