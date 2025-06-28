@@ -21,4 +21,4 @@ export { applyLanguageAlias } from './search-utils'
 export { LANGUAGE_ALIAS_TABLE } from './language-aliases'
 
 // Export components
-export { LanguageSelect, lt } from './components'
+export { LanguageSelect, SimpleLanguageSelect, lt } from './components'

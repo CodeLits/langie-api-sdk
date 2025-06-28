@@ -33,6 +33,14 @@ Experience all features including:
 npm install langie-api-sdk
 ```
 
+### For LanguageSelect Component (Optional)
+
+If you plan to use the `LanguageSelect` component, install its dependencies:
+
+```bash
+npm install @vueform/multiselect fuse.js
+```
+
 ## Quick Start
 
 ### Using the `<lt>` Component
@@ -188,6 +196,70 @@ Your translation service needs these endpoints:
 ### Component Resolution Issues
 
 If you see errors like `Failed to resolve component: lt` or `Component is missing template or render function`, try these solutions:
+
+### LanguageSelect Component Not Visible
+
+The `LanguageSelect` component requires additional dependencies and setup. Here's how to fix it:
+
+#### 1. **Install Required Dependencies**
+
+```bash
+npm install @vueform/multiselect fuse.js
+# or
+bun add @vueform/multiselect fuse.js
+```
+
+#### 2. **Import CSS Styles**
+
+```js
+// main.js or in your component
+import '@vueform/multiselect/themes/default.css'
+```
+
+#### 3. **Provide Languages Data**
+
+```vue
+<script setup>
+import { ref, onMounted } from 'vue'
+import { LanguageSelect, useLangie } from 'langie-api-sdk/components'
+
+const { availableLanguages, fetchLanguages } = useLangie({
+  translatorHost: 'https://your-api.com'
+})
+
+const selectedLang = ref(null)
+
+onMounted(async () => {
+  await fetchLanguages() // This populates availableLanguages
+})
+</script>
+
+<template>
+  <LanguageSelect v-model="selectedLang" :languages="availableLanguages" />
+</template>
+```
+
+#### 4. **Alternative: Use SimpleLanguageSelect (No Dependencies)**
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { SimpleLanguageSelect } from 'langie-api-sdk/components'
+
+const selectedLang = ref(null)
+const languages = [
+  { code: 'en', name: 'English', native_name: 'English' },
+  { code: 'es', name: 'Spanish', native_name: 'Español' },
+  { code: 'fr', name: 'French', native_name: 'Français' }
+]
+</script>
+
+<template>
+  <SimpleLanguageSelect v-model="selectedLang" :languages="languages" :show-native-names="true" />
+</template>
+```
+
+> **Note:** `SimpleLanguageSelect` is a basic HTML select dropdown that doesn't require any external dependencies. Use `LanguageSelect` for advanced features like search and flags.
 
 #### 1. **Correct Import Path**
 

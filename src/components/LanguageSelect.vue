@@ -1,16 +1,17 @@
 <template>
   <div class="language-select" :class="{ 'is-dark': isDark }">
+    <!-- Show multiselect when we have languages OR when not loading -->
     <Multiselect
-      v-if="!isLoading && validLanguages.length"
+      v-if="validLanguages.length > 0 || !isLoading"
       :key="multiselectKey"
       v-model="selectedLanguage"
       :options="filteredLanguages"
       :searchable="true"
-      :canClear="false"
+      :can-clear="false"
       :allow-empty="false"
       :object="true"
-      :placeholder="placeholder"
-      :disabled="props.disabled"
+      :placeholder="validLanguages.length === 0 ? 'No languages available' : placeholder"
+      :disabled="props.disabled || validLanguages.length === 0"
       :loading="isLoading"
       track-by="name"
       label="name"
@@ -19,7 +20,7 @@
       @search-change="handleSearch"
     >
       <template #singlelabel="{ value }">
-        <div class="multiselect-single-label" v-if="value">
+        <div v-if="value" class="multiselect-single-label">
           <img
             v-if="value.code"
             :key="selectedLanguageKey"
@@ -49,10 +50,17 @@
         <div class="multiselect-no-results">No languages found.</div>
       </template>
       <template #nooptions>
-        <div class="multiselect-no-options">No languages available.</div>
+        <div class="multiselect-no-options">
+          {{
+            validLanguages.length === 0
+              ? 'Please provide languages via the :languages prop'
+              : 'No languages available.'
+          }}
+        </div>
       </template>
     </Multiselect>
-    <div v-else class="skeleton-loader"></div>
+    <!-- Only show skeleton loader when actually loading AND we have no languages yet -->
+    <div v-else-if="isLoading && validLanguages.length === 0" class="skeleton-loader"></div>
   </div>
 </template>
 
@@ -212,6 +220,12 @@ const onFlagError = (event: Event) => {
 onMounted(() => {
   if (validLanguages.value.length > 0) {
     isLoading.value = false
+  } else {
+    // Stop loading after 2 seconds if no languages are provided
+    // This prevents the component from being "invisible" forever
+    setTimeout(() => {
+      isLoading.value = false
+    }, 2000)
   }
 })
 
