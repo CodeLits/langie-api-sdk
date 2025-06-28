@@ -47,12 +47,12 @@ import { ArrowPathIcon } from '@heroicons/vue/24/outline'
 import { LanguageSelect, lt } from '@/index'
 
 const props = defineProps({
-  sourceLang: Object,
-  targetLang: Object,
-  languages: Array,
-  isLoading: Boolean,
-  isDark: Boolean,
-  swapTitle: String
+  sourceLang: { type: Object, default: null },
+  targetLang: { type: Object, default: null },
+  languages: { type: Array, default: () => [] },
+  isLoading: { type: Boolean, default: false },
+  isDark: { type: Boolean, default: false },
+  swapTitle: { type: String, default: '' }
 })
 
 defineEmits(['update:sourceLang', 'update:targetLang', 'swap'])
