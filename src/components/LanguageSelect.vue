@@ -66,6 +66,7 @@
 
 <script lang="ts" setup>
 import '@vueform/multiselect/themes/default.css'
+import '../styles/teleport.css'
 import { ref, computed, watch, onMounted } from 'vue'
 import type { PropType } from 'vue'
 import Multiselect from '@vueform/multiselect'

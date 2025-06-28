@@ -22,6 +22,3 @@ export { LANGUAGE_ALIAS_TABLE } from './language-aliases'
 
 // Export components
 export { LanguageSelect, SimpleLanguageSelect, lt } from './components'
-
-// Global styles to override teleport elements (flags, options)
-import './styles/teleport.css'
