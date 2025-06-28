@@ -1,5 +1,4 @@
 <template>
-  testestetetstes asdffasdfasafsafaff
   <LanguageSelect
     :model-value="currentLanguageObject"
     :languages="filteredLanguages"
@@ -11,7 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, watch } from 'vue'
+import { computed, watch, onMounted } from 'vue'
 import LanguageSelect from './LanguageSelect.vue'
 import { useLangie } from '../useLangie'
 import type { TranslatorLanguage } from '../types'
@@ -51,9 +50,27 @@ const filteredLanguages = computed(() => {
 function handleLanguageChange(selectedLanguage: TranslatorLanguage | null) {
   if (selectedLanguage) {
     setLanguage(selectedLanguage.code)
+    // Save to localStorage when user manually changes language
+    localStorage.setItem('interface_language', selectedLanguage.code)
     emit('update:modelValue', selectedLanguage)
   }
 }
+
+// Watch for current language changes to save to localStorage
+watch(currentLanguage, (newLangCode) => {
+  if (newLangCode) {
+    localStorage.setItem('interface_language', newLangCode)
+  }
+})
+
+// Load saved language from localStorage on initialization
+onMounted(() => {
+  const savedLanguageCode = localStorage.getItem('interface_language')
+  if (savedLanguageCode && savedLanguageCode !== currentLanguage.value) {
+    // Only set if different from current to avoid unnecessary changes
+    setLanguage(savedLanguageCode)
+  }
+})
 
 // Emit the current language when it changes
 watch(
