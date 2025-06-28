@@ -78,7 +78,7 @@
           </div>
           <div>
             <strong><lt orig="en">SimpleLanguageSelect:</lt></strong>
-            <lt orig="en">When you want minimal dependencies and a basic dropdown</lt>
+            <lt orig="en">When you want minimal dependencies and a native dropdown</lt>
           </div>
         </div>
       </div>

@@ -201,6 +201,10 @@ If you see errors like `Failed to resolve component: lt` or `Component is missin
 
 The `LanguageSelect` component requires additional dependencies and setup. Here's how to fix it:
 
+> 🚨 **Most Common Issue**: Missing CSS! If your LanguageSelect looks broken/ugly, you're probably missing the required CSS imports.
+>
+> 📖 **Detailed Styling Guide**: See [STYLING_TROUBLESHOOTING.md](./STYLING_TROUBLESHOOTING.md) for complete styling solutions.
+
 #### 1. **Install Required Dependencies**
 
 ```bash
@@ -209,11 +213,31 @@ npm install @vueform/multiselect fuse.js
 bun add @vueform/multiselect fuse.js
 ```
 
-#### 2. **Import CSS Styles**
+#### 2. **Import CSS Styles** ⚠️ **CRITICAL**
+
+The `LanguageSelect` component will look broken without these styles!
+
+**Option A: Global import (recommended)**
 
 ```js
-// main.js or in your component
+// main.js
 import '@vueform/multiselect/themes/default.css'
+```
+
+**Option B: Component-level import**
+
+```vue
+<script setup>
+import '@vueform/multiselect/themes/default.css'
+import { LanguageSelect } from 'langie-api-sdk/components'
+</script>
+```
+
+**Option C: CSS import**
+
+```css
+/* In your main CSS file */
+@import '@vueform/multiselect/themes/default.css';
 ```
 
 #### 3. **Provide Languages Data**

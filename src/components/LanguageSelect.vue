@@ -68,7 +68,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import type { PropType } from 'vue'
 import Multiselect from '@vueform/multiselect'
-import '@vueform/multiselect/themes/default.css'
+// Note: Import '@vueform/multiselect/themes/default.css' in your main.js or component
 import Fuse from 'fuse.js'
 import { applyLanguageAlias } from '../search-utils'
 import type { TranslatorLanguage } from '../types'
