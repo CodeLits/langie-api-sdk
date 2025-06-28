@@ -16,20 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 📦 Package Exports
 
-Now properly supports all these import paths:
+Only one stable import path:
 
 ```js
-// Main styles (recommended)
+// Only working path
 import 'langie-api-sdk/dist/index.css'
-import 'langie-api-sdk/styles'
-
-// Backwards compatibility
-import 'langie-api-sdk/dist/style.css' // redirects to index.css
-import 'langie-api-sdk/style'
-
-// Teleport-only styles (optional)
-import 'langie-api-sdk/dist/teleport.css'
-import 'langie-api-sdk/teleport'
 ```
 
 ### 🎨 CSS Changes
@@ -109,10 +100,6 @@ import 'langie-api-sdk/teleport'
 ```js
 // ✅ Recommended (stable)
 import 'langie-api-sdk/dist/index.css'
-
-// ❌ Avoid (was inconsistent in 1.2.x)
-import 'langie-api-sdk/dist/style.css'
-import 'langie-api-sdk/dist/teleport.css'
 ```
 
 **Flag Styling** - Now works automatically:
@@ -121,11 +108,6 @@ import 'langie-api-sdk/dist/teleport.css'
 // ✅ 1.3.0+ (flags work out of the box)
 import { LanguageSelect } from 'langie-api-sdk'
 import 'langie-api-sdk/dist/index.css'
-
-// ❌ 1.2.x (required additional CSS)
-import { LanguageSelect } from 'langie-api-sdk'
-import 'langie-api-sdk/dist/index.css'
-import 'langie-api-sdk/dist/teleport.css' // no longer needed
 ```
 
 ### Breaking Changes Summary
