@@ -321,7 +321,7 @@ watch(
   --ms-dropdown-color: #f9fafb;
 }
 
-.lang-flag {
+:deep(.lang-flag) {
   width: 20px;
   height: 15px;
   margin-right: 10px;
@@ -330,34 +330,34 @@ watch(
   object-fit: cover;
 }
 
-.is-dark .lang-flag {
+.is-dark :deep(.lang-flag) {
   border-color: #4b5563;
 }
 
-.multiselect-single-label,
-.multiselect-option {
+:deep(.multiselect-single-label),
+:deep(.multiselect-option) {
   display: flex;
   align-items: center;
 }
 
-.native-name {
+:deep(.native-name) {
   color: #6b7280;
   margin-left: 0.5rem;
   font-size: 0.9em;
 }
 
-.is-dark .native-name {
+.is-dark :deep(.native-name) {
   color: #9ca3af;
 }
 
-.multiselect-no-results,
-.multiselect-no-options {
+:deep(.multiselect-no-results),
+:deep(.multiselect-no-options) {
   padding: 0.5rem 0.875rem;
   color: #6b7280;
 }
 
-.is-dark .multiselect-no-results,
-.is-dark .multiselect-no-options {
+.is-dark :deep(.multiselect-no-results),
+.is-dark :deep(.multiselect-no-options) {
   color: #9ca3af;
 }
 </style>
