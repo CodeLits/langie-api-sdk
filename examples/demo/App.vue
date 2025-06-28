@@ -1,29 +1,24 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import {
-  useLangie,
-  DEFAULT_API_HOST,
-  DEV_API_HOST,
-  lt,
-  LanguageSelect,
-  SimpleLanguageSelect
-} from '@/index'
+import { useLangie, DEFAULT_API_HOST, DEV_API_HOST, lt, LanguageSelect } from '@/index'
 import '@vueform/multiselect/themes/default.css'
-import { ArrowPathIcon } from '@heroicons/vue/24/outline'
-import {
-  SunIcon,
-  MoonIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  XCircleIcon
-} from '@heroicons/vue/24/solid'
+import { SunIcon, MoonIcon } from '@heroicons/vue/24/solid'
+
+// Components
+import ServiceStatus from './components/ServiceStatus.vue'
+import ApiWarning from './components/ApiWarning.vue'
+import LanguageSelector from './components/LanguageSelector.vue'
+import TranslationForm from './components/TranslationForm.vue'
+import ComponentDemo from './components/ComponentDemo.vue'
+
+// Composables
+import { useTheme } from './composables/useTheme.js'
 
 // Use production API in production, dev API in development
 const API_HOST = import.meta.env.PROD ? DEFAULT_API_HOST : DEV_API_HOST
 
 const {
   translate,
-  currentLanguage,
   availableLanguages,
   setLanguage,
   fetchLanguages,
@@ -33,7 +28,10 @@ const {
   translatorHost: API_HOST
 })
 
-const isDark = ref(false)
+// Theme management
+const { isDark, toggleTheme, initTheme } = useTheme()
+
+// State
 const interfaceLang = ref(null)
 const sourceLang = ref(null)
 const targetLang = ref(null)
@@ -45,23 +43,11 @@ const serviceStatus = ref('Checking...')
 const rateLimited = ref(false)
 const lastRateLimitTime = ref(null)
 
-// Demo component variables
-const demoLangAdvanced = ref(null)
-const demoLangSimple = ref(null)
-const showComponentDemo = ref(false)
-
 const isLoading = computed(() => isTranslatorLoading.value)
 
-const serviceStatusIcon = computed(() => {
-  if (serviceStatus.value.includes('Online')) return CheckCircleIcon
-  if (serviceStatus.value.includes('Issues')) return ExclamationTriangleIcon
-  return XCircleIcon
-})
-
-const serviceStatusText = computed(() => {
-  if (serviceStatus.value.includes('Online')) return 'Online'
-  if (serviceStatus.value.includes('Issues')) return 'Issues'
-  return 'Offline'
+const isRateLimitExpired = computed(() => {
+  if (!lastRateLimitTime.value) return true
+  return Date.now() - lastRateLimitTime.value > 60000
 })
 
 const checkServiceHealth = async () => {
@@ -81,88 +67,21 @@ const checkServiceHealth = async () => {
 const handleRateLimit = () => {
   rateLimited.value = true
   lastRateLimitTime.value = Date.now()
-
-  // Reset rate limit after 1 minute
   setTimeout(() => {
     rateLimited.value = false
     lastRateLimitTime.value = null
   }, 60000)
 }
 
-const isRateLimitExpired = computed(() => {
-  if (!lastRateLimitTime.value) return true
-  return Date.now() - lastRateLimitTime.value > 60000
-})
-
 onMounted(async () => {
-  // Initialize dark mode first - check localStorage then system preference
-  const savedDarkMode = localStorage.getItem('darkMode')
-  let darkMode = false
+  initTheme()
 
-  if (savedDarkMode !== null) {
-    // User has explicitly set a preference
-    darkMode = savedDarkMode === 'true'
-  } else {
-    // No saved preference, use system preference
-    darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-    // Save the detected system preference
-    localStorage.setItem('darkMode', darkMode.toString())
-  }
-
-  isDark.value = darkMode
-  updateTheme()
-
-  // Load saved text and interface language
   const saved = localStorage.getItem('translateText')
   if (saved) textToTranslate.value = saved
 
-  // We will set the language via the watcher once languages are loaded
-  // const savedInterfaceLang = localStorage.getItem('interfaceLanguage')
-  // if (savedInterfaceLang) {
-  //   interfaceLang.value = savedInterfaceLang
-  //   setLanguage(savedInterfaceLang)
-  // }
-
-  // Check service health first
   await checkServiceHealth()
-
-  // The useLangie composable now handles the initial fetch automatically.
-  // This explicit call is redundant and causes a double-fetch.
-  //
-  // if (serviceStatus.value.includes('Online') && !rateLimited.value) {
-  //   try {
-  //     await fetchLanguages({ force: true })
-  //   } catch (err) {
-  //     console.warn('Failed to fetch languages on mount:', err)
-  //     // Trigger rate limiting on any fetch failure that could indicate rate limiting
-  //     if (
-  //       err.message?.includes('429') ||
-  //       err.message?.includes('Too Many Requests') ||
-  //       err.message?.includes('Failed to fetch') ||
-  //       err.message?.includes('CORS')
-  //     ) {
-  //       handleRateLimit()
-  //       console.log('Rate limiting triggered due to API errors')
-  //     }
-  //   }
-  // }
-
   isMounted.value = true
 })
-
-const toggleTheme = () => {
-  isDark.value = !isDark.value
-  localStorage.setItem('darkMode', isDark.value.toString())
-  updateTheme()
-}
-
-const updateTheme = () => {
-  if (isDark.value) {
-    document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
-  }
-}
 
 const handleTranslate = async () => {
   if (!textToTranslate.value.trim()) {
@@ -185,69 +104,25 @@ const handleTranslate = async () => {
       targetLang.value?.code
     )
 
-    if (
-      result &&
-      result.translations &&
-      Array.isArray(result.translations) &&
-      result.translations.length > 0
-    ) {
-      // API returns: { translations: [{ text: "original", translated: "translation" }] }
+    if (result?.translations?.[0]?.translated) {
       translation.value = result.translations[0].translated
-    } else if (Array.isArray(result) && result.length > 0) {
-      // Fallback for array format
+    } else if (Array.isArray(result) && result[0]) {
       translation.value = result[0].text || result[0].translated || result[0]
     } else if (typeof result === 'string') {
       translation.value = result
     } else {
       translation.value = 'Translation returned an unexpected format.'
-      console.log('Unexpected translation result:', result)
     }
   } catch (err) {
     console.error('Translation error:', err)
 
-    if (
-      err.message?.includes('429') ||
-      err.message?.includes('Too Many Requests') ||
-      err.message?.includes('Failed to fetch') ||
-      err.message?.includes('CORS') ||
-      err.message?.includes('Access-Control-Allow-Origin')
-    ) {
+    if (err.message?.includes('429') || err.message?.includes('CORS')) {
       handleRateLimit()
-      if (err.message?.includes('CORS') || err.message?.includes('Access-Control-Allow-Origin')) {
-        error.value =
-          'CORS error: The translation API needs CORS headers configured for this domain.'
-      } else if (err.message?.includes('429') || err.message?.includes('Too Many Requests')) {
-        error.value = 'API rate limit exceeded. Please wait a moment before trying again.'
-      } else {
-        error.value =
-          'Network/API error: Unable to connect to translation service. This could be due to rate limiting or server issues.'
-      }
+      error.value = err.message?.includes('CORS')
+        ? 'CORS error: The translation API needs CORS headers configured for this domain.'
+        : 'API rate limit exceeded. Please wait a moment before trying again.'
     } else {
       error.value = err.message || 'Translation failed'
-    }
-  }
-}
-
-const retryFetchLanguages = async () => {
-  if (rateLimited.value && !isRateLimitExpired.value) {
-    error.value = 'Please wait before retrying due to rate limits.'
-    return
-  }
-
-  try {
-    error.value = ''
-    await fetchLanguages({ force: true })
-  } catch (err) {
-    if (
-      err.message?.includes('429') ||
-      err.message?.includes('Too Many Requests') ||
-      err.message?.includes('Failed to fetch') ||
-      err.message?.includes('CORS')
-    ) {
-      handleRateLimit()
-      error.value = 'API issues detected (rate limiting or CORS). Languages will use fallback list.'
-    } else {
-      error.value = 'Failed to fetch languages from API. Using fallback list.'
     }
   }
 }
@@ -258,10 +133,18 @@ const swapLanguages = () => {
   targetLang.value = temp
 }
 
+// Computed
+const displayLanguages = computed(() => {
+  return availableLanguages.value?.length > 0 ? availableLanguages.value : []
+})
+
+const findLang = (code) => displayLanguages.value.find((l) => l.code === code) || null
+
+// Watchers
 watch(
   interfaceLang,
   (newLang) => {
-    if (newLang && newLang.code) {
+    if (newLang?.code) {
       setLanguage(newLang.code)
       localStorage.setItem('interfaceLanguage', newLang.code)
     }
@@ -272,17 +155,14 @@ watch(
 watch(
   sourceLang,
   (newLang) => {
-    if (newLang && newLang.code) {
+    if (newLang?.code) {
       localStorage.setItem('sourceLang', newLang.code)
-
-      // If target language is the same as source, change it to a different one
-      if (targetLang.value && targetLang.value.code === newLang.code) {
+      // Auto-change target if same as source
+      if (targetLang.value?.code === newLang.code) {
         const alternativeLang = displayLanguages.value.find(
           (lang) => lang.code !== newLang.code && lang.code !== 'auto'
         )
-        if (alternativeLang) {
-          targetLang.value = alternativeLang
-        }
+        if (alternativeLang) targetLang.value = alternativeLang
       }
     }
   },
@@ -292,9 +172,7 @@ watch(
 watch(
   targetLang,
   (newLang) => {
-    if (newLang && newLang.code) {
-      localStorage.setItem('targetLang', newLang.code)
-    }
+    if (newLang?.code) localStorage.setItem('targetLang', newLang.code)
   },
   { deep: true }
 )
@@ -303,56 +181,21 @@ watch(textToTranslate, (val) => {
   localStorage.setItem('translateText', val)
 })
 
-// Use API languages when available, fallback to simple languages
-const displayLanguages = computed(() => {
-  if (availableLanguages.value && availableLanguages.value.length > 0) {
-    const apiLangs = availableLanguages.value.map((lang) => ({
-      code: lang.code,
-      name: lang.name,
-      native_name: lang.native_name,
-      flag_country: lang.flag_country
-    }))
-
-    return apiLangs
-  }
-  // Return empty array when API languages aren't loaded yet
-  return []
-})
-
-const canRetryLanguages = computed(() => {
-  return (
-    serviceStatus.value.includes('Online') &&
-    availableLanguages.value.length === 0 &&
-    (!rateLimited.value || isRateLimitExpired.value)
-  )
-})
-
-const findLang = (code) => displayLanguages.value.find((l) => l.code === code) || null
-
-const targetLanguageOptions = computed(() => {
-  return displayLanguages.value.filter(
-    (lang) => !sourceLang.value || lang.code !== sourceLang.value.code
-  )
-})
-
 watch(
   displayLanguages,
   (langs) => {
     if (langs.length > 0) {
       if (!interfaceLang.value) {
-        const savedInterfaceLangCode = localStorage.getItem('interfaceLanguage') || 'en'
-        const foundLang = findLang(savedInterfaceLangCode)
-        interfaceLang.value = foundLang
+        const savedCode = localStorage.getItem('interfaceLanguage') || 'en'
+        interfaceLang.value = findLang(savedCode)
       }
       if (!sourceLang.value) {
-        const savedSourceLangCode = localStorage.getItem('sourceLang') || 'en'
-        const foundLang = findLang(savedSourceLangCode)
-        sourceLang.value = foundLang
+        const savedCode = localStorage.getItem('sourceLang') || 'en'
+        sourceLang.value = findLang(savedCode)
       }
       if (!targetLang.value) {
-        const savedTargetLangCode = localStorage.getItem('targetLang') || 'es'
-        const foundLang = findLang(savedTargetLangCode)
-        targetLang.value = foundLang
+        const savedCode = localStorage.getItem('targetLang') || 'es'
+        targetLang.value = findLang(savedCode)
       }
     }
   },
@@ -371,19 +214,7 @@ watch(
         <div class="flex items-center space-x-4">
           <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Langie API SDK</h1>
           <div class="flex flex-col">
-            <div class="flex items-center gap-2">
-              <span
-                class="px-2 py-1 text-xs font-semibold rounded-full flex items-center gap-1"
-                :class="{
-                  'bg-green-100 text-green-800': serviceStatus.includes('Online'),
-                  'bg-yellow-100 text-yellow-800': serviceStatus.includes('Issues'),
-                  'bg-red-100 text-red-800': serviceStatus.includes('Offline')
-                }"
-              >
-                <component :is="serviceStatusIcon" class="w-4 h-4" />
-                {{ serviceStatusText }}
-              </span>
-            </div>
+            <ServiceStatus :status="serviceStatus" />
             <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {{ API_HOST }}
             </span>
@@ -400,38 +231,7 @@ watch(
         </div>
       </div>
 
-      <!-- API Issues warning -->
-      <div
-        v-if="serviceStatus.includes('Offline') || rateLimited"
-        class="p-4 mb-4 text-sm rounded-lg flex items-start gap-2"
-        :class="{
-          'bg-red-100 text-red-700 dark:bg-red-200 dark:text-red-800':
-            serviceStatus.includes('Offline'),
-          'bg-yellow-100 text-yellow-700 dark:bg-yellow-200 dark:text-yellow-800': rateLimited
-        }"
-        role="alert"
-      >
-        <XCircleIcon
-          v-if="serviceStatus.includes('Offline')"
-          class="w-6 h-6 mt-0.5 flex-shrink-0"
-        />
-        <ExclamationTriangleIcon v-else class="w-6 h-6 mt-0.5 flex-shrink-0" />
-        <div>
-          <span class="font-medium">
-            <lt v-if="serviceStatus.includes('Offline')" orig="en">API Offline</lt>
-            <lt v-else orig="en">Rate Limit</lt>
-          </span>
-          <div class="mt-1">
-            <lt v-if="serviceStatus.includes('Offline')" orig="en"
-              >The translation service is currently offline. Using a fallback list of languages.</lt
-            >
-            <lt v-else orig="en"
-              >API rate limit may have been reached. Language list may be incomplete. Please wait a
-              moment.</lt
-            >
-          </div>
-        </div>
-      </div>
+      <ApiWarning :service-status="serviceStatus" :rate-limited="rateLimited" />
 
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -450,170 +250,29 @@ watch(
         <lt orig="en">Translation</lt>
       </h2>
 
-      <div class="mb-6">
-        <div class="grid grid-cols-5 gap-4 items-end">
-          <div class="col-span-2">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              <lt orig="en">Source Language</lt>
-            </label>
-            <LanguageSelect
-              v-model="sourceLang"
-              placeholder="Source Language"
-              :disabled="isLoading"
-              :is-dark="isDark"
-              :languages="displayLanguages"
-            />
-          </div>
-          <div class="col-span-1 flex justify-center">
-            <button
-              @click="swapLanguages"
-              :disabled="isLoading || !sourceLang || !targetLang"
-              class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
-              :title="l('Swap languages')"
-            >
-              <ArrowPathIcon class="w-7 h-7 text-gray-600 dark:text-gray-300" />
-            </button>
-          </div>
-          <div class="col-span-2">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              <lt orig="en">Target Language</lt>
-            </label>
-            <LanguageSelect
-              v-model="targetLang"
-              placeholder="Target Language"
-              :disabled="isLoading"
-              :is-dark="isDark"
-              :languages="targetLanguageOptions"
-            />
-          </div>
-        </div>
-      </div>
+      <LanguageSelector
+        v-model:source-lang="sourceLang"
+        v-model:target-lang="targetLang"
+        :languages="displayLanguages"
+        :is-loading="isLoading"
+        :is-dark="isDark"
+        :swap-title="l('Swap languages')"
+        @swap="swapLanguages"
+      />
 
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          <lt orig="en">Text to translate</lt>
-        </label>
-        <input
-          v-model="textToTranslate"
-          type="text"
-          :placeholder="l('Enter text to translate')"
-          class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-        />
-      </div>
+      <TranslationForm
+        v-model:text-to-translate="textToTranslate"
+        :placeholder="l('Enter text to translate')"
+        :is-mounted="isMounted"
+        :is-loading="isLoading"
+        :rate-limited="rateLimited"
+        :is-rate-limit-expired="isRateLimitExpired"
+        :translation="translation"
+        :error="error"
+        @translate="handleTranslate"
+      />
 
-      <button
-        :disabled="
-          !isMounted || isLoading || !textToTranslate || (rateLimited && !isRateLimitExpired)
-        "
-        class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
-        @click="handleTranslate"
-      >
-        <span v-if="isLoading"><lt orig="en">Translating...</lt></span>
-        <span v-else-if="rateLimited && !isRateLimitExpired"
-          ><lt orig="en">Rate Limited - Please Wait</lt></span
-        >
-        <span v-else><lt orig="en">Translate</lt></span>
-      </button>
-
-      <div v-if="translation" class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
-        <h2 class="text-lg font-semibold mb-2"><lt orig="en">Translation</lt></h2>
-        <p class="text-gray-800 dark:text-gray-100">{{ translation }}</p>
-      </div>
-
-      <div
-        v-if="error"
-        class="mt-6 p-4 bg-red-50 text-red-700 dark:bg-red-900 dark:text-red-300 rounded-md"
-      >
-        {{ error }}
-      </div>
-
-      <!-- Component Demo Section -->
-      <div class="mt-8 border-t pt-6 dark:border-gray-700">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-            <lt orig="en">Component Demo</lt>
-          </h2>
-          <button
-            @click="showComponentDemo = !showComponentDemo"
-            class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
-          >
-            <lt v-if="showComponentDemo" orig="en">Hide Demo</lt>
-            <lt v-else orig="en">Show Demo</lt>
-          </button>
-        </div>
-
-        <div v-if="showComponentDemo" class="space-y-6">
-          <!-- Advanced LanguageSelect Demo -->
-          <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
-              <lt orig="en">Advanced LanguageSelect</lt>
-            </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              <lt orig="en"
-                >Features: Search, flags, fuzzy matching (requires @vueform/multiselect +
-                fuse.js)</lt
-              >
-            </p>
-            <div class="max-w-md">
-              <LanguageSelect
-                v-model="demoLangAdvanced"
-                placeholder="Choose a language..."
-                :disabled="isLoading"
-                :is-dark="isDark"
-                :languages="displayLanguages"
-              />
-            </div>
-            <div v-if="demoLangAdvanced" class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-              <lt orig="en">Selected:</lt> {{ demoLangAdvanced.name }} ({{ demoLangAdvanced.code }})
-              <span v-if="demoLangAdvanced.native_name"> - {{ demoLangAdvanced.native_name }}</span>
-            </div>
-          </div>
-
-          <!-- Simple LanguageSelect Demo -->
-          <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
-              <lt orig="en">SimpleLanguageSelect</lt>
-            </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              <lt orig="en">Features: Basic HTML select, no dependencies, works everywhere</lt>
-            </p>
-            <div class="max-w-md">
-              <SimpleLanguageSelect
-                v-model="demoLangSimple"
-                placeholder="Pick a language..."
-                :disabled="isLoading"
-                :show-native-names="true"
-                :languages="displayLanguages"
-              />
-            </div>
-            <div v-if="demoLangSimple" class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-              <lt orig="en">Selected:</lt> {{ demoLangSimple.name }} ({{ demoLangSimple.code }})
-              <span v-if="demoLangSimple.native_name"> - {{ demoLangSimple.native_name }}</span>
-            </div>
-          </div>
-
-          <!-- Comparison Info -->
-          <div
-            class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
-          >
-            <h4 class="font-medium text-blue-900 dark:text-blue-200 mb-2">
-              <lt orig="en">When to use which component?</lt>
-            </h4>
-            <div class="text-sm text-blue-800 dark:text-blue-300 space-y-2">
-              <div>
-                <strong><lt orig="en">LanguageSelect:</lt></strong>
-                <lt orig="en"
-                  >When you want advanced features like search, flags, and fuzzy matching</lt
-                >
-              </div>
-              <div>
-                <strong><lt orig="en">SimpleLanguageSelect:</lt></strong>
-                <lt orig="en">When you want minimal dependencies and a basic dropdown</lt>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ComponentDemo :languages="displayLanguages" :is-loading="isLoading" :is-dark="isDark" />
     </div>
   </div>
 </template>
