@@ -1,7 +1,13 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useLangie, DEFAULT_API_HOST, DEV_API_HOST, lt, LanguageSelect } from '@/index'
-import '@vueform/multiselect/themes/default.css'
+import {
+  useLangie,
+  DEFAULT_API_HOST,
+  DEV_API_HOST,
+  lt,
+  LanguageSelect,
+  translateBatch
+} from '@/index'
 import { SunIcon, MoonIcon } from '@heroicons/vue/24/solid'
 
 // Components
@@ -18,7 +24,6 @@ import { useTheme } from './composables/useTheme.js'
 const API_HOST = import.meta.env.PROD ? DEFAULT_API_HOST : DEV_API_HOST
 
 const {
-  translate,
   availableLanguages,
   setLanguage,
   fetchLanguages,
@@ -98,21 +103,20 @@ const handleTranslate = async () => {
   translation.value = ''
 
   try {
-    const result = await translate(
-      textToTranslate.value,
-      sourceLang.value?.code,
-      targetLang.value?.code
+    const [result] = await translateBatch(
+      [
+        {
+          text: textToTranslate.value,
+          from_lang: sourceLang.value?.code || 'auto',
+          to_lang: targetLang.value?.code || 'en'
+        }
+      ],
+      {
+        translatorHost: API_HOST
+      }
     )
 
-    if (result?.translations?.[0]?.translated) {
-      translation.value = result.translations[0].translated
-    } else if (Array.isArray(result) && result[0]) {
-      translation.value = result[0].text || result[0].translated || result[0]
-    } else if (typeof result === 'string') {
-      translation.value = result
-    } else {
-      translation.value = 'Translation returned an unexpected format.'
-    }
+    translation.value = result?.translated || result?.text || result || 'Translation failed'
   } catch (err) {
     console.error('Translation error:', err)
 
