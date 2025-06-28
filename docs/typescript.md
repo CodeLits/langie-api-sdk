@@ -244,17 +244,58 @@ When working with components that emit events, you can type the events:
 
 ```vue
 <template>
-  <LanguageSelect @change="handleLanguageChange" />
+  <div>
+    <!-- Manual language selection -->
+    <LanguageSelect @change="handleLanguageChange" />
+
+    <!-- Automatic interface language selection -->
+    <InterfaceLanguageSelect @change="handleInterfaceLanguageChange" />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { LanguageSelect } from 'langie-api-sdk/components'
+import { LanguageSelect, InterfaceLanguageSelect } from 'langie-api-sdk/components'
 
 function handleLanguageChange(langCode: string) {
   console.log(`Language changed to: ${langCode}`)
   // langCode is typed as string
 }
+
+function handleInterfaceLanguageChange(langCode: string) {
+  console.log(`Interface language changed to: ${langCode}`)
+  // Automatically saved to localStorage and applied globally
+  // langCode is typed as string
+}
 </script>
+```
+
+### Component Props Types
+
+For TypeScript usage with component props:
+
+```vue
+<script setup lang="ts">
+import type { Component } from 'vue'
+import { InterfaceLanguageSelect } from 'langie-api-sdk/components'
+
+// Props are fully typed
+const props = defineProps<{
+  placeholder?: string
+  disabled?: boolean
+  isDark?: boolean
+  class?: string
+}>()
+</script>
+
+<template>
+  <InterfaceLanguageSelect
+    :placeholder="placeholder || 'Select interface language'"
+    :disabled="disabled"
+    :is-dark="isDark"
+    :class="class"
+    @change="handleLanguageChange"
+  />
+</template>
 ```
 
 ## Type Augmentation

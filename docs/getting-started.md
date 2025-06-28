@@ -72,15 +72,49 @@ const { translate, setLanguage, currentLanguage } = useLangie()
 ```vue
 <template>
   <div>
-    <LanguageSelect />
+    <!-- Manual language selection (requires languages prop) -->
+    <LanguageSelect :languages="languages" />
+
+    <!-- Automatic interface language selection -->
+    <InterfaceLanguageSelect />
+
+    <!-- Text translation -->
     <lt>Welcome to our application!</lt>
   </div>
 </template>
 
 <script setup>
-import { LanguageSelect, lt } from 'langie-api-sdk/components'
+import { LanguageSelect, InterfaceLanguageSelect, lt } from 'langie-api-sdk/components'
 </script>
 ```
+
+### Interface Language Selection
+
+For interface language selection, use the smart `InterfaceLanguageSelect` component:
+
+```vue
+<template>
+  <div>
+    <!-- Automatically handles everything -->
+    <InterfaceLanguageSelect placeholder="Choose interface language" :is-dark="isDarkMode" />
+  </div>
+</template>
+
+<script setup>
+import { InterfaceLanguageSelect } from 'langie-api-sdk/components'
+import { ref } from 'vue'
+
+const isDarkMode = ref(false)
+</script>
+```
+
+**Key Features:**
+
+- ✅ Automatically fetches languages from your API
+- ✅ Detects browser language on first load
+- ✅ Persists selection in localStorage
+- ✅ Excludes currently selected language from dropdown
+- ✅ Integrates with global app state
 
 ## Configuration Options
 

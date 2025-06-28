@@ -5,7 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.0] - 2025-01-XX - STABILITY RELEASE
+## [1.4.0] - 2025-01-18 - NEW COMPONENT RELEASE
+
+### ✨ Added
+
+- **InterfaceLanguageSelect Component**: Smart interface language selector with automatic API integration
+  - Automatically fetches languages from API using `useLangie` composable
+  - Browser language detection on first load
+  - Persistent language selection with localStorage
+  - Auto-excludes currently selected language from dropdown
+  - Built using composition pattern over `LanguageSelect` (clean architecture)
+- **Component Architecture**: Elegant composition-based design instead of code duplication
+- **Documentation**: Complete documentation for new component with usage examples
+- **Demo Integration**: InterfaceLanguageSelect showcased in demo application
+
+### 🔧 Changed
+
+- **Component Exports**: Added `InterfaceLanguageSelect` to main package exports
+- **Demo App**: Replaced manual `LanguageSelect` with automatic `InterfaceLanguageSelect`
+- **Type Definitions**: Added proper TypeScript support for new component
+
+### 📚 Documentation
+
+- Added `InterfaceLanguageSelect` to components documentation
+- Updated README.md with new component usage
+- Added comparison guide: when to use which language selector
+- Included examples in demo application
+
+### 🏗️ Technical Details
+
+- **Composition over Inheritance**: `InterfaceLanguageSelect` wraps `LanguageSelect` instead of duplicating code
+- **Minimal Footprint**: ~50 lines vs 300+ lines (no code duplication)
+- **Auto-sync**: Automatically syncs with global application state
+
+## [1.3.0] - 2025-01-15 - STABILITY RELEASE
 
 ### 🔧 Fixed
 
