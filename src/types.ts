@@ -48,6 +48,11 @@ export interface TranslatorOptions {
    * Defaults to 300ms.
    */
   initialBatchDelay?: number
+  /**
+   * Debounce delay (ms) for subsequent flushes after the initial batch.
+   * Defaults to 50ms.
+   */
+  followupBatchDelay?: number
   minPopularity?: number
   country?: string
   region?: string

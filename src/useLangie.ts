@@ -36,6 +36,9 @@ export function useLangie(options: TranslatorOptions = {}) {
   }
 
   const setLanguage = (lang: string) => {
+    if (lang && lang !== currentLanguage.value) {
+      console.log(`[useLangie] setLanguage: ${currentLanguage.value} → ${lang}`)
+    }
     currentLanguage.value = lang
   }
 
@@ -153,11 +156,25 @@ export function useLangie(options: TranslatorOptions = {}) {
   const queueMap = new Map<string, Map<string, { text: string; context: string }>>() // batchKey (from|to) -> Map<cacheKey, { text, context }>
   let flushTimeout: NodeJS.Timeout | null = null
   // Initial batching settings
+  const DEFAULT_INITIAL_DELAY = 600
+  const DEFAULT_FOLLOWUP_DELAY = 100
+
   const isInitialLoad = true
   const initialBatchDelay =
-    typeof options.initialBatchDelay === 'number' ? options.initialBatchDelay : 300
+    typeof options.initialBatchDelay === 'number'
+      ? options.initialBatchDelay
+      : DEFAULT_INITIAL_DELAY
+
+  const followupBatchDelay =
+    typeof options.followupBatchDelay === 'number'
+      ? options.followupBatchDelay
+      : DEFAULT_FOLLOWUP_DELAY
 
   const flushQueues = async () => {
+    const pendingBeforeFlush = Array.from(queueMap.values()).reduce((sum, m) => sum + m.size, 0)
+    console.log(
+      `[useLangie] flushing ${pendingBeforeFlush} queued keys (buckets: ${queueMap.size})`
+    )
     // Collect all pending requests into a single batch
     const allRequests: Array<{
       text: string
@@ -195,13 +212,15 @@ export function useLangie(options: TranslatorOptions = {}) {
     if (queueMap.size > 0) {
       scheduleFlush()
     }
+
+    // Mark that initial load has completed after first flush
   }
 
   const scheduleFlush = () => {
     // If a flush is already scheduled, do nothing (debounce)
     if (flushTimeout !== null) return
 
-    const timeout = isInitialLoad ? initialBatchDelay : 50
+    const timeout = isInitialLoad ? initialBatchDelay : followupBatchDelay
 
     console.log(`[useLangie] Scheduling flush in ${timeout}ms (initial: ${isInitialLoad})`)
 
@@ -249,6 +268,13 @@ export function useLangie(options: TranslatorOptions = {}) {
       const batchKey = `${normFrom}|${lang}`
       if (!queueMap.has(batchKey)) queueMap.set(batchKey, new Map())
       queueMap.get(batchKey)!.set(cacheKey, { text, context: effectiveContext })
+      // Debug: show queue size after adding a key
+      try {
+        const totalQueued = Array.from(queueMap.values()).reduce((sum, m) => sum + m.size, 0)
+        console.log(`[useLangie] queued "${text.slice(0, 25)}…" – pending keys: ${totalQueued}`)
+      } catch (_) {
+        /* noop */
+      }
       scheduleFlush()
     }
 
@@ -401,7 +427,10 @@ export function useLangie(options: TranslatorOptions = {}) {
   // Watch for interface language change to clear caches
   watch(
     () => currentLanguage.value,
-    () => {
+    (newLang, oldLang) => {
+      if (newLang !== oldLang) {
+        console.log(`[useLangie] Interface language changed: ${oldLang} → ${newLang}`)
+      }
       clearTranslations()
     }
   )
