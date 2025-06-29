@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.3] - 2025-01-18 - BUILD & TYPE SAFETY IMPROVEMENTS
+
+### 🛠️ Fixed
+
+- **Build System**: Fixed Vue component export issues in TypeScript declarations
+- **Import Resolution**: Resolved demo app import errors for Vue components (`lt`, `LanguageSelect`, etc.)
+- **Type Safety**: Replaced all `any` types with proper TypeScript types throughout codebase
+- **Manual Declarations**: Created manual TypeScript declaration file to avoid Vue component compilation issues
+- **Package Configuration**: Updated package.json to use manual declarations for better compatibility
+
+### 🔧 Technical Improvements
+
+- **Lint Cleanup**: Eliminated all TypeScript `any` type warnings
+- **Build Stability**: Disabled automatic TypeScript declarations to prevent Vue component issues
+- **Import Compatibility**: Components can now be imported from main index file as expected
+- **Type Definitions**: Comprehensive manual TypeScript declarations for all exports
+
+### 📦 Package Changes
+
+- **Manual Declarations**: `src/index.d.ts` provides full TypeScript support
+- **Build Output**: Clean builds without Vue component declaration conflicts
+- **Export Structure**: Maintained backward compatibility while fixing import issues
+
 ## [1.4.2] - 2025-01-18 - PATCH & TEST IMPROVEMENTS
 
 ### 🛠️ Fixed
