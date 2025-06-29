@@ -53,6 +53,11 @@ export interface TranslatorOptions {
    * Defaults to 50ms.
    */
   followupBatchDelay?: number
+  /**
+   * Maximum number of translations to send in a single batch request.
+   * Defaults to 50. Larger batches may be more efficient but could timeout.
+   */
+  maxBatchSize?: number
   minPopularity?: number
   country?: string
   region?: string

@@ -25,7 +25,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   const batching = new TranslationBatching(
     {
       initialBatchDelay: options.initialBatchDelay,
-      followupBatchDelay: options.followupBatchDelay
+      followupBatchDelay: options.followupBatchDelay,
+      maxBatchSize: options.maxBatchSize
     },
     translatorHost,
     () => currentLanguage.value,
@@ -142,7 +143,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   // Watch for language changes and clear translations
   watch(currentLanguage, () => {
     clearTranslations()
-    batching.clearAllPending()
+    batching.cleanup()
   })
 
   return {
@@ -157,7 +158,14 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
     // Translation functions
     l,
-    fetchAndCacheBatch
+    fetchAndCacheBatch,
+
+    // Utility functions
+    cleanup: () => {
+      clearTranslations()
+      batching.cleanup()
+    },
+    getBatchingStats: () => batching.getStats()
   }
 }
 

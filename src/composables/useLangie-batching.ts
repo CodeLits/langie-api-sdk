@@ -3,6 +3,7 @@ import type { BatchRequest } from './types'
 export interface BatchingOptions {
   initialBatchDelay?: number
   followupBatchDelay?: number
+  maxBatchSize?: number
 }
 
 export class TranslationBatching {
@@ -25,6 +26,10 @@ export class TranslationBatching {
 
   private get followupBatchDelay() {
     return this.options.followupBatchDelay ?? 100
+  }
+
+  private get maxBatchSize() {
+    return this.options.maxBatchSize ?? 50
   }
 
   private scheduleClearQueuedThisTick() {
@@ -57,14 +62,28 @@ export class TranslationBatching {
     }
 
     if (allRequests.length > 0) {
-      console.debug('[TranslationBatching] Sending batch:', allRequests.length, 'requests')
-      try {
-        await this.fetchAndCacheBatchMixed(allRequests)
-      } catch (error) {
-        console.error('[TranslationBatching] Batch translation error:', error)
-        allRequests.forEach((req) => this.pendingRequests.delete(req.cacheKey))
+      console.debug('[TranslationBatching] Sending batch:', allRequests.length, 'translation items')
+
+      // Split large batches into smaller chunks
+      const chunks = this.chunkArray(allRequests, this.maxBatchSize)
+
+      for (const chunk of chunks) {
+        try {
+          await this.fetchAndCacheBatchMixed(chunk)
+        } catch (error) {
+          console.error('[TranslationBatching] Batch translation error:', error)
+          chunk.forEach((req) => this.pendingRequests.delete(req.cacheKey))
+        }
       }
     }
+  }
+
+  private chunkArray<T>(array: T[], size: number): T[][] {
+    const chunks: T[][] = []
+    for (let i = 0; i < array.length; i += size) {
+      chunks.push(array.slice(i, i + size))
+    }
+    return chunks
   }
 
   private scheduleFlush = () => {
@@ -114,37 +133,49 @@ export class TranslationBatching {
     for (const [langPair, batchRequests] of Object.entries(grouped)) {
       const [fromLang, toLang] = langPair.split('|')
 
-      const response = await fetch(`${this.translatorHost}/translate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          translations: batchRequests.map((req) => ({
-            text: req.text,
-            context: req.context
-          })),
-          from_lang: fromLang,
-          to_lang: toLang
+      try {
+        const response = await fetch(`${this.translatorHost}/translate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            translations: batchRequests.map((req) => ({
+              text: req.text,
+              context: req.context
+            })),
+            from_lang: fromLang,
+            to_lang: toLang
+          })
         })
-      })
 
-      if (!response.ok) {
-        console.error(
-          '[TranslationBatching] Translation request failed:',
-          response.status,
-          response.statusText
-        )
-        throw new Error(`Translation request failed: ${response.status}`)
+        if (!response.ok) {
+          console.error(
+            '[TranslationBatching] Translation request failed:',
+            response.status,
+            response.statusText
+          )
+          throw new Error(`Translation request failed: ${response.status}`)
+        }
+
+        const result = await response.json()
+        allResults.push(result)
+
+        // Clear pending requests for this batch
+        batchRequests.forEach((req) => {
+          this.pendingRequests.delete(req.cacheKey)
+        })
+      } catch (error) {
+        console.error('[TranslationBatching] Batch request failed for', langPair, ':', error)
+
+        // Clear pending requests for failed batch
+        batchRequests.forEach((req) => {
+          this.pendingRequests.delete(req.cacheKey)
+        })
+
+        // Re-throw to be handled by the caller
+        throw error
       }
-
-      const result = await response.json()
-      allResults.push(result)
-
-      // Clear pending requests for this batch
-      batchRequests.forEach((req) => {
-        this.pendingRequests.delete(req.cacheKey)
-      })
     }
 
     this.onBatchComplete(allResults)
@@ -156,5 +187,25 @@ export class TranslationBatching {
 
   public clearAllPending() {
     this.pendingRequests.clear()
+  }
+
+  public cleanup() {
+    this.clearAllPending()
+    this.queueMap.clear()
+    this.queuedThisTick.clear()
+    if (this.flushTimeout) {
+      clearTimeout(this.flushTimeout)
+      this.flushTimeout = null
+    }
+    this.clearQueuedThisTickScheduled = false
+  }
+
+  public getStats() {
+    return {
+      pendingRequests: this.pendingRequests.size,
+      queuedBatches: this.queueMap.size,
+      queuedThisTick: this.queuedThisTick.size,
+      hasFlushTimeout: !!this.flushTimeout
+    }
   }
 }
