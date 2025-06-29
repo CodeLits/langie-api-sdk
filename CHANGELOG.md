@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2025-01-18 - PATCH & TEST IMPROVEMENTS
+
+### 🛠️ Fixed
+
+- Improved batching deduplication logic to further reduce duplicate translation requests
+- Added robust singleton reset for test isolation
+- Added and fixed batching tests for reliability
+- Improved debug logging for translation and batching system
+- Updated test setup for better compatibility
+
 ## [1.4.1] - 2025-01-18 - PERFORMANCE OPTIMIZATION RELEASE
 
 ### 🚀 Performance Improvements
