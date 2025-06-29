@@ -1,13 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { useLangie, __resetLangieSingletonForTests } from '../useLangie'
-
-beforeAll(() => {
-  vi.useFakeTimers()
-})
-afterAll(() => {
-  vi.useRealTimers()
-})
 
 describe('useLangie batching', () => {
   let mockFetch: any
@@ -16,7 +9,6 @@ describe('useLangie batching', () => {
   beforeEach(() => {
     // Reset fetch mock
     mockFetch = vi.fn((url: string) => {
-      console.log('[TEST] Mock fetch called with:', url)
       if (url.includes('/languages')) {
         return Promise.resolve({
           ok: true,
@@ -53,23 +45,20 @@ describe('useLangie batching', () => {
   afterEach(() => {
     vi.clearAllMocks()
     __resetLangieSingletonForTests()
+    // Small delay to ensure singleton is reset
+    return new Promise((resolve) => setTimeout(resolve, 10))
   })
 
   function getTranslateCalls() {
     const allCalls = mockFetch.mock.calls
-    console.log(
-      '[TEST] All fetch calls:',
-      allCalls.map(([url]: [string]) => url)
-    )
     const translateCalls = allCalls.filter(([url]: [string]) => url.includes('/translate'))
-    console.log('[TEST] Translate calls found:', translateCalls.length)
     return translateCalls
   }
 
   it('should batch multiple translation calls into a single request', async () => {
     const { l, setLanguage } = useLangie({
       translatorHost: 'http://localhost:8081',
-      initialBatchDelay: 100 // Shorter delay for testing
+      initialBatchDelay: 50 // Very short delay for testing
     })
 
     setLanguage('fr')
@@ -80,8 +69,8 @@ describe('useLangie batching', () => {
     l('Welcome')
 
     await nextTick()
-    vi.runAllTimers()
-    await nextTick()
+    // Wait for batching delay + some buffer
+    await new Promise((resolve) => setTimeout(resolve, 200))
 
     const translateCalls = getTranslateCalls()
     expect(translateCalls).toHaveLength(1)
@@ -102,7 +91,7 @@ describe('useLangie batching', () => {
   it('should not make duplicate requests for the same text', async () => {
     const { l, setLanguage } = useLangie({
       translatorHost: 'http://localhost:8081',
-      initialBatchDelay: 100
+      initialBatchDelay: 50
     })
 
     setLanguage('fr')
@@ -113,8 +102,7 @@ describe('useLangie batching', () => {
     l('Hello')
 
     await nextTick()
-    vi.runAllTimers()
-    await nextTick()
+    await new Promise((resolve) => setTimeout(resolve, 200))
 
     const translateCalls = getTranslateCalls()
     expect(translateCalls).toHaveLength(1)
@@ -129,7 +117,7 @@ describe('useLangie batching', () => {
   it('should handle different language pairs in the same batch', async () => {
     const { l, setLanguage } = useLangie({
       translatorHost: 'http://localhost:8081',
-      initialBatchDelay: 100
+      initialBatchDelay: 50
     })
 
     setLanguage('fr')
@@ -139,8 +127,7 @@ describe('useLangie batching', () => {
     l('Hola', 'ui', 'es') // es -> fr
 
     await nextTick()
-    vi.runAllTimers()
-    await nextTick()
+    await new Promise((resolve) => setTimeout(resolve, 200))
 
     const translateCalls = getTranslateCalls()
     expect(translateCalls).toHaveLength(2) // Two separate requests for different language pairs
@@ -162,7 +149,7 @@ describe('useLangie batching', () => {
   it('should respect the initialBatchDelay setting', async () => {
     const { l, setLanguage } = useLangie({
       translatorHost: 'http://localhost:8081',
-      initialBatchDelay: 200
+      initialBatchDelay: 100
     })
 
     setLanguage('fr')
@@ -172,12 +159,15 @@ describe('useLangie batching', () => {
     l('World')
 
     await nextTick()
-    vi.runAllTimers()
-    await nextTick()
+    // Wait less than the delay - should not have called fetch yet
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    let translateCalls = getTranslateCalls()
+    expect(translateCalls).toHaveLength(0)
 
-    const translateCalls = getTranslateCalls()
+    // Wait for the full delay
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    translateCalls = getTranslateCalls()
     expect(translateCalls).toHaveLength(1)
-    // We can't reliably test elapsed time with fake timers
   })
 
   it('should handle errors gracefully and clear pending requests', async () => {
@@ -191,7 +181,7 @@ describe('useLangie batching', () => {
 
     const { l, setLanguage } = useLangie({
       translatorHost: 'http://localhost:8081',
-      initialBatchDelay: 100
+      initialBatchDelay: 50
     })
 
     setLanguage('fr')
@@ -201,8 +191,7 @@ describe('useLangie batching', () => {
     l('World')
 
     await nextTick()
-    vi.runAllTimers()
-    await nextTick()
+    await new Promise((resolve) => setTimeout(resolve, 200))
 
     let translateCalls = getTranslateCalls()
     expect(translateCalls).toHaveLength(1)
@@ -210,8 +199,7 @@ describe('useLangie batching', () => {
     // Now, succeed
     l('Hello')
     await nextTick()
-    vi.runAllTimers()
-    await nextTick()
+    await new Promise((resolve) => setTimeout(resolve, 200))
 
     translateCalls = getTranslateCalls()
     expect(translateCalls).toHaveLength(2)
@@ -220,7 +208,7 @@ describe('useLangie batching', () => {
   it('should skip translations when source and target languages are the same', async () => {
     const { l, setLanguage } = useLangie({
       translatorHost: 'http://localhost:8081',
-      initialBatchDelay: 100
+      initialBatchDelay: 50
     })
 
     setLanguage('fr')
@@ -230,8 +218,7 @@ describe('useLangie batching', () => {
     l('Hello') // should be translated
 
     await nextTick()
-    vi.runAllTimers()
-    await nextTick()
+    await new Promise((resolve) => setTimeout(resolve, 200))
 
     const translateCalls = getTranslateCalls()
     expect(translateCalls).toHaveLength(1)
