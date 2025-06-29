@@ -218,27 +218,46 @@ const onFlagError = (event: Event) => {
   target.style.display = 'none'
 }
 
-onMounted(() => {
-  if (validLanguages.value.length > 0) {
-    isLoading.value = false
-  } else {
-    // Stop loading after 2 seconds if no languages are provided
-    // This prevents the component from being "invisible" forever
-    setTimeout(() => {
-      isLoading.value = false
-    }, 2000)
-  }
-})
-
 watch(
   () => props.languages,
   (newVal) => {
+    console.debug('[LanguageSelect] props.languages changed:', newVal)
+    console.debug('[LanguageSelect] validLanguages.length:', validLanguages.value.length)
     if (newVal && newVal.length > 0) {
+      console.debug('[LanguageSelect] Setting isLoading to false')
       isLoading.value = false
     }
   },
   { immediate: true }
 )
+
+watch(validLanguages, (val) => {
+  console.debug('[LanguageSelect] validLanguages:', val)
+  console.debug('[LanguageSelect] validLanguages.length:', val.length)
+})
+
+watch(filteredLanguages, (val) => {
+  console.debug('[LanguageSelect] filteredLanguages:', val)
+})
+
+watch(isLoading, (val) => {
+  console.debug('[LanguageSelect] isLoading changed:', val)
+})
+
+onMounted(() => {
+  console.debug('[LanguageSelect] onMounted props.languages:', props.languages)
+  console.debug('[LanguageSelect] onMounted validLanguages.length:', validLanguages.value.length)
+  if (validLanguages.value.length > 0) {
+    console.debug('[LanguageSelect] Setting isLoading to false on mount')
+    isLoading.value = false
+  } else {
+    console.debug('[LanguageSelect] No valid languages, setting timeout')
+    setTimeout(() => {
+      console.debug('[LanguageSelect] Timeout reached, setting isLoading to false')
+      isLoading.value = false
+    }, 2000)
+  }
+})
 </script>
 
 <style scoped>

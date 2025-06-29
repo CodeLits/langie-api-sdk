@@ -26,7 +26,10 @@ const API_HOST = import.meta.env.PROD ? DEFAULT_API_HOST : DEV_API_HOST
 const {
   availableLanguages,
   l,
-  isLoading: isTranslatorLoading
+  isLoading: isTranslatorLoading,
+  setLanguage,
+  currentLanguage,
+  fetchLanguages
 } = useLangie({
   translatorHost: API_HOST
 })
@@ -80,6 +83,17 @@ onMounted(async () => {
 
   const saved = localStorage.getItem('translateText')
   if (saved) textToTranslate.value = saved
+
+  // Restore interface language if saved and different
+  const savedInterfaceLang = localStorage.getItem('interface_language')
+  if (savedInterfaceLang && savedInterfaceLang !== currentLanguage.value) {
+    setLanguage(savedInterfaceLang)
+  }
+
+  // Fetch available languages
+  console.debug('[App] Fetching languages...')
+  await fetchLanguages()
+  console.debug('[App] Languages fetched:', availableLanguages.value)
 
   await checkServiceHealth()
   isMounted.value = true
@@ -187,6 +201,22 @@ watch(
   },
   { immediate: true, deep: true }
 )
+
+function handleInterfaceLanguageChange(lang) {
+  if (lang?.code && lang.code !== currentLanguage.value) {
+    setLanguage(lang.code)
+    localStorage.setItem('interface_language', lang.code)
+  }
+}
+
+// Add debug watcher for availableLanguages
+watch(
+  availableLanguages,
+  (languages) => {
+    console.debug('[App] availableLanguages changed:', languages)
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -223,7 +253,11 @@ watch(
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           <lt orig="en">Interface Language</lt>
         </label>
-        <InterfaceLanguageSelect placeholder="UI Language" :is-dark="isDark" />
+        <InterfaceLanguageSelect
+          placeholder="UI Language"
+          :is-dark="isDark"
+          @update:model-value="handleInterfaceLanguageChange"
+        />
       </div>
 
       <h2 class="text-2xl font-semibold text-center text-gray-800 dark:text-gray-200 mb-6">
