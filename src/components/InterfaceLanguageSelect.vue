@@ -41,16 +41,26 @@ const { availableLanguages, currentLanguage, setLanguage } = useLangie()
 
 // Use provided languages if available, otherwise use fetched languages
 const effectiveLanguages = computed(() => {
-  return props.languages.length > 0 ? props.languages : availableLanguages.value
+  const languages = props.languages.length > 0 ? props.languages : availableLanguages.value
+  // Only filter out the currently selected language if there are other languages available
+  const filtered = languages.filter((lang) => lang.code !== currentLanguage.value)
+  // If filtering would result in an empty list, return the original list
+  return filtered.length > 0 ? filtered : languages
 })
 
 const currentLanguageObject = computed(() => {
-  if (!currentLanguage.value) return null
-  return effectiveLanguages.value.find((lang) => lang.code === currentLanguage.value) || null
+  if (!currentLanguage.value) {
+    // If no current language is set, return undefined instead of null
+    // This prevents the LanguageSelect component from receiving null model-value
+    return undefined
+  }
+  // Look for current language in the full language list (not filtered)
+  const allLanguages = props.languages.length > 0 ? props.languages : availableLanguages.value
+  return allLanguages.find((lang) => lang.code === currentLanguage.value) || undefined
 })
 
-function handleLanguageChange(selectedLanguage: TranslatorLanguage | null) {
-  if (selectedLanguage) {
+function handleLanguageChange(selectedLanguage: TranslatorLanguage | null | undefined) {
+  if (selectedLanguage && selectedLanguage.code) {
     setLanguage(selectedLanguage.code)
     // Save to localStorage when user manually changes language
     localStorage.setItem('interface_language', selectedLanguage.code)

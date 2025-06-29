@@ -82,8 +82,8 @@ const getFlagCode = (lang: TranslatorLanguage): string => {
 
 const props = defineProps({
   modelValue: {
-    type: Object as PropType<TranslatorLanguage | null>,
-    default: null
+    type: Object as PropType<TranslatorLanguage | null | undefined>,
+    default: undefined
   },
   languages: {
     type: Array as PropType<TranslatorLanguage[]>,
@@ -137,15 +137,15 @@ const multiselectKey = computed(() => {
 })
 
 const selectedLanguageKey = computed(() => {
-  if (!props.modelValue) return 'no-selection'
+  if (!props.modelValue || !props.modelValue.code) return 'no-selection'
   const key = `${props.modelValue.code}-${props.modelValue.flag_country || 'fallback'}`
   return key
 })
 
 const selectedLanguage = computed({
-  get: () => props.modelValue,
+  get: () => props.modelValue || null,
   set: (value) => {
-    if (value) {
+    if (value && value.code) {
       emit('update:modelValue', value)
     }
   }
@@ -212,7 +212,7 @@ const filteredLanguages = computed(() => {
 
   // Remove the currently selected language from the options
   const filtered = results.filter(
-    (lang) => !props.modelValue || lang.code !== props.modelValue.code
+    (lang) => !props.modelValue || !props.modelValue.code || lang.code !== props.modelValue.code
   )
 
   return filtered
