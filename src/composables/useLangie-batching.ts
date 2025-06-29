@@ -1,4 +1,5 @@
 import type { BatchRequest } from './types'
+import type { TranslateServiceResponse } from '../types'
 
 export interface BatchingOptions {
   initialBatchDelay?: number
@@ -17,7 +18,7 @@ export class TranslationBatching {
     private options: BatchingOptions = {},
     private translatorHost: string,
     private currentLanguage: () => string,
-    private onBatchComplete: (results: any[]) => void
+    private onBatchComplete: (results: TranslateServiceResponse[]) => void
   ) {}
 
   private get initialBatchDelay() {
@@ -139,7 +140,7 @@ export class TranslationBatching {
       grouped[key].push(req)
     })
 
-    const allResults: any[] = []
+    const allResults: TranslateServiceResponse[] = []
     for (const [langPair, batchRequests] of Object.entries(grouped)) {
       const [fromLang, toLang] = langPair.split('|')
 

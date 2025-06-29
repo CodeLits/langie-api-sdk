@@ -3,8 +3,13 @@ import { nextTick } from 'vue'
 import { useLangie, __resetLangieSingletonForTests } from '../useLangie'
 
 describe('useLangie batching', () => {
-  let mockFetch: any
-  let mockLocalStorage: any
+  let mockFetch: ReturnType<typeof vi.fn>
+  let mockLocalStorage: {
+    getItem: ReturnType<typeof vi.fn>
+    setItem: ReturnType<typeof vi.fn>
+    removeItem: ReturnType<typeof vi.fn>
+    clear: ReturnType<typeof vi.fn>
+  }
 
   beforeEach(() => {
     // Reset fetch mock
@@ -51,7 +56,10 @@ describe('useLangie batching', () => {
 
   function getTranslateCalls() {
     const allCalls = mockFetch.mock.calls
-    const translateCalls = allCalls.filter(([url]: [string]) => url.includes('/translate'))
+    const translateCalls = allCalls.filter((call: unknown[]) => {
+      const url = call[0] as string
+      return url.includes('/translate')
+    })
     return translateCalls
   }
 

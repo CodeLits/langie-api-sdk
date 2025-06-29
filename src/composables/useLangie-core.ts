@@ -18,6 +18,18 @@ let _autoSelected = false
 let _languagesCache: TranslatorLanguage[] | null = null
 let _languagesPromise: Promise<TranslatorLanguage[]> | null = null
 
+// Test reset function
+export function __resetLangieCoreForTests() {
+  availableLanguages.value = []
+  Object.keys(translations).forEach((key) => delete translations[key])
+  Object.keys(uiTranslations).forEach((key) => delete uiTranslations[key])
+  currentLanguage.value = 'en'
+  _translatorHost = DEFAULT_API_HOST
+  _autoSelected = false
+  _languagesCache = null
+  _languagesPromise = null
+}
+
 export function useLangieCore(options: TranslatorOptions = {}) {
   // If a host is provided in options, it overrides the global host for all instances.
   // This ensures that the first initialization (e.g., from App.vue) sets the host correctly.
@@ -31,7 +43,8 @@ export function useLangieCore(options: TranslatorOptions = {}) {
   const isLoading = ref(false)
 
   // Initialize shared currentLanguage with default if not already set
-  if (currentLanguage.value === 'en' && defaultLanguage !== 'en') {
+  // For tests, always respect the defaultLanguage option
+  if (defaultLanguage !== 'en' && currentLanguage.value === 'en') {
     currentLanguage.value = defaultLanguage
   }
 
@@ -85,7 +98,10 @@ export function useLangieCore(options: TranslatorOptions = {}) {
           if (intlLoc.includes('-')) countryHint = intlLoc.split('-')[1].toUpperCase()
         }
         if (!countryHint) {
-          const base = navigator.language || (navigator as any).userLanguage || ''
+          const base =
+            navigator.language ||
+            (navigator as Navigator & { userLanguage?: string }).userLanguage ||
+            ''
           if (base.includes('-')) countryHint = base.split('-')[1].toUpperCase()
         }
       }
@@ -94,23 +110,27 @@ export function useLangieCore(options: TranslatorOptions = {}) {
       if (countryHint) url += `?country=${countryHint}`
 
       _languagesPromise = fetch(`${translatorHost}${url}`).then((res) => res.json())
-      const response = (await _languagesPromise) as any
+      const response = (await _languagesPromise) as
+        | TranslatorLanguage[]
+        | { languages: TranslatorLanguage[] }
       const rawList: TranslatorLanguage[] = Array.isArray(response)
         ? response
         : response.languages || []
 
       // normalise to expected structure
-      const mapped: TranslatorLanguage[] = rawList.map((lang: any) => {
-        let flag = lang.flag_country || lang.code
-        if (Array.isArray(flag)) {
-          flag = flag[0]
+      const mapped: TranslatorLanguage[] = rawList.map(
+        (lang: TranslatorLanguage & { flag_country?: string | string[] }) => {
+          let flag = lang.flag_country || lang.code
+          if (Array.isArray(flag)) {
+            flag = flag[0]
+          }
+          return {
+            ...lang,
+            value: lang.code,
+            flag_country: flag
+          }
         }
-        return {
-          ...lang,
-          value: lang.code,
-          flag_country: flag
-        }
-      })
+      )
 
       // Keep only desired Serbian variants
       const filtered: TranslatorLanguage[] = mapped.filter((l) => {

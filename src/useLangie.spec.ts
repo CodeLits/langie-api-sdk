@@ -17,7 +17,7 @@ describe('useLangie', () => {
   })
 
   it('sets language correctly', () => {
-    const { currentLanguage, setLanguage } = useLangie()
+    const { currentLanguage, setLanguage } = useLangie({ defaultLanguage: 'en' })
     // The default language should be 'en' unless overridden
     expect(currentLanguage.value).toBe('en') // default
     setLanguage('de')

@@ -7,7 +7,7 @@ global.fetch = mockFetch
 
 // Helper to create proper Response mock
 const createMockResponse = (
-  data: any,
+  data: unknown,
   ok: boolean = true,
   status: number = 200,
   statusText: string = 'OK'

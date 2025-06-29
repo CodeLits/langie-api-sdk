@@ -1,11 +1,17 @@
 import { watch } from 'vue'
-import type { TranslatorOptions } from './types'
-import { useLangieCore } from './composables/useLangie-core'
+import type { TranslatorOptions, TranslateServiceResponse } from './types'
+import { useLangieCore, __resetLangieCoreForTests } from './composables/useLangie-core'
 import { TranslationBatching } from './composables/useLangie-batching'
 
 // Global singleton instance
 let globalLangieInstance: ReturnType<typeof createLangieInstance> | null = null
 let globalOptions: string | null = null
+
+// Extended type for translation objects that includes context
+interface TranslationWithContext extends TranslateServiceResponse {
+  context?: string
+  translated_text?: string
+}
 
 function createLangieInstance(options: TranslatorOptions = {}) {
   const core = useLangieCore(options)
@@ -34,7 +40,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       // Process batch results and update translations
       results.forEach((result) => {
         if (result.translations) {
-          result.translations.forEach((translation: any) => {
+          result.translations.forEach((translation: TranslationWithContext) => {
             // Handle different possible response formats
             const translatedText =
               translation.translated_text ||
@@ -94,9 +100,11 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     recentlyQueued.add(languageCacheKey)
 
     // Clear the recently queued cache after a short delay
+    // Use a shorter delay for tests to allow retries
+    const clearDelay = process.env.NODE_ENV === 'test' ? 100 : 1000
     setTimeout(() => {
       recentlyQueued.delete(languageCacheKey)
-    }, 1000)
+    }, clearDelay)
 
     // Return original text for now (will be updated when translation arrives)
     return text
@@ -139,7 +147,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       const result = await response.json()
 
       if (result.translations) {
-        result.translations.forEach((translation: any) => {
+        result.translations.forEach((translation: TranslationWithContext) => {
           // Handle different possible response formats
           const translatedText =
             translation.translated_text ||
@@ -202,6 +210,10 @@ export function useLangie(options: TranslatorOptions = {}) {
 }
 
 export function __resetLangieSingletonForTests() {
+  if (globalLangieInstance) {
+    globalLangieInstance.cleanup()
+  }
   globalLangieInstance = null
   globalOptions = null
+  __resetLangieCoreForTests()
 }

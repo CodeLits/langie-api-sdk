@@ -13,15 +13,7 @@ export default defineConfig({
     teleport: 'src/styles/teleport.css'
   },
   format: ['esm', 'cjs'],
-  dts: {
-    entry: {
-      index: 'src/index.ts',
-      'components/index': 'src/components/index.ts'
-    },
-    compilerOptions: {
-      skipLibCheck: true
-    }
-  },
+  dts: false,
   splitting: false,
   sourcemap: true,
   clean: true,
