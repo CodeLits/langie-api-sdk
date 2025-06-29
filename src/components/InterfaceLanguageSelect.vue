@@ -1,7 +1,7 @@
 <template>
   <LanguageSelect
     :model-value="currentLanguageObject"
-    :languages="filteredLanguages"
+    :languages="effectiveLanguages"
     :placeholder="props.placeholder"
     :disabled="props.disabled"
     :is-dark="props.isDark"
@@ -16,6 +16,10 @@ import { useLangie } from '../useLangie'
 import type { TranslatorLanguage } from '../types'
 
 const props = defineProps({
+  languages: {
+    type: Array as () => TranslatorLanguage[],
+    default: () => []
+  },
   placeholder: {
     type: String,
     default: 'Select interface language'
@@ -35,16 +39,14 @@ const emit = defineEmits(['update:modelValue'])
 // Use useLangie to get languages and current language automatically
 const { availableLanguages, currentLanguage, setLanguage } = useLangie()
 
-const currentLanguageObject = computed(() => {
-  if (!currentLanguage.value) return null
-  return availableLanguages.value.find((lang) => lang.code === currentLanguage.value) || null
+// Use provided languages if available, otherwise use fetched languages
+const effectiveLanguages = computed(() => {
+  return props.languages.length > 0 ? props.languages : availableLanguages.value
 })
 
-// Filter out the currently selected language from the dropdown options
-const filteredLanguages = computed(() => {
-  return availableLanguages.value.filter(
-    (lang) => !currentLanguage.value || lang.code !== currentLanguage.value
-  )
+const currentLanguageObject = computed(() => {
+  if (!currentLanguage.value) return null
+  return effectiveLanguages.value.find((lang) => lang.code === currentLanguage.value) || null
 })
 
 function handleLanguageChange(selectedLanguage: TranslatorLanguage | null) {

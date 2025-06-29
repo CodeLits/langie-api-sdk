@@ -21,6 +21,7 @@ The `InterfaceLanguageSelect` component is a specialized version of `LanguageSel
 ### Key Features
 
 - **Automatic API Integration**: Languages are fetched automatically from your translation API
+- **Backend Language Support**: Can accept languages list as prop from your backend
 - **Browser Language Detection**: Automatically selects the appropriate language based on browser settings
 - **Auto-exclusion**: Currently selected language is automatically removed from dropdown options
 - **Persistent State**: Uses `useLangie` composable to maintain language state across the application
@@ -29,6 +30,7 @@ The `InterfaceLanguageSelect` component is a specialized version of `LanguageSel
 
 | Prop          | Type      | Default                       | Description                                   |
 | ------------- | --------- | ----------------------------- | --------------------------------------------- |
+| `languages`   | `Array`   | `[]`                          | Array of languages from backend (optional)    |
 | `placeholder` | `String`  | `'Select interface language'` | Placeholder text when no language is selected |
 | `disabled`    | `Boolean` | `false`                       | Whether the select is disabled                |
 | `isDark`      | `Boolean` | `false`                       | Whether to use dark theme styling             |
@@ -53,6 +55,29 @@ import { InterfaceLanguageSelect } from 'langie-api-sdk/components'
 </script>
 ```
 
+### With Backend Languages
+
+```vue
+<template>
+  <div>
+    <InterfaceLanguageSelect :languages="backendLanguages" />
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { InterfaceLanguageSelect } from 'langie-api-sdk/components'
+
+const backendLanguages = ref([])
+
+onMounted(async () => {
+  // Fetch languages from your backend
+  const response = await fetch('/api/languages')
+  backendLanguages.value = await response.json()
+})
+</script>
+```
+
 ### With Event Handling
 
 ```vue
@@ -73,6 +98,19 @@ function handleLanguageChange(language) {
 }
 </script>
 ```
+
+### Language Source Priority
+
+The component uses languages in the following priority order:
+
+1. **Languages prop**: If provided, uses the languages array from props
+2. **API languages**: Falls back to automatically fetched languages from the translation API
+
+This allows you to:
+
+- Use your own backend language list when available
+- Fall back to automatic API fetching when no languages are provided
+- Maintain flexibility in how languages are sourced
 
 ### Difference from LanguageSelect
 
