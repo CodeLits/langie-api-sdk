@@ -187,21 +187,6 @@ export function useLangieCore(options: TranslatorOptions = {}) {
     }
   }
 
-  const getCountryFromLang = (langCode: string): string | undefined => {
-    if (!availableLanguages.value || !availableLanguages.value.length) return undefined
-    const entry = availableLanguages.value.find((l) => l.code === langCode)
-    if (!entry) return undefined
-    const flag = entry.flag_country
-    if (Array.isArray(flag)) return flag[0]
-    if (typeof flag === 'string') return flag.split(',')[0]
-    return undefined
-  }
-
-  const getTranslation = (key: string, context = 'ui') => {
-    const cache = context === 'ui' ? uiTranslations : translations
-    return cache[key] || key
-  }
-
   const clearTranslations = () => {
     Object.keys(translations).forEach((key) => delete translations[key])
     Object.keys(uiTranslations).forEach((key) => delete uiTranslations[key])
@@ -215,8 +200,6 @@ export function useLangieCore(options: TranslatorOptions = {}) {
     isLoading,
     setLanguage,
     fetchLanguages,
-    getCountryFromLang,
-    getTranslation,
     clearTranslations,
     translatorHost
   }

@@ -13,10 +13,8 @@ export function useLangie(options: TranslatorOptions = {}) {
     isLoading,
     setLanguage,
     fetchLanguages,
-    getCountryFromLang,
-    getTranslation,
-    clearTranslations,
-    translatorHost
+    translatorHost,
+    clearTranslations
   } = core
 
   // Create batching instance
@@ -176,15 +174,9 @@ export function useLangie(options: TranslatorOptions = {}) {
     isLoading,
     setLanguage,
     fetchLanguages,
-    getCountryFromLang,
-    getTranslation,
-    clearTranslations,
 
     // Translation functions
     l,
-    fetchAndCacheBatch,
-
-    // Expose batching for testing
-    _batching: batching
+    fetchAndCacheBatch
   }
 }

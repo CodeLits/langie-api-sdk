@@ -77,7 +77,6 @@
 	},
 	"dependencies": {
 		"@vueform/multiselect": "^2.6.11",
-		"client-only": "^0.0.1",
 		"fuse.js": "^7.1.0"
 	}
 }

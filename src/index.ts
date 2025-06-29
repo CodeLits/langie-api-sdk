@@ -3,31 +3,24 @@
  * Main entry point for the SDK
  */
 
-// Export core functionality
-export { translateBatch, fetchAvailableLanguages } from './core'
+// Core exports
 export { useLangie } from './useLangie'
+export { translateBatch } from './core'
 
-// Export constants
-export { DEFAULT_API_HOST, DEFAULT_TRANSLATOR_OPTIONS, DEV_API_HOST } from './constants'
+// Component exports
+export { default as LanguageSelect } from './components/LanguageSelect.vue'
+export { default as SimpleLanguageSelect } from './components/SimpleLanguageSelect.vue'
+export { default as InterfaceLanguageSelect } from './components/InterfaceLanguageSelect.vue'
+export { default as lt } from './components/lt.vue'
 
-// Export types
-export type { TranslateRequestBody, TranslateServiceResponse, TranslatorLanguage } from './types'
-export type {
-  LanguageSelectProps,
-  SimpleLanguageSelectProps,
-  InterfaceLanguageSelectProps,
-  ltProps
-} from './components'
+// Type exports
+export type { TranslatorOptions, TranslatorLanguage, TranslateServiceResponse } from './types'
 
-// Export utility functions
-export { isClientOnly, isNuxtEnvironment, shouldUseClientOnly } from './utils/client-only'
-export { applyLanguageAlias } from './search-utils'
+// Constant exports
+export { DEFAULT_API_HOST, DEV_API_HOST } from './constants'
 
-// Export language aliases
-export { LANGUAGE_ALIAS_TABLE } from './language-aliases'
-
-// Export components
-export { LanguageSelect, SimpleLanguageSelect, InterfaceLanguageSelect, lt } from './components'
+// Language aliases
+export { LANGUAGE_ALIAS_TABLE, type AliasEntry } from './language-aliases'
 
 // Import teleport styles to ensure flag styling works out of the box
 import './styles/teleport.css'

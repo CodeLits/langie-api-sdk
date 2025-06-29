@@ -10,4 +10,3 @@ export const LANGUAGE_ALIAS_TABLE: AliasEntry[] = [
 ]
 
 export type { AliasEntry }
-export { EUROPEAN_LANGUAGES, ASIAN_LANGUAGES, AFRICAN_LANGUAGES }
