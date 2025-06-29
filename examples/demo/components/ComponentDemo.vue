@@ -17,7 +17,7 @@
       <!-- Advanced LanguageSelect Demo -->
       <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
-          <lt orig="en">Advanced LanguageSelect</lt>
+          Advanced <span class="text-blue-500">{{ '<LanguageSelect />' }}</span>
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
           <lt orig="en">
@@ -42,7 +42,7 @@
       <!-- InterfaceLanguageSelect Demo -->
       <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
-          <lt orig="en">InterfaceLanguageSelect</lt>
+          <span class="text-blue-500">{{ '<InterfaceLanguageSelect />' }}</span>
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
           <lt orig="en">
@@ -69,7 +69,7 @@
       <!-- Simple LanguageSelect Demo -->
       <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
-          <lt orig="en">SimpleLanguageSelect</lt>
+          <span class="text-blue-500">{{ '<SimpleLanguageSelect />' }}</span>
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
           <lt orig="en">Features: Basic HTML select, no dependencies, works everywhere</lt>

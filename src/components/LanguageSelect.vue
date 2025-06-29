@@ -72,6 +72,7 @@ import type { PropType } from 'vue'
 import Multiselect from '@vueform/multiselect'
 import Fuse from 'fuse.js'
 import { applyLanguageAlias } from '../search-utils'
+import { THEME_COLORS, COLORS } from '../constants/colors'
 import type { TranslatorLanguage } from '../types'
 
 const getFlagCode = (lang: TranslatorLanguage): string => {
@@ -301,67 +302,67 @@ onMounted(() => {
 :deep(.multiselect) {
   --ms-font-size: 1rem;
   --ms-line-height: 1.5;
-  --ms-bg: #fff;
-  --ms-bg-disabled: #f3f4f6;
-  --ms-border-color: #d1d5db;
+  --ms-bg: v-bind('THEME_COLORS.light.background');
+  --ms-bg-disabled: v-bind('THEME_COLORS.light.backgroundDisabled');
+  --ms-border-color: v-bind('THEME_COLORS.light.border');
   --ms-border-width: 1px;
   --ms-radius: 4px;
   --ms-py: 0.3rem;
   --ms-px: 0.875rem;
   --ms-ring-width: 3px;
-  --ms-ring-color: #10b98130;
-  --ms-placeholder-color: #9ca3af;
+  --ms-ring-color: v-bind('THEME_COLORS.light.ring');
+  --ms-placeholder-color: v-bind('THEME_COLORS.light.placeholder');
 
   /* Options */
   --ms-option-font-size: 1rem;
   --ms-option-line-height: 1;
   --ms-option-py: 0.35rem;
   --ms-option-px: 0.875rem;
-  --ms-option-bg-pointed: #f3f4f6;
-  --ms-option-color-pointed: #1f2937;
-  --ms-option-bg-selected: #10b981;
-  --ms-option-color-selected: #fff;
+  --ms-option-bg-pointed: v-bind('THEME_COLORS.light.optionPointed');
+  --ms-option-color-pointed: v-bind('THEME_COLORS.light.optionPointedText');
+  --ms-option-bg-selected: v-bind('THEME_COLORS.light.optionSelected');
+  --ms-option-color-selected: v-bind('THEME_COLORS.light.optionSelectedText');
   --ms-option-bg-disabled: #fff;
   --ms-option-color-disabled: #d1d5db;
 
   /* Dropdown */
-  --ms-dropdown-bg: #fff;
-  --ms-dropdown-border-color: #d1d5db;
+  --ms-dropdown-bg: v-bind('THEME_COLORS.light.dropdownBackground');
+  --ms-dropdown-border-color: v-bind('THEME_COLORS.light.dropdownBorder');
 
   /* Others */
-  --ms-tag-bg: #10b981;
+  --ms-tag-bg: v-bind('THEME_COLORS.light.tagBackground');
 }
 
 .is-dark :deep(.multiselect) {
-  --ms-bg: #1f2937;
-  --ms-bg-disabled: #374151;
-  --ms-border-color: #4b5563;
-  --ms-placeholder-color: #9ca3af;
-  --ms-ring-color: #10b98150;
+  --ms-bg: v-bind('THEME_COLORS.dark.background');
+  --ms-bg-disabled: v-bind('THEME_COLORS.dark.backgroundDisabled');
+  --ms-border-color: v-bind('THEME_COLORS.dark.border');
+  --ms-placeholder-color: v-bind('THEME_COLORS.dark.placeholder');
+  --ms-ring-color: v-bind('THEME_COLORS.dark.ring');
 
   /* Options */
-  --ms-option-bg-pointed: #374151;
-  --ms-option-color-pointed: #f9fafb;
-  --ms-option-bg-selected: #10b981;
-  --ms-option-color-selected: #fff;
+  --ms-option-bg-pointed: v-bind('THEME_COLORS.dark.optionPointed');
+  --ms-option-color-pointed: v-bind('THEME_COLORS.dark.optionPointedText');
+  --ms-option-bg-selected: v-bind('THEME_COLORS.dark.optionSelected');
+  --ms-option-color-selected: v-bind('THEME_COLORS.dark.optionSelectedText');
 
   /* Dropdown */
-  --ms-dropdown-bg: #1f2937;
-  --ms-dropdown-border-color: #4b5563;
-  --ms-dropdown-color: #f9fafb;
+  --ms-dropdown-bg: v-bind('THEME_COLORS.dark.dropdownBackground');
+  --ms-dropdown-border-color: v-bind('THEME_COLORS.dark.dropdownBorder');
+  --ms-dropdown-color: v-bind('THEME_COLORS.dark.dropdownText');
 }
 
 :deep(.lang-flag) {
   width: 20px;
   height: 15px;
   margin-right: 10px;
-  border: 1px solid #eee;
+  border: 1px solid v-bind('COLORS.border.flag');
   border-radius: 2px;
   object-fit: cover;
 }
 
 .is-dark :deep(.lang-flag) {
-  border-color: #4b5563;
+  border-color: v-bind('COLORS.border.dark');
 }
 
 :deep(.multiselect-single-label),
@@ -371,23 +372,23 @@ onMounted(() => {
 }
 
 :deep(.native-name) {
-  color: #6b7280;
+  color: v-bind('COLORS.text.secondary');
   margin-left: 0.5rem;
   font-size: 0.9em;
 }
 
 .is-dark :deep(.native-name) {
-  color: #9ca3af;
+  color: v-bind('COLORS.neutral.gray400');
 }
 
 :deep(.multiselect-no-results),
 :deep(.multiselect-no-options) {
   padding: 0.5rem 0.875rem;
-  color: #6b7280;
+  color: v-bind('COLORS.text.secondary');
 }
 
 .is-dark :deep(.multiselect-no-results),
 .is-dark :deep(.multiselect-no-options) {
-  color: #9ca3af;
+  color: v-bind('COLORS.neutral.gray400');
 }
 </style>

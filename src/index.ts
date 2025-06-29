@@ -18,6 +18,10 @@ export type { TranslatorOptions, TranslatorLanguage, TranslateServiceResponse } 
 
 // Constant exports
 export { DEFAULT_API_HOST, DEV_API_HOST } from './constants'
+export { COLORS, THEME_COLORS, CSS_VARS } from './constants/colors'
+
+// Theme utilities
+export { setThemeColors, clearThemeColors } from './utils/theme'
 
 // Language aliases
 export { LANGUAGE_ALIAS_TABLE, type AliasEntry } from './language-aliases'

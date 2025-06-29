@@ -16,6 +16,7 @@
 
 <script lang="ts" setup>
 import type { PropType } from 'vue'
+import { COLORS } from '../constants/colors'
 import type { TranslatorLanguage } from '../types'
 
 defineOptions({
@@ -65,46 +66,46 @@ const handleChange = (event: Event) => {
   width: 100%;
   min-width: 200px;
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid v-bind('COLORS.border.light');
   border-radius: 6px;
-  background-color: white;
+  background-color: v-bind('COLORS.neutral.white');
   font-size: 14px;
-  color: #374151;
+  color: v-bind('COLORS.text.primary');
   cursor: pointer;
   transition: border-color 0.2s ease;
 }
 
 .language-dropdown:hover {
-  border-color: #9ca3af;
+  border-color: v-bind('COLORS.neutral.gray400');
 }
 
 .language-dropdown:focus {
   outline: none;
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  border-color: v-bind('COLORS.primary.blue');
+  box-shadow: 0 0 0 3px v-bind('COLORS.primary.blueAlpha30');
 }
 
 .language-dropdown:disabled {
-  background-color: #f9fafb;
-  color: #9ca3af;
+  background-color: v-bind('COLORS.neutral.gray50');
+  color: v-bind('COLORS.neutral.gray400');
   cursor: not-allowed;
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .language-dropdown {
-    background-color: #1f2937;
-    border-color: #4b5563;
-    color: #f9fafb;
+    background-color: v-bind('COLORS.neutral.gray800');
+    border-color: v-bind('COLORS.border.dark');
+    color: v-bind('COLORS.neutral.gray50');
   }
 
   .language-dropdown:hover {
-    border-color: #6b7280;
+    border-color: v-bind('COLORS.neutral.gray500');
   }
 
   .language-dropdown:disabled {
-    background-color: #374151;
-    color: #6b7280;
+    background-color: v-bind('COLORS.neutral.gray700');
+    color: v-bind('COLORS.neutral.gray500');
   }
 }
 </style>

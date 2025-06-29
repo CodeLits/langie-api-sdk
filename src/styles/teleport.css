@@ -1,3 +1,6 @@
+/* Teleport styles for multiselect components */
+/* These styles are used by components that are teleported outside the normal DOM flow */
+
 .multiselect-single-label,
 .multiselect-option {
   display: flex;
@@ -8,32 +11,32 @@
   width: 20px;
   height: 15px;
   margin-right: 10px;
-  border: 1px solid #eee;
+  border: 1px solid var(--langie-flag-border, #eee);
   border-radius: 2px;
   object-fit: cover;
 }
 
 .is-dark .lang-flag {
-  border-color: #4b5563;
+  border-color: var(--langie-flag-border-dark, #4b5563);
 }
 
 .native-name {
-  color: #6b7280;
+  color: var(--langie-text-secondary, #6b7280);
   margin-left: 0.5rem;
   font-size: 0.9em;
 }
 
 .is-dark .native-name {
-  color: #9ca3af;
+  color: var(--langie-text-secondary-dark, #9ca3af);
 }
 
 .multiselect-no-results,
 .multiselect-no-options {
   padding: 0.5rem 0.875rem;
-  color: #6b7280;
+  color: var(--langie-text-secondary, #6b7280);
 }
 
 .is-dark .multiselect-no-results,
 .is-dark .multiselect-no-options {
-  color: #9ca3af;
+  color: var(--langie-text-secondary-dark, #9ca3af);
 }
