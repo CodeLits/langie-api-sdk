@@ -46,26 +46,24 @@ export function useLangieCore(options: TranslatorOptions = {}) {
     const { force = false, country: explicitCountry } = opts
     // const startTime = Date.now()
 
-    // console.debug('[useLangie] fetchLanguages called', { force, explicitCountry })
-
     if (!force) {
       if (_languagesCache) {
-        // console.debug('[useLangie] Using cached languages', {
-        //   cacheSize: _languagesCache.length,
-        //   duration: `${Date.now() - startTime}ms`
-        // })
         return _languagesCache
       }
       if (_languagesPromise) {
-        // console.debug('[useLangie] Using existing languages promise')
         return _languagesPromise
       }
     }
 
     try {
-      // Determine country hint
+      // Determine country hint - but only if we don't have cached languages
       let countryHint = explicitCountry || null
-      if (!countryHint && availableLanguages.value && availableLanguages.value.length) {
+      if (
+        !countryHint &&
+        !_languagesCache &&
+        availableLanguages.value &&
+        availableLanguages.value.length
+      ) {
         const currentLang = currentLanguage.value
         const entry = availableLanguages.value.find(
           (l: TranslatorLanguage) => l.code === currentLang
@@ -79,7 +77,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
           if (c) countryHint = c.toUpperCase()
         }
       }
-      if (!countryHint && typeof window !== 'undefined') {
+      if (!countryHint && !_languagesCache && typeof window !== 'undefined') {
         const match = (navigator.languages || []).find((l) => l.includes('-'))
         if (match) countryHint = match.split('-')[1].toUpperCase()
         if (!countryHint) {
@@ -94,19 +92,12 @@ export function useLangieCore(options: TranslatorOptions = {}) {
 
       let url = '/languages'
       if (countryHint) url += `?country=${countryHint}`
-      // console.log('[useLangie] Fetching languages', { country: countryHint, url })
 
       _languagesPromise = fetch(`${translatorHost}${url}`).then((res) => res.json())
       const response = (await _languagesPromise) as any
       const rawList: TranslatorLanguage[] = Array.isArray(response)
         ? response
         : response.languages || []
-
-      // console.debug('[useLangie] Raw languages received', {
-      //   isArray: Array.isArray(response),
-      //   hasLanguages: !!response.languages,
-      //   rawCount: rawList.length
-      // })
 
       // normalise to expected structure
       const mapped: TranslatorLanguage[] = rawList.map((lang: any) => {
@@ -128,12 +119,6 @@ export function useLangieCore(options: TranslatorOptions = {}) {
         }
         return true
       })
-
-      // console.debug('[useLangie] Languages processed', {
-      //   mappedCount: mapped.length,
-      //   filteredCount: filtered.length,
-      //   serbianFiltered: mapped.length - filtered.length
-      // })
 
       availableLanguages.value = filtered
 
@@ -172,12 +157,6 @@ export function useLangieCore(options: TranslatorOptions = {}) {
       }
       _languagesCache = filtered
       _languagesPromise = null
-
-      // const totalDuration = Date.now() - startTime
-      // console.debug('[useLangie] fetchLanguages completed', {
-      //   totalDuration: `${totalDuration}ms`,
-      //   finalCount: filtered.length
-      // })
 
       return filtered
     } catch (error) {

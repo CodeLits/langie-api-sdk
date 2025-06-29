@@ -220,30 +220,43 @@ const onFlagError = (event: Event) => {
 
 watch(
   () => props.languages,
-  (newVal) => {
-    if (newVal && newVal.length > 0) {
+  (newVal, oldVal) => {
+    // Only trigger if the length actually changed or if we went from empty to non-empty
+    const newLength = newVal?.length || 0
+    const oldLength = oldVal?.length || 0
+
+    if (newLength > 0 && newLength !== oldLength) {
       isLoading.value = false
     }
   },
   { immediate: true }
 )
 
-watch(validLanguages, (val) => {
-  // Only log when there's a significant change
-  if (val.length > 0) {
-    console.debug('[LanguageSelect] Loaded', val.length, 'valid languages')
+watch(validLanguages, (val, oldVal) => {
+  // Only log when there's a significant change in length
+  const newLength = val.length
+  const oldLength = oldVal?.length || 0
+
+  if (newLength > 0 && newLength !== oldLength) {
+    console.debug('[LanguageSelect] Loaded', newLength, 'valid languages')
   }
 })
 
-watch(filteredLanguages, (val) => {
-  // Only log when there's a significant change
-  if (val.length > 0) {
-    console.debug('[LanguageSelect] Filtered to', val.length, 'languages')
+watch(filteredLanguages, (val, oldVal) => {
+  // Only log when there's a significant change in length
+  const newLength = val.length
+  const oldLength = oldVal?.length || 0
+
+  if (newLength > 0 && newLength !== oldLength) {
+    console.debug('[LanguageSelect] Filtered to', newLength, 'languages')
   }
 })
 
-watch(isLoading, (val) => {
-  console.debug('[LanguageSelect] Loading state:', val)
+watch(isLoading, (val, oldVal) => {
+  // Only log when the loading state actually changes
+  if (val !== oldVal) {
+    console.debug('[LanguageSelect] Loading state:', val)
+  }
 })
 
 onMounted(() => {
