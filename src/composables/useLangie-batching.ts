@@ -55,16 +55,15 @@ export class TranslationBatching {
       }
       this.queueMap.delete(batchKey)
     }
+
     if (allRequests.length > 0) {
-      console.debug('[TranslationBatching] Sending batch:', allRequests)
+      console.debug('[TranslationBatching] Sending batch:', allRequests.length, 'requests')
       try {
         await this.fetchAndCacheBatchMixed(allRequests)
       } catch (error) {
         console.error('[TranslationBatching] Batch translation error:', error)
         allRequests.forEach((req) => this.pendingRequests.delete(req.cacheKey))
       }
-    } else {
-      console.debug('[TranslationBatching] No requests to flush.')
     }
   }
 
@@ -73,7 +72,6 @@ export class TranslationBatching {
       clearTimeout(this.flushTimeout)
     }
     const delay = this.queueMap.size === 1 ? this.initialBatchDelay : this.followupBatchDelay
-    console.debug('[TranslationBatching] Scheduling flush in', delay, 'ms')
     this.flushTimeout = setTimeout(() => {
       this.flushQueues()
       this.flushTimeout = null
@@ -88,18 +86,19 @@ export class TranslationBatching {
     cacheKey: string
   ) {
     if (this.pendingRequests.has(cacheKey) || this.queuedThisTick.has(cacheKey)) {
-      console.debug('[TranslationBatching] Skipping duplicate queue for', cacheKey)
       return
     }
+
     this.queuedThisTick.add(cacheKey)
     this.scheduleClearQueuedThisTick()
     this.pendingRequests.add(cacheKey)
+
     const batchKey = `${fromLang}|${toLang}`
     if (!this.queueMap.has(batchKey)) {
       this.queueMap.set(batchKey, new Map())
     }
+
     this.queueMap.get(batchKey)!.set(cacheKey, { text, context })
-    console.debug('[TranslationBatching] Queued', { text, context, fromLang, toLang, cacheKey })
     this.scheduleFlush()
   }
 
@@ -110,10 +109,11 @@ export class TranslationBatching {
       if (!grouped[key]) grouped[key] = []
       grouped[key].push(req)
     })
+
     const allResults: any[] = []
     for (const [langPair, batchRequests] of Object.entries(grouped)) {
       const [fromLang, toLang] = langPair.split('|')
-      console.debug('[TranslationBatching] Sending request for', langPair, batchRequests)
+
       const response = await fetch(`${this.translatorHost}/translate`, {
         method: 'POST',
         headers: {
@@ -128,6 +128,7 @@ export class TranslationBatching {
           to_lang: toLang
         })
       })
+
       if (!response.ok) {
         console.error(
           '[TranslationBatching] Translation request failed:',
@@ -136,9 +137,16 @@ export class TranslationBatching {
         )
         throw new Error(`Translation request failed: ${response.status}`)
       }
+
       const result = await response.json()
       allResults.push(result)
+
+      // Clear pending requests for this batch
+      batchRequests.forEach((req) => {
+        this.pendingRequests.delete(req.cacheKey)
+      })
     }
+
     this.onBatchComplete(allResults)
   }
 

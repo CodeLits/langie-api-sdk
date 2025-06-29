@@ -221,7 +221,7 @@ const onFlagError = (event: Event) => {
 watch(
   () => props.languages,
   (newVal) => {
-    console.debug('[LanguageSelect] props.languages changed:', newVal)
+    console.debug('[LanguageSelect] props.languages changed:', newVal?.length || 0, 'items')
     console.debug('[LanguageSelect] validLanguages.length:', validLanguages.value.length)
     if (newVal && newVal.length > 0) {
       console.debug('[LanguageSelect] Setting isLoading to false')
@@ -232,12 +232,11 @@ watch(
 )
 
 watch(validLanguages, (val) => {
-  console.debug('[LanguageSelect] validLanguages:', val)
   console.debug('[LanguageSelect] validLanguages.length:', val.length)
 })
 
 watch(filteredLanguages, (val) => {
-  console.debug('[LanguageSelect] filteredLanguages:', val)
+  console.debug('[LanguageSelect] filteredLanguages.length:', val.length)
 })
 
 watch(isLoading, (val) => {
@@ -245,7 +244,11 @@ watch(isLoading, (val) => {
 })
 
 onMounted(() => {
-  console.debug('[LanguageSelect] onMounted props.languages:', props.languages)
+  console.debug(
+    '[LanguageSelect] onMounted props.languages:',
+    props.languages?.length || 0,
+    'items'
+  )
   console.debug('[LanguageSelect] onMounted validLanguages.length:', validLanguages.value.length)
   if (validLanguages.value.length > 0) {
     console.debug('[LanguageSelect] Setting isLoading to false on mount')

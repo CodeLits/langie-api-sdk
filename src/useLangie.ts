@@ -3,7 +3,11 @@ import type { TranslatorOptions } from './types'
 import { useLangieCore } from './composables/useLangie-core'
 import { TranslationBatching } from './composables/useLangie-batching'
 
-export function useLangie(options: TranslatorOptions = {}) {
+// Global singleton instance
+let globalLangieInstance: ReturnType<typeof createLangieInstance> | null = null
+let globalOptions: string | null = null
+
+function createLangieInstance(options: TranslatorOptions = {}) {
   const core = useLangieCore(options)
   const {
     availableLanguages,
@@ -27,11 +31,9 @@ export function useLangie(options: TranslatorOptions = {}) {
     () => currentLanguage.value,
     (results) => {
       // Process batch results and update translations
-      console.debug('[useLangie] Processing batch results:', results)
       results.forEach((result) => {
         if (result.translations) {
           result.translations.forEach((translation: any) => {
-            console.debug('[useLangie] Processing translation:', translation)
             // Handle different possible response formats
             const translatedText =
               translation.translated_text ||
@@ -42,10 +44,6 @@ export function useLangie(options: TranslatorOptions = {}) {
               const cacheKey = `${translation.text}|${translation.context || 'ui'}`
               const cache = translation.context === 'ui' ? uiTranslations : translations
               cache[cacheKey] = translatedText
-              console.debug('[useLangie] Cached translation:', {
-                key: cacheKey,
-                value: translatedText
-              })
             }
           })
         }
@@ -65,7 +63,6 @@ export function useLangie(options: TranslatorOptions = {}) {
 
     // Skip translation if source and target languages are the same
     if (fromLang === toLang) {
-      console.debug('[useLangie] Skipping translation (same language):', { text, fromLang, toLang })
       return text
     }
 
@@ -74,20 +71,9 @@ export function useLangie(options: TranslatorOptions = {}) {
 
     // Return cached translation if available
     if (cache[cacheKey]) {
-      console.debug('[useLangie] Returning cached translation:', {
-        key: cacheKey,
-        value: cache[cacheKey]
-      })
       return cache[cacheKey]
     }
 
-    console.debug('[useLangie] Queuing translation:', {
-      text,
-      context: context || 'ui',
-      fromLang,
-      toLang,
-      cacheKey
-    })
     // Queue for translation
     batching.queueTranslation(text, context || 'ui', fromLang, toLang, cacheKey)
 
@@ -132,9 +118,7 @@ export function useLangie(options: TranslatorOptions = {}) {
       const result = await response.json()
 
       if (result.translations) {
-        console.debug('[useLangie] Processing fetchAndCacheBatch result:', result)
         result.translations.forEach((translation: any) => {
-          console.debug('[useLangie] Processing translation in fetchAndCacheBatch:', translation)
           // Handle different possible response formats
           const translatedText =
             translation.translated_text ||
@@ -145,10 +129,6 @@ export function useLangie(options: TranslatorOptions = {}) {
             const cacheKey = `${translation.text}|${translation.context || 'ui'}`
             const cache = translation.context === 'ui' ? uiTranslations : translations
             cache[cacheKey] = translatedText
-            console.debug('[useLangie] Cached translation in fetchAndCacheBatch:', {
-              key: cacheKey,
-              value: translatedText
-            })
           }
         })
       }
@@ -179,4 +159,16 @@ export function useLangie(options: TranslatorOptions = {}) {
     l,
     fetchAndCacheBatch
   }
+}
+
+export function useLangie(options: TranslatorOptions = {}) {
+  // Check if we need to create a new instance or reuse existing one
+  const optionsKey = JSON.stringify(options)
+
+  if (!globalLangieInstance || globalOptions !== optionsKey) {
+    globalLangieInstance = createLangieInstance(options)
+    globalOptions = optionsKey
+  }
+
+  return globalLangieInstance
 }

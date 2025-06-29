@@ -93,7 +93,7 @@ onMounted(async () => {
   // Fetch available languages
   console.debug('[App] Fetching languages...')
   await fetchLanguages()
-  console.debug('[App] Languages fetched:', availableLanguages.value)
+  console.debug('[App] Languages fetched:', availableLanguages.value?.length || 0, 'languages')
 
   await checkServiceHealth()
   isMounted.value = true
@@ -213,7 +213,7 @@ function handleInterfaceLanguageChange(lang) {
 watch(
   availableLanguages,
   (languages) => {
-    console.debug('[App] availableLanguages changed:', languages)
+    console.debug('[App] availableLanguages changed:', languages?.length || 0, 'languages')
   },
   { immediate: true }
 )
