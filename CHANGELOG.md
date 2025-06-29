@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.5] - 2025-01-18 - TEST COVERAGE ENHANCEMENT
+
+### 🧪 Added
+
+- **LanguageSelect Component Tests**: Comprehensive test suite for LanguageSelect component
+  - Test coverage for current language filtering functionality
+  - Verification that selected language is properly removed from dropdown options
+  - Dynamic selection change testing with proper filtering updates
+  - Edge case handling for empty language arrays
+  - Full TypeScript type safety in test implementations
+
+### 🔧 Technical Improvements
+
+- **Test Infrastructure**: Enhanced testing setup with proper mocking
+  - Mock implementations for `@vueform/multiselect` and `fuse.js` dependencies
+  - Vue component testing using `@vue/test-utils`
+  - Async component update handling with proper `$nextTick()` usage
+- **Type Safety**: Fixed all TypeScript warnings in test files
+  - Proper type casting using `unknown` intermediate type
+  - Full type safety without compromising test functionality
+
+### 📊 Test Results
+
+- **4 Test Cases Added**: All passing with comprehensive coverage
+  - ✅ Current language filtering verification
+  - ✅ No selection state handling
+  - ✅ Dynamic selection change behavior
+  - ✅ Empty language array edge case
+- **Quality Assurance**: All tests pass, no linting errors, full TypeScript compliance
+
+### 🎯 Verification
+
+The tests confirm that `LanguageSelect` component correctly implements the filtering logic to remove the currently selected language from dropdown options, ensuring users don't see duplicate selections.
+
 ## [1.4.4] - 2025-01-18 - BACKEND LANGUAGE SUPPORT
 
 ### ✨ Added
