@@ -31,36 +31,69 @@ const props = defineProps({
   isDark: {
     type: Boolean,
     default: false
+  },
+  translatorHost: {
+    type: String,
+    default: ''
+  },
+  apiKey: {
+    type: String,
+    default: ''
   }
 })
 
 const emit = defineEmits(['update:modelValue'])
 
 // Use useLangie to get languages and current language automatically
-const { availableLanguages, currentLanguage, setLanguage } = useLangie()
+const langieOptions = computed(() => {
+  const options: any = {}
+  if (props.translatorHost) options.translatorHost = props.translatorHost
+  if (props.apiKey) options.apiKey = props.apiKey
+  return options
+})
+
+const { availableLanguages, currentLanguage, setLanguage } = useLangie(langieOptions.value)
 
 // Use provided languages if available, otherwise use fetched languages
 const effectiveLanguages = computed(() => {
-  const languages = props.languages.length > 0 ? props.languages : availableLanguages.value
-  // Only filter out the currently selected language if there are other languages available
-  const filtered = languages.filter((lang) => lang.code !== currentLanguage.value)
-  // If filtering would result in an empty list, return the original list
-  return filtered.length > 0 ? filtered : languages
+  return props.languages.length > 0 ? props.languages : availableLanguages.value
 })
 
 const currentLanguageObject = computed(() => {
-  if (!currentLanguage.value) {
-    // If no current language is set, return undefined instead of null
-    // This prevents the LanguageSelect component from receiving null model-value
-    return undefined
-  }
-  // Look for current language in the full language list (not filtered)
-  const allLanguages = props.languages.length > 0 ? props.languages : availableLanguages.value
-  return allLanguages.find((lang) => lang.code === currentLanguage.value) || undefined
+  if (!currentLanguage.value) return null
+  return effectiveLanguages.value.find((lang) => lang.code === currentLanguage.value) || null
 })
 
-function handleLanguageChange(selectedLanguage: TranslatorLanguage | null | undefined) {
-  if (selectedLanguage && selectedLanguage.code) {
+// Function to detect browser language from available languages
+function detectBrowserLanguage(languages: TranslatorLanguage[]): string | null {
+  if (languages.length === 0) return null
+
+  // Get browser languages in order of preference
+  const browserLanguages = navigator.languages || [navigator.language || 'en']
+
+  // Try to find exact match first
+  for (const browserLang of browserLanguages) {
+    const langCode = browserLang.toLowerCase().split('-')[0] // Extract language code (e.g., 'en' from 'en-US')
+    const exactMatch = languages.find((lang) => lang.code.toLowerCase() === langCode)
+    if (exactMatch) {
+      return exactMatch.code
+    }
+  }
+
+  // If no exact match, try with full locale (e.g., 'en-US')
+  for (const browserLang of browserLanguages) {
+    const fullLangCode = browserLang.toLowerCase()
+    const localeMatch = languages.find((lang) => lang.code.toLowerCase() === fullLangCode)
+    if (localeMatch) {
+      return localeMatch.code
+    }
+  }
+
+  return null
+}
+
+function handleLanguageChange(selectedLanguage: TranslatorLanguage | null) {
+  if (selectedLanguage) {
     setLanguage(selectedLanguage.code)
     // Save to localStorage when user manually changes language
     localStorage.setItem('interface_language', selectedLanguage.code)
@@ -75,12 +108,56 @@ watch(currentLanguage, (newLangCode) => {
   }
 })
 
+// Watch for changes in provided languages to set browser language
+watch(
+  () => props.languages,
+  (newLanguages) => {
+    if (newLanguages.length > 0 && !currentLanguage.value) {
+      // Only set browser language if no language is currently selected
+      const savedLanguageCode = localStorage.getItem('interface_language')
+
+      if (savedLanguageCode) {
+        // Check if saved language exists in the provided languages
+        const savedLangExists = newLanguages.find((lang) => lang.code === savedLanguageCode)
+        if (savedLangExists) {
+          setLanguage(savedLanguageCode)
+          return
+        }
+      }
+
+      // If no saved language or saved language doesn't exist, detect browser language
+      const browserLang = detectBrowserLanguage(newLanguages)
+      if (browserLang) {
+        setLanguage(browserLang)
+      }
+    }
+  },
+  { immediate: true }
+)
+
 // Load saved language from localStorage on initialization
 onMounted(() => {
   const savedLanguageCode = localStorage.getItem('interface_language')
   if (savedLanguageCode && savedLanguageCode !== currentLanguage.value) {
-    // Only set if different from current to avoid unnecessary changes
-    setLanguage(savedLanguageCode)
+    // Check if saved language exists in current languages
+    const currentLanguages = effectiveLanguages.value
+    const savedLangExists = currentLanguages.find((lang) => lang.code === savedLanguageCode)
+
+    if (savedLangExists) {
+      setLanguage(savedLanguageCode)
+    } else if (currentLanguages.length > 0) {
+      // If saved language doesn't exist, try to detect browser language
+      const browserLang = detectBrowserLanguage(currentLanguages)
+      if (browserLang) {
+        setLanguage(browserLang)
+      }
+    }
+  } else if (!currentLanguage.value && effectiveLanguages.value.length > 0) {
+    // If no saved language and no current language, detect browser language
+    const browserLang = detectBrowserLanguage(effectiveLanguages.value)
+    if (browserLang) {
+      setLanguage(browserLang)
+    }
   }
 })
 

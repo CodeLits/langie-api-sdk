@@ -5,6 +5,61 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.6] - 2025-01-18 - BROWSER LANGUAGE DETECTION & API CONFIGURATION
+
+### 🚀 Added
+
+- **API Configuration Props**: `InterfaceLanguageSelect` now accepts translator configuration
+  - New `translatorHost` prop for custom translator API endpoints
+  - New `apiKey` prop for API authentication
+  - Dynamic configuration passed to `useLangie` composable
+  - Allows per-component API configuration flexibility
+
+### 🛠️ Fixed
+
+- **Browser Language Detection**: Fixed automatic browser language detection with custom languages
+  - Now properly detects and sets browser language when `languages` prop is provided
+  - Smart language matching supports both exact (`en`) and locale (`en-US`) formats
+  - Enhanced language priority system: Saved Language → Browser Language → No Selection
+  - Validates that detected languages exist in the provided language list
+
+### 🔧 Enhanced
+
+- **Language Selection Logic**: Improved initialization and fallback handling
+  - Reactive watching of `languages` prop changes
+  - Automatic browser language detection for both API and custom language lists
+  - Non-intrusive language setting (only when no current language exists)
+  - Better validation of saved languages against current language list
+
+### 🧪 Test Coverage
+
+- **6 New Test Cases**: Comprehensive testing for browser language detection
+  - Browser language detection with custom languages (multiple scenarios)
+  - Saved language priority validation
+  - Fallback behavior when saved language doesn't exist
+  - Edge cases for unavailable browser languages
+  - Non-intrusive behavior with existing language selections
+
+### 📚 Documentation
+
+- **Updated Component Docs**: Added Language Selection Priority section
+- **Enhanced Examples**: Better explanation of language source priority
+- **API Configuration**: Documentation for new translator configuration props
+
+### 🎯 Usage Examples
+
+```vue
+<!-- With custom API configuration -->
+<InterfaceLanguageSelect
+  :languages="backendLanguages"
+  translator-host="https://api.example.com"
+  api-key="your-api-key"
+/>
+
+<!-- Browser language auto-detection works with custom languages -->
+<InterfaceLanguageSelect :languages="customLanguages" />
+```
+
 ## [1.4.5] - 2025-01-18 - TEST COVERAGE ENHANCEMENT
 
 ### 🧪 Added

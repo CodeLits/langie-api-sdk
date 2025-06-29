@@ -22,18 +22,30 @@ The `InterfaceLanguageSelect` component is a specialized version of `LanguageSel
 
 - **Automatic API Integration**: Languages are fetched automatically from your translation API
 - **Backend Language Support**: Can accept languages list as prop from your backend
-- **Browser Language Detection**: Automatically selects the appropriate language based on browser settings
-- **Auto-exclusion**: Currently selected language is automatically removed from dropdown options
+- **Smart Browser Detection**: Automatically detects and sets browser language from both API and custom language lists
 - **Persistent State**: Uses `useLangie` composable to maintain language state across the application
+- **Fallback Logic**: Intelligent fallback system for language selection priority
+
+### Language Selection Priority
+
+The component uses the following priority order for setting the initial language:
+
+1. **Saved Language**: Previously saved language from localStorage (if it exists in current language list)
+2. **Browser Language**: Automatically detected from `navigator.languages` (if available in current language list)
+3. **No Selection**: No language set if none of the above match
+
+This priority system works with both API-fetched languages and custom backend languages.
 
 ### Props
 
-| Prop          | Type      | Default                       | Description                                   |
-| ------------- | --------- | ----------------------------- | --------------------------------------------- |
-| `languages`   | `Array`   | `[]`                          | Array of languages from backend (optional)    |
-| `placeholder` | `String`  | `'Select interface language'` | Placeholder text when no language is selected |
-| `disabled`    | `Boolean` | `false`                       | Whether the select is disabled                |
-| `isDark`      | `Boolean` | `false`                       | Whether to use dark theme styling             |
+| Prop             | Type      | Default                       | Description                                   |
+| ---------------- | --------- | ----------------------------- | --------------------------------------------- |
+| `languages`      | `Array`   | `[]`                          | Array of languages from backend (optional)    |
+| `placeholder`    | `String`  | `'Select interface language'` | Placeholder text when no language is selected |
+| `disabled`       | `Boolean` | `false`                       | Whether the select is disabled                |
+| `isDark`         | `Boolean` | `false`                       | Whether to use dark theme styling             |
+| `translatorHost` | `String`  | `''`                          | Custom translator API endpoint URL            |
+| `apiKey`         | `String`  | `''`                          | API key for translator authentication         |
 
 ### Events
 
@@ -92,6 +104,38 @@ import { ref } from 'vue'
 import { InterfaceLanguageSelect } from 'langie-api-sdk/components'
 
 const isDarkMode = ref(false)
+
+function handleLanguageChange(language) {
+  console.log(`Interface language changed to: ${language.name} (${language.code})`)
+}
+</script>
+```
+
+### With Custom API Configuration
+
+```vue
+<template>
+  <div>
+    <InterfaceLanguageSelect
+      :languages="backendLanguages"
+      translator-host="https://api.example.com"
+      api-key="your-api-key"
+      @update:modelValue="handleLanguageChange"
+    />
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { InterfaceLanguageSelect } from 'langie-api-sdk/components'
+
+const backendLanguages = ref([])
+
+onMounted(async () => {
+  // Fetch languages from your backend
+  const response = await fetch('/api/languages')
+  backendLanguages.value = await response.json()
+})
 
 function handleLanguageChange(language) {
   console.log(`Interface language changed to: ${language.name} (${language.code})`)
