@@ -21,11 +21,11 @@ export class TranslationBatching {
   ) {}
 
   private get initialBatchDelay() {
-    return this.options.initialBatchDelay ?? 600
+    return this.options.initialBatchDelay ?? 100
   }
 
   private get followupBatchDelay() {
-    return this.options.followupBatchDelay ?? 100
+    return this.options.followupBatchDelay ?? 25
   }
 
   private get maxBatchSize() {

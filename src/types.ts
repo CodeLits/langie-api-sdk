@@ -45,12 +45,12 @@ export interface TranslatorOptions {
   /**
    * Delay (ms) before the first batch of UI translations is sent.
    * Allows collecting more keys into a single request on initial page load.
-   * Defaults to 300ms.
+   * Defaults to 100ms.
    */
   initialBatchDelay?: number
   /**
    * Debounce delay (ms) for subsequent flushes after the initial batch.
-   * Defaults to 50ms.
+   * Defaults to 25ms.
    */
   followupBatchDelay?: number
   /**
