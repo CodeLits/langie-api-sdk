@@ -152,20 +152,43 @@ export function useLangie(options: TranslatorOptions = {}) {
   const pendingRequests = new Set<string>()
   const queueMap = new Map<string, Map<string, { text: string; context: string }>>() // batchKey (from|to) -> Map<cacheKey, { text, context }>
   let flushTimeout: NodeJS.Timeout | null = null
+  // Initial batching settings
+  const isInitialLoad = true
+  const initialBatchDelay =
+    typeof options.initialBatchDelay === 'number' ? options.initialBatchDelay : 300
 
   const flushQueues = async () => {
+    // Collect all pending requests into a single batch
+    const allRequests: Array<{
+      text: string
+      context: string
+      fromLang: string
+      toLang: string
+      cacheKey: string
+    }> = []
+
     for (const [batchKey, map] of Array.from(queueMap.entries())) {
       if (!map || map.size === 0) {
         queueMap.delete(batchKey)
         continue
       }
-      queueMap.delete(batchKey)
-      const items = Array.from(map.values()) as Array<{
-        text: string
-        context?: string
-      }>
+
       const [fromLang, toLang] = batchKey.split('|')
-      await fetchAndCacheBatch(items, fromLang, toLang)
+      for (const [cacheKey, item] of map.entries()) {
+        allRequests.push({
+          text: item.text,
+          context: item.context,
+          fromLang,
+          toLang,
+          cacheKey
+        })
+      }
+      queueMap.delete(batchKey)
+    }
+
+    // Make a single batch request for all translations
+    if (allRequests.length > 0) {
+      await fetchAndCacheBatchMixed(allRequests)
     }
 
     // If new items queued during this flush, schedule another run
@@ -175,8 +198,17 @@ export function useLangie(options: TranslatorOptions = {}) {
   }
 
   const scheduleFlush = () => {
-    if (flushTimeout !== null) clearTimeout(flushTimeout)
-    flushTimeout = setTimeout(flushQueues, 10)
+    // If a flush is already scheduled, do nothing (debounce)
+    if (flushTimeout !== null) return
+
+    const timeout = isInitialLoad ? initialBatchDelay : 50
+
+    console.log(`[useLangie] Scheduling flush in ${timeout}ms (initial: ${isInitialLoad})`)
+
+    flushTimeout = setTimeout(() => {
+      flushTimeout = null // Allow future scheduling
+      flushQueues()
+    }, timeout)
   }
 
   /**
@@ -285,6 +317,71 @@ export function useLangie(options: TranslatorOptions = {}) {
       return translatedItems
     } catch (error) {
       console.error('Batch translation error:', error)
+      return {}
+    }
+  }
+
+  /**
+   * Fetch translations for mixed language pairs in a single batch request
+   * This combines all pending translations into one request for better performance
+   */
+  const fetchAndCacheBatchMixed = async (
+    requests: Array<{
+      text: string
+      context: string
+      fromLang: string
+      toLang: string
+      cacheKey: string
+    }>
+  ) => {
+    if (!Array.isArray(requests) || requests.length === 0) {
+      return {}
+    }
+
+    try {
+      console.log(`[useLangie] Making single batch request for ${requests.length} translations`)
+
+      const requestBody = {
+        translations: requests.map((req) => ({
+          text: req.text,
+          context: req.context || 'ui',
+          from_lang: req.fromLang,
+          to_lang: req.toLang
+        }))
+      }
+
+      const resp = await fetch(`${translatorHost}/translate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      }).then((res) => res.json())
+
+      const translatedItems = resp.translations || []
+
+      // Populate cache with results
+      translatedItems.forEach((item: TranslateServiceResponse, index: number) => {
+        const request = requests[index]
+        if (!request) return
+
+        const originalText = item.text || request.text
+        const translatedText = item.translated || item.t || originalText
+        const cacheKey = request.cacheKey
+
+        translations[cacheKey] = translatedText
+        uiTranslations[cacheKey] = translatedText
+        pendingRequests.delete(cacheKey)
+      })
+
+      console.log(`[useLangie] Successfully cached ${translatedItems.length} translations`)
+      return translatedItems
+    } catch (error) {
+      console.error('Batch translation error:', error)
+      // Clear pending requests on error to allow retry
+      requests.forEach((req) => {
+        pendingRequests.delete(req.cacheKey)
+      })
       return {}
     }
   }

@@ -42,6 +42,12 @@ export interface TranslatorOptions {
   apiKey?: string
   defaultLanguage?: string
   fallbackLanguage?: string
+  /**
+   * Delay (ms) before the first batch of UI translations is sent.
+   * Allows collecting more keys into a single request on initial page load.
+   * Defaults to 300ms.
+   */
+  initialBatchDelay?: number
   minPopularity?: number
   country?: string
   region?: string

@@ -6,3 +6,4 @@ alwaysApply: true
 
 use bun as the main package manager.
 do not spawn a new process of app. i have vite server with auto reload.
+Do not restart server in dev mode.
