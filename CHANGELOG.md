@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2025-01-18 - PERFORMANCE OPTIMIZATION RELEASE
+
+### 🚀 Performance Improvements
+
+- **Reduced Batching Delays**: Lowered default batching timings for faster translations
+  - Initial batch delay: 600ms → 100ms
+  - Subsequent batch delay: 100ms → 25ms
+  - Configurable via `batchDelay` and `subsequentBatchDelay` options
+- **Singleton Pattern**: Implemented shared batching queue across all `useLangie` instances
+  - Eliminates duplicate API calls from multiple component instances
+  - Reduces network overhead and improves performance
+- **Optimized Language Processing**: Reduced unnecessary re-processing of languages
+  - Improved watchers in `LanguageSelect` to only trigger on meaningful changes
+  - Better caching logic in `fetchLanguages` to prevent redundant API calls
+
+### 🔧 Fixed
+
+- **Translation Caching**: Fixed caching logic to handle different API response formats
+- **Component Loading**: Resolved infinite loading issue in `LanguageSelect` components
+- **Debug Output**: Cleaned up excessive console logging for better development experience
+- **Code Organization**: Split large files (>400 lines) into focused modules
+  - Separated `useLangie.ts` into core and batching composables
+  - Refactored language aliases into regional files with index
+
+### 🧹 Code Cleanup
+
+- **Removed Unused Dependencies**: Eliminated `client-only` package and related utilities
+- **Unused Code Removal**: Cleaned up unused exports and files throughout codebase
+- **Debug Logging**: Streamlined debug output to reduce console noise
+- **File Structure**: Improved code organization and maintainability
+
+### 📚 Documentation
+
+- Updated batching timing documentation with new default values
+- Added performance optimization notes in README
+- Clarified debug message terminology ("translation items" vs "requests")
+
 ## [1.4.0] - 2025-01-18 - NEW COMPONENT RELEASE
 
 ### ✨ Added
