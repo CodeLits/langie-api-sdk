@@ -52,6 +52,9 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     }
   )
 
+  // Simple cache to track recently queued translations
+  const recentlyQueued = new Set<string>()
+
   /**
    * Synchronously get translation for the provided key.
    * If the key is not yet translated, the original key will be returned and
@@ -75,8 +78,25 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       return cache[cacheKey]
     }
 
+    // Check if we've recently queued this translation
+    const languageCacheKey = `${cacheKey}|${fromLang}|${toLang}`
+    if (recentlyQueued.has(languageCacheKey)) {
+      return text
+    }
+
+    // Debug: Log what's being queued
+    console.debug('[useLangie] Queuing translation:', { text, context, fromLang, toLang, cacheKey })
+
     // Queue for translation
     batching.queueTranslation(text, context || 'ui', fromLang, toLang, cacheKey)
+
+    // Mark as recently queued
+    recentlyQueued.add(languageCacheKey)
+
+    // Clear the recently queued cache after a short delay
+    setTimeout(() => {
+      recentlyQueued.delete(languageCacheKey)
+    }, 1000)
 
     // Return original text for now (will be updated when translation arrives)
     return text
@@ -179,4 +199,9 @@ export function useLangie(options: TranslatorOptions = {}) {
   }
 
   return globalLangieInstance
+}
+
+export function __resetLangieSingletonForTests() {
+  globalLangieInstance = null
+  globalOptions = null
 }

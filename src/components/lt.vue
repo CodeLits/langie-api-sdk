@@ -5,7 +5,6 @@
 </template>
 
 <script lang="ts" setup>
-// @ts-nocheck
 import { computed, useSlots } from 'vue'
 import { useLangie } from '../useLangie'
 

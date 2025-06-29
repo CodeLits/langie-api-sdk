@@ -112,6 +112,14 @@ const validLanguages = computed(() => {
   return props.languages.filter((lang) => lang && lang.code && lang.name && lang.native_name)
 })
 
+// More stable computed that only changes when language data actually changes
+const stableValidLanguages = computed(() => {
+  const valid = validLanguages.value
+  // Create a stable key based on the actual language data
+  const dataKey = valid.map((lang) => `${lang.code}:${lang.name}`).join('|')
+  return { languages: valid, dataKey }
+})
+
 const fuse = computed(() => {
   if (!validLanguages.value.length) return null
   return new Fuse(validLanguages.value, {
@@ -233,25 +241,20 @@ watch(
   { immediate: true }
 )
 
-watch(validLanguages, (val, oldVal) => {
-  // Only log when there's a significant change in length
-  const newLength = val.length
-  const oldLength = oldVal?.length || 0
+// Track if we've already logged the initial load
+let hasLoggedInitialLoad = false
 
-  if (newLength > 0 && newLength !== oldLength) {
-    console.debug('[LanguageSelect] Loaded', newLength, 'valid languages')
-  }
-})
-
-watch(filteredLanguages, (val, oldVal) => {
-  // Only log when there's a significant change in length
-  const newLength = val.length
-  const oldLength = oldVal?.length || 0
-
-  if (newLength > 0 && newLength !== oldLength) {
-    console.debug('[LanguageSelect] Filtered to', newLength, 'languages')
-  }
-})
+watch(
+  stableValidLanguages,
+  (val, oldVal) => {
+    // Only log when the actual language data changes (dataKey changes) and we haven't logged yet
+    if (val.dataKey !== oldVal?.dataKey && !hasLoggedInitialLoad && val.languages.length > 0) {
+      console.debug('[LanguageSelect] Loaded', val.languages.length, 'valid languages')
+      hasLoggedInitialLoad = true
+    }
+  },
+  { deep: true }
+)
 
 watch(isLoading, (val, oldVal) => {
   // Only log when the loading state actually changes

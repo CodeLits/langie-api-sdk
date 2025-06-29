@@ -212,8 +212,14 @@ function handleInterfaceLanguageChange(lang) {
 // Add debug watcher for availableLanguages
 watch(
   availableLanguages,
-  (languages) => {
-    console.debug('[App] availableLanguages changed:', languages?.length || 0, 'languages')
+  (languages, oldLanguages) => {
+    const newLength = languages?.length || 0
+    const oldLength = oldLanguages?.length || 0
+
+    // Only log when there's a significant change
+    if (newLength > 0 && Math.abs(newLength - oldLength) > 5) {
+      console.debug('[App] availableLanguages changed:', newLength, 'languages')
+    }
   },
   { immediate: true }
 )

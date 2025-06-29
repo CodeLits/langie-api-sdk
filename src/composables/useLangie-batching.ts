@@ -62,7 +62,14 @@ export class TranslationBatching {
     }
 
     if (allRequests.length > 0) {
-      console.debug('[TranslationBatching] Sending batch:', allRequests.length, 'translation items')
+      // Only log if there are more than 1 request to reduce noise
+      if (allRequests.length > 1) {
+        console.debug(
+          '[TranslationBatching] Sending batch:',
+          allRequests.length,
+          'translation items'
+        )
+      }
 
       // Split large batches into smaller chunks
       const chunks = this.chunkArray(allRequests, this.maxBatchSize)
@@ -105,8 +112,11 @@ export class TranslationBatching {
     cacheKey: string
   ) {
     if (this.pendingRequests.has(cacheKey) || this.queuedThisTick.has(cacheKey)) {
+      console.debug('[TranslationBatching] Skipping duplicate:', cacheKey)
       return
     }
+
+    console.debug('[TranslationBatching] Adding to queue:', cacheKey)
 
     this.queuedThisTick.add(cacheKey)
     this.scheduleClearQueuedThisTick()
