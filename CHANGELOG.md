@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.4] - 2025-01-18 - BACKEND LANGUAGE SUPPORT
+
+### ✨ Added
+
+- **Backend Language Support**: `InterfaceLanguageSelect` now accepts languages list as prop
+  - New `languages` prop allows passing languages from your backend
+  - Falls back to automatic API fetching when no languages provided
+  - Maintains backward compatibility with existing usage
+  - Priority system: backend languages > API languages
+
+### 🔧 Enhanced
+
+- **Flexible Language Sources**: Component now supports multiple language data sources
+  - Use your own backend language list when available
+  - Automatic fallback to translation API languages
+  - No breaking changes to existing implementations
+
+### 📚 Documentation
+
+- **Updated Component Docs**: Added comprehensive documentation for new `languages` prop
+  - Usage examples with backend integration
+  - Language source priority explanation
+  - Code examples for both approaches
+- **New Examples**: Added backend language integration examples
+
+### 🏗️ Technical Details
+
+- **Smart Fallback**: `effectiveLanguages` computed property handles language source priority
+- **Type Safety**: Full TypeScript support for new prop with proper typing
+- **Performance**: No additional API calls when languages provided via prop
+
 ## [1.4.3] - 2025-01-18 - BUILD & TYPE SAFETY IMPROVEMENTS
 
 ### 🛠️ Fixed
