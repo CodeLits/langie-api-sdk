@@ -8,18 +8,7 @@
 	<title>Langie API SDK - Demo App</title>
 	<link rel="icon" type="image/svg+xml"
 		href="/favicon.svg">
-	<!-- 
-		⚠️  DEVELOPMENT ONLY - Using Tailwind CDN for demo purposes
-		For production, install Tailwind CSS properly: https://tailwindcss.com/docs/installation
-		This CDN version should NOT be used in production applications.
-	-->
-	<script src="https://cdn.tailwindcss.com"></script>
 	<script>
-		// Configure Tailwind for class-based dark mode
-		tailwind.config = {
-			darkMode: 'class'
-		}
-
 		// Initialize dark mode before Vue loads to prevent flash
 		// Check localStorage first, then fall back to system preference
 		const savedDarkMode = localStorage.getItem('darkMode');

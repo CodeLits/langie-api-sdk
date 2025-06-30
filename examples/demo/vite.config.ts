@@ -8,7 +8,8 @@ export default defineConfig({
   root: resolve(__dirname),
   resolve: {
     alias: {
-      '@': resolve(__dirname, '../../src')
+      '@': resolve(__dirname, '../../src'),
+      'langie-api-sdk': resolve(__dirname, '../../src')
     }
   },
   server: {
