@@ -2,7 +2,6 @@ import { watch } from 'vue'
 import type { TranslatorOptions, TranslateServiceResponse } from './types'
 import { useLangieCore, __resetLangieCoreForTests } from './composables/useLangie-core'
 import { TranslationBatching } from './composables/useLangie-batching'
-import { debugOnlyDev } from './utils/debug'
 
 // Global singleton instance
 let globalLangieInstance: ReturnType<typeof createLangieInstance> | null = null
@@ -91,8 +90,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       return text
     }
 
-    // Debug: Log what's being queued
-    debugOnlyDev('[useLangie] Queuing translation:', { text, context, fromLang, toLang, cacheKey })
+
 
     // Queue for translation
     batching.queueTranslation(text, context || 'ui', fromLang, toLang, cacheKey)

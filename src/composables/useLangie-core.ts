@@ -36,11 +36,9 @@ export function useLangieCore(options: TranslatorOptions = {}) {
   // This ensures that the first initialization (e.g., from App.vue) sets the host correctly.
   if (options.translatorHost) {
     _translatorHost = options.translatorHost
-    debugOnlyDev('[useLangie-core] Set translatorHost to:', _translatorHost)
   }
 
   const translatorHost = _translatorHost // Use the shared host
-  debugOnlyDev('[useLangie-core] Using translatorHost:', translatorHost)
   const defaultLanguage = options.defaultLanguage || 'en'
 
   const isLoading = ref(false)
@@ -112,7 +110,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
       let url = '/languages'
       if (countryHint) url += `?country=${countryHint}`
 
-      debugOnlyDev('[useLangie-core] Fetching languages from:', `${translatorHost}${url}`)
+
       _languagesPromise = fetch(`${translatorHost}${url}`).then((res) => res.json())
       const response = (await _languagesPromise) as
         | TranslatorLanguage[]
