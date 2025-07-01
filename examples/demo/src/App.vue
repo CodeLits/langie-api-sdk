@@ -48,6 +48,7 @@ const serviceStatus = ref('Checking...')
 const rateLimited = ref(false)
 const lastRateLimitTime = ref(null)
 const refreshUsage = ref(0)
+const isLimitReached = ref(false)
 
 const isLoading = computed(() => isTranslatorLoading.value)
 
@@ -72,9 +73,11 @@ const checkServiceHealth = async () => {
 
 const handleRateLimit = () => {
   rateLimited.value = true
+  isLimitReached.value = true
   lastRateLimitTime.value = Date.now()
   setTimeout(() => {
     rateLimited.value = false
+    isLimitReached.value = false
     lastRateLimitTime.value = null
   }, 60000)
 }
@@ -135,6 +138,7 @@ const handleTranslate = async () => {
 
     if (err.message?.includes('429') || err.message?.includes('CORS')) {
       handleRateLimit()
+      isLimitReached.value = true
       error.value = err.message?.includes('CORS')
         ? 'CORS error: The translation API needs CORS headers configured for this domain.'
         : 'API rate limit exceeded. Please wait a moment before trying again.'
@@ -242,10 +246,8 @@ watch(
               :status="serviceStatus"
               :refresh-usage="refreshUsage"
               :api-host="API_HOST"
+              :is-limit-reached="isLimitReached"
             />
-            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {{ API_HOST }}
-            </span>
           </div>
         </div>
         <div class="flex items-center space-x-2">
