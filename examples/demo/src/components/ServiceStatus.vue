@@ -12,7 +12,10 @@
       <span class="text-sm font-medium">Service: {{ status }}</span>
     </div>
     <div v-if="usage" class="text-xs text-gray-500 dark:text-gray-400">
-      Usage: {{ usage.used }} / {{ usage.limit }}
+      Usage: {{ usage.used }} / {{ usage.limit }} ({{ usage.type }})
+    </div>
+    <div v-if="usage" class="text-xs text-gray-500 dark:text-gray-400">
+      Chain: {{ usage.type === 'anonymous' ? 'frontend → api' : 'frontend → backend → api' }}
     </div>
   </div>
 </template>

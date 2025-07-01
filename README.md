@@ -96,6 +96,28 @@ Your translation service needs:
 
 - `POST /translate` - Translate texts
 - `GET /languages` - Available languages
+- `GET /limit` - API usage limits (returns `{"type":"anonymous","used":0,"limit":100}`)
+
+## User Types & Request Flow
+
+The SDK supports different user types with different request flows:
+
+### Anonymous Users
+
+- **Chain**: `frontend → api`
+- **Type**: `anonymous`
+- **Usage**: Limited (typically 100 requests)
+
+### Registered & Pro Users
+
+- **Chain**: `frontend → backend → api`
+- **Type**: `user`
+- **Usage**: Higher limits (varies by plan)
+- **Authentication**: Requires API key
+
+The request chain is automatically determined based on your authentication setup. For registered users, you need to provide an API key in your configuration.
+
+**Get your API key**: [https://api.langie.uk/](https://api.langie.uk/)
 
 ## License
 
