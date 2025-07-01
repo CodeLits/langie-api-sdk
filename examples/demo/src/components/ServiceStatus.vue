@@ -1,39 +1,54 @@
 <template>
-  <div class="flex items-center gap-2">
-    <span
-      class="px-2 py-1 text-xs font-semibold rounded-full flex items-center gap-1"
-      :class="{
-        'bg-green-100 text-green-800': status.includes('Online'),
-        'bg-yellow-100 text-yellow-800': status.includes('Issues'),
-        'bg-red-100 text-red-800': status.includes('Offline')
-      }"
-    >
-      <component :is="statusIcon" class="w-4 h-4" />
-      {{ statusText }}
-    </span>
+  <div class="flex flex-col gap-1">
+    <div class="flex items-center gap-2">
+      <span
+        class="inline-block w-2 h-2 rounded-full"
+        :class="{
+          'bg-green-500': status === 'Online',
+          'bg-yellow-400': status === 'Issues',
+          'bg-red-500': status === 'Offline'
+        }"
+      ></span>
+      <span class="text-sm font-medium">Service: {{ status }}</span>
+    </div>
+    <div v-if="usage" class="text-xs text-gray-500 dark:text-gray-400">
+      Usage: {{ usage.used }} / {{ usage.limit }}
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon } from '@heroicons/vue/24/solid'
+import { ref, onMounted, watch, defineProps } from 'vue'
 
 const props = defineProps({
   status: {
     type: String,
     required: true
+  },
+  refreshUsage: {
+    type: Number,
+    default: 0
+  },
+  apiHost: {
+    type: String,
+    required: true
   }
 })
 
-const statusIcon = computed(() => {
-  if (props.status.includes('Online')) return CheckCircleIcon
-  if (props.status.includes('Issues')) return ExclamationTriangleIcon
-  return XCircleIcon
-})
+const usage = ref(null)
 
-const statusText = computed(() => {
-  if (props.status.includes('Online')) return 'Online'
-  if (props.status.includes('Issues')) return 'Issues'
-  return 'Offline'
-})
+async function fetchUsage() {
+  try {
+    const res = await fetch(`${props.apiHost}/limit`)
+    if (res.ok) {
+      usage.value = await res.json()
+    }
+  } catch (e) {
+    usage.value = null
+  }
+}
+
+onMounted(fetchUsage)
+
+watch(() => props.refreshUsage, fetchUsage)
 </script>

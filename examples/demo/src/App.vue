@@ -47,6 +47,7 @@ const isMounted = ref(false)
 const serviceStatus = ref('Checking...')
 const rateLimited = ref(false)
 const lastRateLimitTime = ref(null)
+const refreshUsage = ref(0)
 
 const isLoading = computed(() => isTranslatorLoading.value)
 
@@ -128,6 +129,7 @@ const handleTranslate = async () => {
     )
 
     translation.value = result?.translated || result?.text || result || 'Translation failed'
+    refreshUsage.value++
   } catch (err) {
     console.error('Translation error:', err)
 
@@ -236,7 +238,11 @@ watch(
         <div class="flex items-center space-x-4">
           <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Langie API SDK</h1>
           <div class="flex flex-col">
-            <ServiceStatus :status="serviceStatus" />
+            <ServiceStatus
+              :status="serviceStatus"
+              :refresh-usage="refreshUsage"
+              :api-host="API_HOST"
+            />
             <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {{ API_HOST }}
             </span>
