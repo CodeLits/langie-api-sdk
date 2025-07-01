@@ -26,10 +26,10 @@
             :key="selectedLanguageKey"
             :src="`https://flagcdn.com/${getFlagCode(value)}.svg`"
             class="lang-flag"
-            :alt="`${value.name} flag`"
+            :alt="`${value.native_name} flag`"
             @error="onFlagError"
           />
-          <span>{{ value.name }}</span>
+          <span>{{ value.native_name }}</span>
         </div>
       </template>
       <template #option="{ option }">
