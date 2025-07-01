@@ -26,10 +26,10 @@
             :key="selectedLanguageKey"
             :src="`https://flagcdn.com/${getFlagCode(value)}.svg`"
             class="lang-flag"
-            :alt="`${value.native_name} flag`"
+            :alt="`${value.native_name || value.name} flag`"
             @error="onFlagError"
           />
-          <span>{{ value.native_name }}</span>
+          <span>{{ value.native_name || value.name }}</span>
         </div>
       </template>
       <template #option="{ option }">
@@ -42,7 +42,7 @@
             @error="onFlagError"
           />
           <span
-            >{{ option.name }} <span class="native-name">({{ option.native_name }})</span></span
+            >{{ option.name }} <span class="native-name">({{ option.native_name || option.name }})</span></span
           >
         </div>
       </template>
