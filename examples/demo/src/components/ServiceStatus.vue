@@ -66,6 +66,7 @@ const usage = ref(null)
 
 async function fetchUsage() {
   try {
+    // Note: /limit endpoint should NOT increase usage count
     const res = await fetch(`${props.apiHost}/limit`)
     if (res.ok) {
       usage.value = await res.json()

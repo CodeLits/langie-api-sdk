@@ -59,6 +59,7 @@ const isRateLimitExpired = computed(() => {
 
 const checkServiceHealth = async () => {
   try {
+    // Note: /health endpoint should NOT increase usage count
     const response = await fetch(`${API_HOST}/health`)
     if (response.ok) {
       const data = await response.json()

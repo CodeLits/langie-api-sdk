@@ -97,6 +97,17 @@ Your translation service needs:
 - `POST /translate` - Translate texts
 - `GET /languages` - Available languages
 - `GET /limit` - API usage limits (returns `{"type":"anonymous","used":0,"limit":100}`)
+- `GET /health` - Service health check
+
+### Usage Counting
+
+The following endpoints should **NOT** increase usage count:
+
+- `GET /languages` - Language list retrieval
+- `GET /limit` - Usage limits check
+- `GET /health` - Health status check
+
+Only translation requests (`POST /translate`) should increment the usage counter.
 
 ## User Types & Request Flow
 

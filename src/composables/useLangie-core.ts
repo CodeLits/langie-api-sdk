@@ -110,7 +110,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
       let url = '/languages'
       if (countryHint) url += `?country=${countryHint}`
 
-
+      // Note: /languages endpoint should NOT increase usage count
       _languagesPromise = fetch(`${translatorHost}${url}`).then((res) => res.json())
       const response = (await _languagesPromise) as
         | TranslatorLanguage[]
