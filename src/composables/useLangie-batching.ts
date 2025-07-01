@@ -1,5 +1,6 @@
 import type { BatchRequest } from './types'
 import type { TranslateServiceResponse } from '../types'
+import { debugOnlyDev } from '../utils/debug'
 
 export interface BatchingOptions {
   initialBatchDelay?: number
@@ -65,7 +66,7 @@ export class TranslationBatching {
     if (allRequests.length > 0) {
       // Only log if there are more than 1 request to reduce noise
       if (allRequests.length > 1) {
-        console.debug(
+        debugOnlyDev(
           '[TranslationBatching] Sending batch:',
           allRequests.length,
           'translation items'
@@ -79,7 +80,7 @@ export class TranslationBatching {
         try {
           await this.fetchAndCacheBatchMixed(chunk)
         } catch (error) {
-          console.error('[TranslationBatching] Batch translation error:', error)
+          debugOnlyDev('[TranslationBatching] Batch translation error:', error)
           chunk.forEach((req) => this.pendingRequests.delete(req.cacheKey))
         }
       }
@@ -113,11 +114,11 @@ export class TranslationBatching {
     cacheKey: string
   ) {
     if (this.pendingRequests.has(cacheKey) || this.queuedThisTick.has(cacheKey)) {
-      console.debug('[TranslationBatching] Skipping duplicate:', cacheKey)
+      debugOnlyDev('[TranslationBatching] Skipping duplicate:', cacheKey)
       return
     }
 
-    console.debug('[TranslationBatching] Adding to queue:', cacheKey)
+    debugOnlyDev('[TranslationBatching] Adding to queue:', cacheKey)
 
     this.queuedThisTick.add(cacheKey)
     this.scheduleClearQueuedThisTick()
@@ -161,7 +162,7 @@ export class TranslationBatching {
         })
 
         if (!response.ok) {
-          console.error(
+          debugOnlyDev(
             '[TranslationBatching] Translation request failed:',
             response.status,
             response.statusText
@@ -177,7 +178,7 @@ export class TranslationBatching {
           this.pendingRequests.delete(req.cacheKey)
         })
       } catch (error) {
-        console.error('[TranslationBatching] Batch request failed for', langPair, ':', error)
+        debugOnlyDev('[TranslationBatching] Batch request failed for', langPair, ':', error)
 
         // Clear pending requests for failed batch
         batchRequests.forEach((req) => {

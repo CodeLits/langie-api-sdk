@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue'
 import type { Ref } from 'vue'
 import type { TranslatorOptions, TranslatorLanguage } from '../types'
 import { DEFAULT_API_HOST } from '../constants'
+import { debugOnlyDev } from '../utils/debug'
 
 const availableLanguages: Ref<TranslatorLanguage[]> = ref([])
 const translations: { [key: string]: string } = reactive({})
@@ -35,9 +36,11 @@ export function useLangieCore(options: TranslatorOptions = {}) {
   // This ensures that the first initialization (e.g., from App.vue) sets the host correctly.
   if (options.translatorHost) {
     _translatorHost = options.translatorHost
+    debugOnlyDev('[useLangie-core] Set translatorHost to:', _translatorHost)
   }
 
   const translatorHost = _translatorHost // Use the shared host
+  debugOnlyDev('[useLangie-core] Using translatorHost:', translatorHost)
   const defaultLanguage = options.defaultLanguage || 'en'
 
   const isLoading = ref(false)
@@ -50,7 +53,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
 
   const setLanguage = (lang: string) => {
     if (lang && lang !== currentLanguage.value) {
-      // console.log(`[useLangie] setLanguage: ${currentLanguage.value} → ${lang}`)
+      // debugOnlyDev(`[useLangie] setLanguage: ${currentLanguage.value} → ${lang}`)
     }
     currentLanguage.value = lang
   }
@@ -109,6 +112,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
       let url = '/languages'
       if (countryHint) url += `?country=${countryHint}`
 
+      debugOnlyDev('[useLangie-core] Fetching languages from:', `${translatorHost}${url}`)
       _languagesPromise = fetch(`${translatorHost}${url}`).then((res) => res.json())
       const response = (await _languagesPromise) as
         | TranslatorLanguage[]
@@ -149,7 +153,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
             ? navigator.languages?.[0] || navigator.language || ''
             : ''
         const browserCode = locale.split('-')[0]
-        // console.log('[useLangie] Browser code', browserCode)
+        // debugOnlyDev('[useLangie] Browser code', browserCode)
         if (browserCode) {
           let pick: TranslatorLanguage | undefined = undefined
           if (browserCode === 'sr') {
@@ -165,7 +169,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
             if (!pick) pick = mapped.find((l) => l.code.startsWith(browserCode))
           }
           if (pick && pick.value) {
-            // console.debug('[useLangie] Auto-selecting browser language', {
+            // debugOnlyDev('[useLangie] Auto-selecting browser language', {
             //   browserCode,
             //   selected: pick.value,
             //   name: pick.name
@@ -181,7 +185,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
       return filtered
     } catch (error) {
       // const totalDuration = Date.now() - startTime
-      console.error('[useLangie] Language fetch error:', { error })
+      debugOnlyDev('[useLangie] Language fetch error:', { error })
       return []
     }
   }

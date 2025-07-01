@@ -14,6 +14,7 @@ import { computed, watch, onMounted } from 'vue'
 import LanguageSelect from './LanguageSelect.vue'
 import { useLangie } from '../useLangie'
 import type { TranslatorLanguage } from '../types'
+import { debugOnlyDev } from '../utils/debug'
 
 const props = defineProps({
   languages: {
@@ -52,11 +53,20 @@ const langieOptions = computed(() => {
   return options
 })
 
-const { availableLanguages, currentLanguage, setLanguage } = useLangie(langieOptions.value)
+const { availableLanguages, currentLanguage, setLanguage, fetchLanguages } = useLangie(
+  langieOptions.value
+)
+
+// Debug logging
+debugOnlyDev('[InterfaceLanguageSelect] useLangie options:', langieOptions.value)
+debugOnlyDev('[InterfaceLanguageSelect] availableLanguages:', availableLanguages.value?.length)
+debugOnlyDev('[InterfaceLanguageSelect] currentLanguage:', currentLanguage.value)
 
 // Use provided languages if available, otherwise use fetched languages
 const effectiveLanguages = computed(() => {
-  return props.languages.length > 0 ? props.languages : availableLanguages.value
+  const languages = props.languages.length > 0 ? props.languages : availableLanguages.value
+  debugOnlyDev('[InterfaceLanguageSelect] effectiveLanguages:', languages?.length)
+  return languages
 })
 
 const currentLanguageObject = computed(() => {
@@ -112,14 +122,21 @@ watch(currentLanguage, (newLangCode) => {
 watch(
   () => props.languages,
   (newLanguages) => {
+    debugOnlyDev('[InterfaceLanguageSelect] Languages changed:', newLanguages.length)
     if (newLanguages.length > 0 && !currentLanguage.value) {
       // Only set browser language if no language is currently selected
       const savedLanguageCode = localStorage.getItem('interface_language')
+      debugOnlyDev('[InterfaceLanguageSelect] Saved language from localStorage:', savedLanguageCode)
 
       if (savedLanguageCode) {
         // Check if saved language exists in the provided languages
         const savedLangExists = newLanguages.find((lang) => lang.code === savedLanguageCode)
+        debugOnlyDev(
+          '[InterfaceLanguageSelect] Saved language found in available languages:',
+          savedLangExists
+        )
         if (savedLangExists) {
+          debugOnlyDev('[InterfaceLanguageSelect] Setting saved language:', savedLanguageCode)
           setLanguage(savedLanguageCode)
           return
         }
@@ -127,6 +144,7 @@ watch(
 
       // If no saved language or saved language doesn't exist, detect browser language
       const browserLang = detectBrowserLanguage(newLanguages)
+      debugOnlyDev('[InterfaceLanguageSelect] Detected browser language:', browserLang)
       if (browserLang) {
         setLanguage(browserLang)
       }
@@ -136,18 +154,46 @@ watch(
 )
 
 // Load saved language from localStorage on initialization
-onMounted(() => {
+onMounted(async () => {
+  debugOnlyDev('[InterfaceLanguageSelect] onMounted called')
+
+  // Fetch languages if not provided via props
+  if (props.languages.length === 0) {
+    debugOnlyDev('[InterfaceLanguageSelect] Fetching languages...')
+    await fetchLanguages()
+    debugOnlyDev('[InterfaceLanguageSelect] Languages fetched:', availableLanguages.value.length)
+  }
+
+  debugOnlyDev('[InterfaceLanguageSelect] onMounted - currentLanguage:', currentLanguage.value)
+  debugOnlyDev(
+    '[InterfaceLanguageSelect] onMounted - effectiveLanguages:',
+    effectiveLanguages.value.length
+  )
+  debugOnlyDev('[InterfaceLanguageSelect] onMounted - props.languages:', props.languages.length)
+  debugOnlyDev(
+    '[InterfaceLanguageSelect] onMounted - availableLanguages:',
+    availableLanguages.value.length
+  )
+
   const savedLanguageCode = localStorage.getItem('interface_language')
+  debugOnlyDev('[InterfaceLanguageSelect] onMounted - savedLanguageCode:', savedLanguageCode)
+
   if (savedLanguageCode && savedLanguageCode !== currentLanguage.value) {
     // Check if saved language exists in current languages
     const currentLanguages = effectiveLanguages.value
     const savedLangExists = currentLanguages.find((lang) => lang.code === savedLanguageCode)
+    debugOnlyDev('[InterfaceLanguageSelect] onMounted - savedLangExists:', savedLangExists)
 
     if (savedLangExists) {
+      debugOnlyDev(
+        '[InterfaceLanguageSelect] onMounted - setting saved language:',
+        savedLanguageCode
+      )
       setLanguage(savedLanguageCode)
     } else if (currentLanguages.length > 0) {
       // If saved language doesn't exist, try to detect browser language
       const browserLang = detectBrowserLanguage(currentLanguages)
+      debugOnlyDev('[InterfaceLanguageSelect] onMounted - browserLang:', browserLang)
       if (browserLang) {
         setLanguage(browserLang)
       }
@@ -155,6 +201,10 @@ onMounted(() => {
   } else if (!currentLanguage.value && effectiveLanguages.value.length > 0) {
     // If no saved language and no current language, detect browser language
     const browserLang = detectBrowserLanguage(effectiveLanguages.value)
+    debugOnlyDev(
+      '[InterfaceLanguageSelect] onMounted - no saved language, browserLang:',
+      browserLang
+    )
     if (browserLang) {
       setLanguage(browserLang)
     }
