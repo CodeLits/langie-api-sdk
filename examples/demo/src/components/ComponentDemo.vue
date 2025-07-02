@@ -2,7 +2,7 @@
   <div class="mt-8 border-t pt-6 dark:border-gray-700">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-        <lt orig="en">Component Demo</lt>
+        <lt orig="en">Vue Components Demo</lt>
       </h2>
       <button
         class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
