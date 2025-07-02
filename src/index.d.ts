@@ -126,3 +126,9 @@ export declare const LanguageSelect: any
 export declare const SimpleLanguageSelect: any
 export declare const InterfaceLanguageSelect: any
 export declare const lt: any
+
+// Runtime translation helper – same as returned from useLangie but accessible directly after global initialisation
+export declare function l(text: string, context?: string, originalLang?: string): string
+
+// Template-literal helper for inline translations
+export declare const lt: (strings: TemplateStringsArray, ...expr: any[]) => string
