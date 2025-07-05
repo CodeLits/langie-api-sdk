@@ -14,6 +14,8 @@ import { computed, watch, onMounted } from 'vue'
 import LanguageSelect from './LanguageSelect.vue'
 import { useLangie } from '../useLangie'
 import type { TranslatorLanguage } from '../types'
+import { getCountryCode } from '../utils/getCountryCode'
+import { devDebug } from '@/utils/debug'
 
 const props = defineProps({
   placeholder: {
@@ -145,12 +147,11 @@ onMounted(async () => {
   // Only fetch languages if not provided via props
   if (!props.languages || props.languages.length === 0) {
     // Get country code from browser for better language ordering
-    const locale = navigator.language || navigator.languages?.[0]
-    const countryCode = locale?.split('-')[1]?.toUpperCase()
-    
+    const countryCode = getCountryCode()
+    devDebug('[InterfaceLanguageSelect] fetching languages for country:', countryCode)
     await fetchLanguages({ country: countryCode })
   }
-  
+
   const savedLanguageCode = localStorage.getItem('interface_language')
 
   if (savedLanguageCode && savedLanguageCode !== currentLanguage.value) {

@@ -57,28 +57,17 @@ function createLangieInstance(options: TranslatorOptions = {}) {
           return
         }
 
-        translationsArray.forEach((translation: TranslationWithContext, translationIndex) => {
+        translationsArray.forEach((translation: TranslationWithContext) => {
           // Handle different possible response formats
           const translatedText =
             translation.translated_text ||
             translation.translated ||
             translation.t ||
             translation.text
-          devDebug('[useLangie] Translation', translationIndex, ':', {
-            original: translation.text,
-            translated: translatedText,
-            context: translation.context
-          })
           if (translatedText && translatedText !== translation.text) {
             const cacheKey = `${translation.text}|${translation.context || 'ui'}`
             const cache = translation.context === 'ui' ? uiTranslations : translations
             cache[cacheKey] = translatedText
-            devDebug('[useLangie] Cached translation:', cacheKey, '->', translatedText)
-          } else {
-            devDebug('[useLangie] Skipping translation (same text or empty):', {
-              original: translation.text,
-              translated: translatedText
-            })
           }
         })
       })

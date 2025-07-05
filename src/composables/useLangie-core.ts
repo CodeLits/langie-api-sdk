@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 import type { TranslatorOptions, TranslatorLanguage } from '../types'
 import { DEFAULT_API_HOST } from '../constants'
 import { devDebug } from '../utils/debug'
+import { getCountryCode } from '../utils/getCountryCode'
 
 const availableLanguages: Ref<TranslatorLanguage[]> = ref([])
 const translations: { [key: string]: string } = reactive({})
@@ -92,19 +93,8 @@ export function useLangieCore(options: TranslatorOptions = {}) {
         }
       }
       if (!countryHint && !_languagesCache && typeof window !== 'undefined') {
-        const match = (navigator.languages || []).find((l) => l.includes('-'))
-        if (match) countryHint = match.split('-')[1].toUpperCase()
-        if (!countryHint) {
-          const intlLoc = Intl?.DateTimeFormat?.().resolvedOptions().locale || ''
-          if (intlLoc.includes('-')) countryHint = intlLoc.split('-')[1].toUpperCase()
-        }
-        if (!countryHint) {
-          const base =
-            navigator.language ||
-            (navigator as Navigator & { userLanguage?: string }).userLanguage ||
-            ''
-          if (base.includes('-')) countryHint = base.split('-')[1].toUpperCase()
-        }
+        const cc = getCountryCode()
+        countryHint = cc ?? null
       }
 
       let url = '/languages'

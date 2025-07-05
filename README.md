@@ -130,6 +130,30 @@ The request chain is automatically determined based on your authentication setup
 
 **Get your API key**: [https://api.langie.uk/](https://api.langie.uk/)
 
+## Language Loading & Country Detection
+
+### How Language Loading Works
+
+- By default, `<InterfaceLanguageSelect>` and `useLangie` **automatically fetch the list of available languages** from your API (`/languages` endpoint).
+- The SDK will **detect the user's country** from the browser locale (e.g., `'en-US'` → `'US'`) and send it as a `country` parameter to the API. This helps prioritize relevant languages and flags for the user.
+- The base URL for all API requests (including `/languages`) is set via the `translatorHost` option.
+
+### Overriding Language List
+
+If you pass the `languages` prop to `<InterfaceLanguageSelect>`, the SDK **will not make any API request** for languages and will use your provided list instead. This is useful if you want to cache languages globally or customize the list.
+
+```vue
+<InterfaceLanguageSelect :languages="myLanguages" />
+```
+
+### Summary Table
+
+| Prop/Option         | Effect                                                            |
+| ------------------- | ----------------------------------------------------------------- |
+| `languages` (prop)  | Uses your list, disables SDK's API call for languages             |
+| No `languages` prop | SDK fetches languages from API, auto-detects country from browser |
+| `translatorHost`    | Sets base URL for all SDK API requests                            |
+
 ## License
 
 [Apache 2.0](LICENSE)

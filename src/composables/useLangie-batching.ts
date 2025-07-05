@@ -165,16 +165,6 @@ export class TranslationBatching {
         }
 
         const result = await response.json()
-        devDebug('[TranslationBatching] API Response:', {
-          fromLang,
-          toLang,
-          requestCount: batchRequests.length,
-          response: result
-        })
-        devDebug(
-          '[TranslationBatching] Full API Response structure:',
-          JSON.stringify(result, null, 2)
-        )
         allResults.push(result)
 
         // Clear pending requests for this batch
