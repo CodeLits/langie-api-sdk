@@ -68,14 +68,13 @@
 <script lang="ts" setup>
 import '@vueform/multiselect/themes/default.css'
 import '../styles/teleport.css'
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import type { PropType } from 'vue'
 import Multiselect from '@vueform/multiselect'
 import Fuse from 'fuse.js'
 import { applyLanguageAlias } from '../search-utils'
 import { THEME_COLORS, COLORS } from '../constants/colors'
 import type { TranslatorLanguage } from '../types'
-import { devDebug } from '../utils/debug'
 
 const getFlagCode = (lang: TranslatorLanguage): string => {
   const flagCode = lang.flag_country || lang.code
@@ -107,19 +106,13 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const isLoading = ref(true)
+const isLoading = computed(() => {
+  return props.languages.length <= 0
+})
 const searchQuery = ref('')
 
 const validLanguages = computed(() => {
   return props.languages.filter((lang) => lang && lang.code && lang.name && lang.native_name)
-})
-
-// More stable computed that only changes when language data actually changes
-const stableValidLanguages = computed(() => {
-  const valid = validLanguages.value
-  // Create a stable key based on the actual language data
-  const dataKey = valid.map((lang) => `${lang.code}:${lang.name}`).join('|')
-  return { languages: valid, dataKey }
 })
 
 const fuse = computed(() => {
@@ -229,44 +222,6 @@ const onFlagError = (event: Event) => {
   console.error('Flag loading error for:', target.src)
   target.style.display = 'none'
 }
-
-watch(
-  () => props.languages,
-  (newVal, oldVal) => {
-    // Only trigger if the length actually changed or if we went from empty to non-empty
-    const newLength = newVal?.length || 0
-    const oldLength = oldVal?.length || 0
-
-    if (newLength > 0 && newLength !== oldLength) {
-      isLoading.value = false
-    }
-  },
-  { immediate: true }
-)
-
-// Track if we've already logged the initial load
-let hasLoggedInitialLoad = false
-
-watch(
-  stableValidLanguages,
-  (val, oldVal) => {
-    if (val.dataKey !== oldVal?.dataKey && !hasLoggedInitialLoad && val.languages.length > 0) {
-      devDebug('[LanguageSelect] Loaded', val.languages.length, 'api languages')
-      hasLoggedInitialLoad = true
-    }
-  },
-  { deep: true }
-)
-
-onMounted(() => {
-  if (validLanguages.value.length > 0) {
-    isLoading.value = false
-  } else {
-    setTimeout(() => {
-      isLoading.value = false
-    }, 2000)
-  }
-})
 </script>
 
 <style scoped>

@@ -286,13 +286,13 @@ watch(
         :languages="displayLanguages"
         :is-loading="isLoading"
         :is-dark="isDark"
-        :swap-title="l('Swap languages')"
+        :swap-title="l('Swap languages', 'ui button title for swapping languages', 'en')"
         @swap="swapLanguages"
       />
 
       <TranslationForm
         v-model:text-to-translate="textToTranslate"
-        :placeholder="l('Enter text to translate')"
+        :placeholder="l('Enter text to translate', 'ui', 'en')"
         :is-mounted="isMounted"
         :is-loading="isLoading"
         :rate-limited="rateLimited"
