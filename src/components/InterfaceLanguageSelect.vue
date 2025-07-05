@@ -1,7 +1,7 @@
 <template>
   <LanguageSelect
     :model-value="currentLanguageObject"
-    :languages="availableLanguages"
+    :languages="effectiveLanguages"
     :placeholder="props.placeholder"
     :disabled="props.disabled"
     :is-dark="props.isDark"
@@ -35,6 +35,10 @@ const props = defineProps({
   apiKey: {
     type: String,
     default: ''
+  },
+  languages: {
+    type: Array as () => TranslatorLanguage[],
+    default: () => []
   }
 })
 
@@ -52,9 +56,17 @@ const { availableLanguages, currentLanguage, setLanguage, fetchLanguages } = use
   langieOptions.value
 )
 
+// Use provided languages if available, otherwise use SDK's languages
+const effectiveLanguages = computed(() => {
+  if (props.languages && props.languages.length > 0) {
+    return props.languages
+  }
+  return availableLanguages.value
+})
+
 const currentLanguageObject = computed(() => {
   if (!currentLanguage.value) return null
-  return availableLanguages.value.find((lang) => lang.code === currentLanguage.value) || null
+  return effectiveLanguages.value.find((lang) => lang.code === currentLanguage.value) || null
 })
 
 // Function to detect browser language from available languages
@@ -101,9 +113,9 @@ watch(currentLanguage, (newLangCode) => {
   }
 })
 
-// Watch for changes in available languages to set browser language
+// Watch for changes in effective languages to set browser language
 watch(
-  () => availableLanguages.value,
+  () => effectiveLanguages.value,
   (newLanguages) => {
     if (newLanguages.length > 0 && !currentLanguage.value) {
       // Only set browser language if no language is currently selected
@@ -130,12 +142,20 @@ watch(
 
 // Load saved language from localStorage on initialization
 onMounted(async () => {
-  await fetchLanguages()
+  // Only fetch languages if not provided via props
+  if (!props.languages || props.languages.length === 0) {
+    // Get country code from browser for better language ordering
+    const locale = navigator.language || navigator.languages?.[0]
+    const countryCode = locale?.split('-')[1]?.toUpperCase()
+    
+    await fetchLanguages({ country: countryCode })
+  }
+  
   const savedLanguageCode = localStorage.getItem('interface_language')
 
   if (savedLanguageCode && savedLanguageCode !== currentLanguage.value) {
     // Check if saved language exists in current languages
-    const currentLanguages = availableLanguages.value
+    const currentLanguages = effectiveLanguages.value
     const savedLangExists = currentLanguages.find((lang) => lang.code === savedLanguageCode)
 
     if (savedLangExists) {
@@ -147,9 +167,9 @@ onMounted(async () => {
         setLanguage(browserLang)
       }
     }
-  } else if (!currentLanguage.value && availableLanguages.value.length > 0) {
+  } else if (!currentLanguage.value && effectiveLanguages.value.length > 0) {
     // If no saved language and no current language, detect browser language
-    const browserLang = detectBrowserLanguage(availableLanguages.value)
+    const browserLang = detectBrowserLanguage(effectiveLanguages.value)
     if (browserLang) {
       setLanguage(browserLang)
     }
