@@ -11,10 +11,15 @@
       ></span>
       <span class="text-sm font-medium">Service: {{ status }}</span>
     </div>
-    <div v-if="usage" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+    <div v-if="usage" class="text-xs flex items-center gap-1" :class="usageClass">
       Usage: {{ usage.used }} / {{ usage.limit }} ({{ usage.type }})
       <div class="relative group">
-        <svg class="w-3 h-3 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+        <svg
+          class="w-3 h-3 cursor-help"
+          :class="usageIconClass"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
           <path
             fill-rule="evenodd"
             d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
@@ -35,13 +40,13 @@
       </div>
     </div>
     <div v-if="props.isLimitReached" class="text-xs text-red-500 dark:text-red-400">
-      ⚠️ Rate limit reached (429 Too Many Requests)
+      ⚠️ {{ limitReachedMessage }}
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch, defineProps } from 'vue'
+import { ref, onMounted, onUnmounted, watch, defineProps, computed } from 'vue'
 
 const props = defineProps({
   status: {
@@ -63,6 +68,30 @@ const props = defineProps({
 })
 
 const usage = ref(null)
+
+const usageClass = computed(() => {
+  if (!usage.value) return 'text-gray-500 dark:text-gray-400'
+  if (usage.value.used >= usage.value.limit) return 'text-red-500 dark:text-red-400'
+  if (usage.value.used >= usage.value.limit * 0.8) return 'text-yellow-600 dark:text-yellow-400'
+  return 'text-gray-500 dark:text-gray-400'
+})
+
+const usageIconClass = computed(() => {
+  if (!usage.value) return 'text-gray-400'
+  if (usage.value.used >= usage.value.limit) return 'text-red-400'
+  if (usage.value.used >= usage.value.limit * 0.8) return 'text-yellow-400'
+  return 'text-gray-400'
+})
+
+const limitReachedMessage = computed(() => {
+  if (usage.value && usage.value.used >= usage.value.limit) {
+    const resetTime = usage.value?.next_reset_at
+      ? ` until ${new Date(usage.value.next_reset_at).toLocaleString()}`
+      : ''
+    return `Usage limit exceeded${resetTime}`
+  }
+  return 'Rate limit reached (429 Too Many Requests)'
+})
 
 async function fetchUsage() {
   try {

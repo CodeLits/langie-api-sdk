@@ -50,12 +50,17 @@ const rateLimited = ref(false)
 const lastRateLimitTime = ref(null)
 const refreshUsage = ref(0)
 const isLimitReached = ref(false)
+const usageInfo = ref(null)
 
 const isLoading = computed(() => isTranslatorLoading.value)
 
 const isRateLimitExpired = computed(() => {
   if (!lastRateLimitTime.value) return true
   return Date.now() - lastRateLimitTime.value > 60000
+})
+
+const isUsageLimitReached = computed(() => {
+  return usageInfo.value && usageInfo.value.used >= usageInfo.value.limit
 })
 
 const checkServiceHealth = async () => {
@@ -73,6 +78,20 @@ const checkServiceHealth = async () => {
   }
 }
 
+const fetchUsageInfo = async () => {
+  try {
+    // Note: /limit endpoint should NOT increase usage count
+    const response = await fetch(`${API_HOST}/limit`)
+    if (response.ok) {
+      usageInfo.value = await response.json()
+    } else if (response.status === 429) {
+      usageInfo.value = null
+    }
+  } catch (error) {
+    usageInfo.value = null
+  }
+}
+
 const handleRateLimit = () => {
   rateLimited.value = true
   isLimitReached.value = true
@@ -87,6 +106,7 @@ const handleRateLimit = () => {
 const refreshUsageWithDelay = () => {
   setTimeout(() => {
     refreshUsage.value++
+    fetchUsageInfo() // Also refresh usage info
   }, 1500) // 1.5 секунды задержки
 }
 
@@ -108,6 +128,7 @@ onMounted(async () => {
   debugOnlyDev('[App] Languages fetched:', availableLanguages.value?.length || 0, 'languages')
 
   await checkServiceHealth()
+  await fetchUsageInfo()
   isMounted.value = true
 })
 
@@ -119,6 +140,14 @@ const handleTranslate = async () => {
 
   if (rateLimited.value && !isRateLimitExpired.value) {
     error.value = 'API rate limit exceeded. Please wait a moment before trying again.'
+    return
+  }
+
+  if (isUsageLimitReached.value) {
+    const resetTime = usageInfo.value?.next_reset_at
+      ? ` until ${new Date(usageInfo.value.next_reset_at).toLocaleString()}`
+      : ''
+    error.value = `Usage limit exceeded${resetTime}. Please wait before trying again.`
     return
   }
 
@@ -262,7 +291,7 @@ watch(
               :status="serviceStatus"
               :refresh-usage="refreshUsage"
               :api-host="API_HOST"
-              :is-limit-reached="isLimitReached"
+              :is-limit-reached="isLimitReached || isUsageLimitReached"
             />
           </div>
         </div>

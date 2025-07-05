@@ -389,3 +389,26 @@ import 'langie-api-sdk/dist/index.css'
 - **1.2.7→1.2.8**: Removed teleport.css auto-import
 - **1.2.8→1.2.9**: Added separate teleport.css build
 - **1.2.9→1.3.0**: Stabilized all CSS paths with backwards compatibility
+
+## [Unreleased]
+
+### Added
+
+- **Limit Monitoring**: Automatic detection and blocking when usage limits are exceeded
+- **Enhanced ServiceStatus Component**: Shows usage limits with color-coded indicators and reset time
+- **Smart Limit Blocking**: Prevents translation requests when `used >= limit`
+- **Usage Limit Messages**: Clear error messages with reset time information
+- **Visual Indicators**: Red/yellow color coding for usage levels (80%+ and 100%)
+
+### Changed
+
+- **Batching Optimization**: Improved global context support to reduce payload size
+- **ServiceStatus Component**: Enhanced with better limit detection and user feedback
+- **Demo App**: Added comprehensive limit monitoring and blocking functionality
+
+### Fixed
+
+- **Batching System**: Fixed context duplication in batch requests
+- **Test Coverage**: Updated tests to support new global context format
+
+## [1.0.0] - 2024-01-XX
