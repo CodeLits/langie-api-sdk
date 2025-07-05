@@ -9,7 +9,7 @@ import {
   translateBatch
 } from '@/index'
 import { SunIcon, MoonIcon } from '@heroicons/vue/24/solid'
-import { debugOnlyDev } from '@/utils/debug'
+import { devDebug as debugOnlyDev } from '@/utils/debug'
 
 // Components
 import ServiceStatus from './components/ServiceStatus.vue'

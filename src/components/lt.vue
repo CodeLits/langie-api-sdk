@@ -65,9 +65,6 @@ const translated = computed(() => {
 
   // For other frameworks, always translate
   const result = l(keyStr.value, props.ctx, props.orig)
-  devDebug(
-    `[lt] Translating "${keyStr.value}" -> "${result}" (${props.ctx ? 'ctx: ' + props.ctx : ''}${props.orig ? ', orig: ' + props.orig : ''})`
-  )
   return result
 })
 </script>

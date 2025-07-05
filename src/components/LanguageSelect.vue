@@ -250,21 +250,13 @@ let hasLoggedInitialLoad = false
 watch(
   stableValidLanguages,
   (val, oldVal) => {
-    // Only log when the actual language data changes (dataKey changes) and we haven't logged yet
     if (val.dataKey !== oldVal?.dataKey && !hasLoggedInitialLoad && val.languages.length > 0) {
-      devDebug('[LanguageSelect] Loaded', val.languages.length, 'valid languages')
+      devDebug('[LanguageSelect] Loaded', val.languages.length, 'api languages')
       hasLoggedInitialLoad = true
     }
   },
   { deep: true }
 )
-
-watch(isLoading, (val, oldVal) => {
-  // Only log when the loading state actually changes
-  if (val !== oldVal) {
-    devDebug('[LanguageSelect] Loading state:', val)
-  }
-})
 
 onMounted(() => {
   if (validLanguages.value.length > 0) {

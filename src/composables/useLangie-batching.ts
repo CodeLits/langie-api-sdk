@@ -114,8 +114,6 @@ export class TranslationBatching {
       return
     }
 
-    devDebug('[TranslationBatching] Adding to queue:', cacheKey)
-
     this.queuedThisTick.add(cacheKey)
     this.scheduleClearQueuedThisTick()
     this.pendingRequests.add(cacheKey)
