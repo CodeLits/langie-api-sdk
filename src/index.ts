@@ -30,3 +30,6 @@ export { LANGUAGE_ALIAS_TABLE, type AliasEntry } from './language-aliases'
 import './styles/teleport.css'
 
 export { getCountryCode } from './utils/getCountryCode'
+
+// Export language mapping utilities
+export { detectBrowserLanguage, BROWSER_LANGUAGE_MAP } from './utils/languageMapping'

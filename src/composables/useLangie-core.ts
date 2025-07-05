@@ -30,6 +30,11 @@ export function __resetLangieCoreForTests() {
   _autoSelected = false
   _languagesCache = null
   _languagesPromise = null
+
+  // Clear localStorage for tests
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('interface_language')
+  }
 }
 
 export function useLangieCore(options: TranslatorOptions = {}) {
@@ -45,9 +50,21 @@ export function useLangieCore(options: TranslatorOptions = {}) {
   const isLoading = ref(false)
 
   // Initialize shared currentLanguage with default if not already set
-  // For tests, always respect the defaultLanguage option
+  // Always respect the defaultLanguage option if it's different from 'en'
   if (defaultLanguage !== 'en' && currentLanguage.value === 'en') {
+    console.log('[LangieSDK] Setting defaultLanguage from options:', defaultLanguage)
     currentLanguage.value = defaultLanguage
+  }
+
+  // Restore saved language from localStorage if available
+  if (typeof window !== 'undefined' && currentLanguage.value === 'en') {
+    const savedLanguage = localStorage.getItem('interface_language')
+    if (savedLanguage) {
+      console.log('[LangieSDK] Restoring saved language from localStorage:', savedLanguage)
+      currentLanguage.value = savedLanguage
+    } else {
+      console.log('[LangieSDK] No saved language in localStorage')
+    }
   }
 
   const setLanguage = (lang: string) => {
@@ -55,6 +72,11 @@ export function useLangieCore(options: TranslatorOptions = {}) {
       // debugOnlyDev(`[useLangie] setLanguage: ${currentLanguage.value} → ${lang}`)
     }
     currentLanguage.value = lang
+
+    // Save to localStorage for persistence
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('interface_language', lang)
+    }
   }
 
   const fetchLanguages = async (opts: { force?: boolean; country?: string } = {}) => {
@@ -153,9 +175,19 @@ export function useLangieCore(options: TranslatorOptions = {}) {
             ? navigator.languages?.[0] || navigator.language || ''
             : ''
         const browserCode = locale.split('-')[0]
-        // debugOnlyDev('[useLangie] Browser code', browserCode)
+
+        console.log('[LangieSDK] Auto-selection check:', {
+          _autoSelected,
+          hasSavedLanguage: !!localStorage.getItem('interface_language'),
+          locale,
+          browserCode,
+          availableLanguages: mapped.length
+        })
+
         if (browserCode) {
           let pick: TranslatorLanguage | undefined = undefined
+
+          // Handle Serbian variants
           if (browserCode === 'sr') {
             const isLatin = /latn/i.test(locale) || locale === 'sr'
             const target = isLatin ? 'sr-latn' : 'sr-cyrl'
@@ -165,15 +197,22 @@ export function useLangieCore(options: TranslatorOptions = {}) {
               mapped.find((l) => l.value === 'sr-latn') ||
               mapped.find((l) => l.code.startsWith('sr'))
           } else {
+            // Try exact match first
             pick = mapped.find((l) => l.value === browserCode)
-            if (!pick) pick = mapped.find((l) => l.code.startsWith(browserCode))
+
+            // If no exact match, try prefix match
+            if (!pick) {
+              pick = mapped.find((l) => l.code.startsWith(browserCode))
+            }
           }
+
+          console.log('[LangieSDK] Language selection result:', {
+            browserCode,
+            found: pick?.value,
+            foundName: pick?.name
+          })
+
           if (pick && pick.value) {
-            // debugOnlyDev('[useLangie] Auto-selecting browser language', {
-            //   browserCode,
-            //   selected: pick.value,
-            //   name: pick.name
-            // })
             setLanguage(pick.value)
           }
         }
