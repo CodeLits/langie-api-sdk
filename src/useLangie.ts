@@ -7,6 +7,32 @@ import { devDebug } from './utils/debug'
 // Global singleton instance
 let globalLangieInstance: ReturnType<typeof createLangieInstance> | null = null
 
+// Track if singleton was ever created to detect resets
+let singletonWasCreated = false
+
+// Preserve singleton across hot module reloads
+if (typeof window !== 'undefined' && (window as any).__LANGIE_SINGLETON__) {
+  globalLangieInstance = (window as any).__LANGIE_SINGLETON__
+  singletonWasCreated = true
+  if (typeof window !== 'undefined') {
+    console.log('[LangieSDK] Restored singleton from hot module reload')
+  }
+}
+
+// Also check if we have a stored singleton in localStorage as backup
+if (!globalLangieInstance && typeof window !== 'undefined') {
+  try {
+    const stored = localStorage.getItem('__LANGIE_SINGLETON_URL__')
+    if (stored) {
+      console.log('[LangieSDK] Found stored singleton URL:', stored)
+      // We can't fully restore the singleton, but we know what URL it should use
+      // This will help prevent recreation with wrong URL
+    }
+  } catch (e) {
+    // Ignore localStorage errors
+  }
+}
+
 // Extended type for translation objects that includes context
 interface TranslationWithContext extends TranslateServiceResponse {
   context?: string
@@ -219,14 +245,65 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 }
 
 export function useLangie(options: TranslatorOptions = {}) {
-  // Логируем параметры при каждом вызове useLangie
   if (typeof window !== 'undefined') {
     console.log('[LangieSDK] useLangie called with options:', options)
+    console.log('[LangieSDK] globalLangieInstance before check:', globalLangieInstance ? 'EXISTS' : 'NULL')
+    console.trace('[LangieSDK] useLangie stack')
   }
-  // Создаём singleton только если его ещё нет
-  if (!globalLangieInstance) {
-    globalLangieInstance = createLangieInstance(options)
+
+  // If singleton exists, always return it regardless of options
+  if (globalLangieInstance) {
+    if (Object.keys(options).length > 0) {
+      // Если пытаются пересоздать singleton с новыми options, выводим warning
+      if (typeof window !== 'undefined') {
+        console.warn('[LangieSDK] useLangie: singleton already created! New options IGNORED.', {
+          current: globalLangieInstance,
+          attempted: options,
+        })
+      }
+    }
+    return globalLangieInstance
   }
+
+  // Check if singleton was reset (was created before but is now null)
+  if (singletonWasCreated && !globalLangieInstance) {
+    if (typeof window !== 'undefined') {
+      console.warn('[LangieSDK] WARNING: Singleton was reset! This should not happen in production.')
+    }
+  }
+
+  // Check if we have a stored URL and prevent recreation with wrong options
+  if (typeof window !== 'undefined' && Object.keys(options).length === 0) {
+    try {
+      const storedUrl = localStorage.getItem('__LANGIE_SINGLETON_URL__')
+      if (storedUrl && storedUrl !== 'https://api.langie.uk/v1') {
+        console.warn('[LangieSDK] WARNING: Attempting to create singleton with default options, but stored URL is:', storedUrl)
+        // Force the correct URL
+        options.translatorHost = storedUrl
+      }
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  }
+
+  // Only create new instance if singleton doesn't exist
+  if (typeof window !== 'undefined') {
+    console.log('[LangieSDK] Creating new singleton instance with options:', options)
+  }
+  globalLangieInstance = createLangieInstance(options)
+  singletonWasCreated = true
+
+  // Store on window for hot module reload preservation
+  if (typeof window !== 'undefined') {
+    (window as any).__LANGIE_SINGLETON__ = globalLangieInstance
+    // Also store the URL in localStorage as backup
+    try {
+      localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost || 'https://api.langie.uk/v1')
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  }
+
   return globalLangieInstance
 }
 
@@ -235,5 +312,17 @@ export function __resetLangieSingletonForTests() {
     globalLangieInstance.cleanup()
   }
   globalLangieInstance = null
+  singletonWasCreated = false
+
+  // Clear localStorage backup
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem('__LANGIE_SINGLETON_URL__')
+      delete (window as any).__LANGIE_SINGLETON__
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  }
+
   __resetLangieCoreForTests()
 }
