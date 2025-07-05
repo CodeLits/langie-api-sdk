@@ -159,6 +159,44 @@ const { translateWithContext, translateWithFallback } = useLangieInjection()
 </script>
 ```
 
+## Optimizing Batch Translations with Global Context
+
+When translating multiple items with the same context, you can optimize by using a global context parameter:
+
+```javascript
+// Instead of repeating context in each item:
+const translations = [
+  { text: 'My API Keys', context: 'ui' },
+  { text: 'Translations', context: 'ui' },
+  { text: 'API Keys', context: 'ui' },
+  { text: 'Docs', context: 'ui' },
+  { text: 'Logout', context: 'ui' }
+]
+
+// Use global context (more efficient):
+const { fetchAndCacheBatch } = useLangie()
+
+await fetchAndCacheBatch(
+  [
+    { text: 'My API Keys' },
+    { text: 'Translations' },
+    { text: 'API Keys' },
+    { text: 'Docs' },
+    { text: 'Logout' }
+  ],
+  'en',
+  'fr',
+  'ui' // Global context for all items
+)
+```
+
+This approach:
+
+- **Reduces payload size** by not repeating the same context
+- **Improves performance** with smaller API requests
+- **Maintains backward compatibility** - individual contexts still work
+- **Simplifies code** when all items share the same context
+
 ## Handling Translation Loading States
 
 For a better user experience, you can handle loading states:
@@ -390,8 +428,7 @@ window.addEventListener('online', () => (isOnline.value = true))
 window.addEventListener('offline', () => (isOnline.value = false))
 
 export function useOfflineTranslator(options = {}) {
-  const { translate, translateAsync, currentLanguage, setLanguage, ...rest } =
-    useLangie(options)
+  const { translate, translateAsync, currentLanguage, setLanguage, ...rest } = useLangie(options)
 
   // Initialize cache from localStorage
   const CACHE_KEY = 'translation-cache'

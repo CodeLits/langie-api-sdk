@@ -126,7 +126,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   const fetchAndCacheBatch = async (
     items: { text: string; context?: string }[],
     fromLang = 'en',
-    toLang = currentLanguage.value
+    toLang = currentLanguage.value,
+    globalContext?: string
   ) => {
     if (items.length === 0) return
 
@@ -138,6 +139,9 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     isLoading.value = true
 
     try {
+      // Use global context if provided, otherwise fall back to individual contexts
+      const effectiveContext = globalContext || 'ui'
+
       const response = await fetch(`${translatorHost}/translate`, {
         method: 'POST',
         headers: {
@@ -146,7 +150,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
         body: JSON.stringify({
           translations: items.map((item) => ({
             text: item.text,
-            context: item.context || 'ui'
+            context: item.context || effectiveContext
           })),
           from_lang: fromLang,
           to_lang: toLang
@@ -168,7 +172,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             translation.t ||
             translation.text
           if (translatedText && translatedText !== translation.text) {
-            const cacheKey = `${translation.text}|${translation.context || 'ui'}`
+            const cacheKey = `${translation.text}|${translation.context || effectiveContext}`
             const cache = translation.context === 'ui' ? uiTranslations : translations
             cache[cacheKey] = translatedText
           }
