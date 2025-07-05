@@ -147,9 +147,9 @@ onMounted(async () => {
   // Only fetch languages if not provided via props
   if (!props.languages || props.languages.length === 0) {
     // Get country code from browser for better language ordering
-    const countryCode = getCountryCode()
+    const countryCode = await getCountryCode()
     devDebug('[InterfaceLanguageSelect] fetching languages for country:', countryCode)
-    await fetchLanguages({ country: countryCode })
+    await fetchLanguages({ country: countryCode || undefined })
   }
 
   const savedLanguageCode = localStorage.getItem('interface_language')

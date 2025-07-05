@@ -93,19 +93,24 @@ export function useLangieCore(options: TranslatorOptions = {}) {
         }
       }
       if (!countryHint && !_languagesCache && typeof window !== 'undefined') {
-        const cc = getCountryCode()
-        countryHint = cc ?? null
+        // Use only browser locale for country hint (synchronous)
+        const cc = await getCountryCode()
+        countryHint = cc
       }
 
       let url = '/languages'
       // Добавляем language и timezone
-      const language = (typeof navigator !== 'undefined' && navigator.languages && navigator.languages[0]) || (typeof navigator !== 'undefined' && navigator.language) || '';
-      const timezone = typeof Intl !== 'undefined' && Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-      const params = new URLSearchParams();
-      if (countryHint) params.append('country', countryHint);
-      if (language) params.append('language', language);
-      if (timezone) params.append('timezone', timezone);
-      if (Array.from(params).length > 0) url += `?${params.toString()}`;
+      const language =
+        (typeof navigator !== 'undefined' && navigator.languages && navigator.languages[0]) ||
+        (typeof navigator !== 'undefined' && navigator.language) ||
+        ''
+      const timezone =
+        (typeof Intl !== 'undefined' && Intl.DateTimeFormat().resolvedOptions().timeZone) || ''
+      const params = new URLSearchParams()
+      if (countryHint) params.append('country', countryHint)
+      if (language) params.append('language', language)
+      if (timezone) params.append('timezone', timezone)
+      if (Array.from(params).length > 0) url += `?${params.toString()}`
 
       // Note: /languages endpoint should NOT increase usage count
       _languagesPromise = fetch(`${translatorHost}${url}`).then((res) => res.json())
