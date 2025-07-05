@@ -119,8 +119,6 @@ export async function translateBatch(
           status: resp.status,
           statusText: resp.statusText,
           body: bodyText.slice(0, 500)
-          // url: `${translatorHost}/translate`,
-          // duration: `${requestDuration}ms`
         })
         throw new Error(`Translator service error: ${resp.status} ${resp.statusText}`)
       }
@@ -139,7 +137,7 @@ export async function translateBatch(
           status: resp.status,
           responseText: await resp.text().catch(() => 'unreadable')
         })
-        parsed = null
+        throw new Error(`Failed to parse JSON response: ${jsonErr}`)
       }
 
       // if (parsed) {
@@ -161,15 +159,12 @@ export async function translateBatch(
       //   expectedCount: serviceTranslations.length
       // })
     } catch (error: unknown) {
-      // const totalDuration = Date.now() - startTime
       if (error instanceof Error && error.name === 'AbortError') {
-        const message = `[translator-sdk] Translator request to ${translatorHost} timed out after 5 seconds.`
-        // console.error(message, { totalDuration: `${totalDuration}ms` })
+        const message = `Translator request to ${translatorHost} timed out after 5 seconds.`
         console.error(message)
         throw new Error(message)
       }
-      const message = `[translator-sdk] Failed to connect to translator at ${translatorHost}. Is the service running?`
-      // console.error(message, { error, totalDuration: `${totalDuration}ms` })
+      const message = `Failed to connect to translator at ${translatorHost}. Is the service running?`
       console.error(message, { error })
       throw new Error(message)
     }
@@ -230,7 +225,6 @@ export async function fetchAvailableLanguages(
   const queryStr = queryParams.length ? `?${queryParams.join('&')}` : ''
 
   const requestUrl = `${translatorHost}/languages${queryStr}`
-  // console.debug('[translator-sdk] Making languages request', { url: requestUrl })
 
   try {
     const resp = await fetch(requestUrl, {
@@ -241,33 +235,11 @@ export async function fetchAvailableLanguages(
       }
     })
 
-    // const requestDuration = Date.now() - startTime
-
-    // console.debug('[translator-sdk] Languages response received', {
-    //   status: resp.status,
-    //   statusText: resp.statusText,
-    //   duration: `${requestDuration}ms`,
-    //   contentType: resp.headers.get('content-type'),
-    //   contentLength: resp.headers.get('content-length')
-    // })
-
     if (!resp.ok) {
-      // console.error('[translator-sdk] Languages request failed', {
-      //   status: resp.status,
-      //   statusText: resp.statusText,
-      //   url: requestUrl,
-      //   duration: `${requestDuration}ms`
-      // })
       throw new Error(`Translator languages error: ${resp.status}`)
     }
 
     const data = await resp.json()
-    // console.debug('[translator-sdk] Languages data received', {
-    //   isArray: Array.isArray(data),
-    //   hasLanguages: !!data.languages,
-    //   rawCount: Array.isArray(data) ? data.length : data.languages?.length || 0
-    // })
-
     const languages = Array.isArray(data) ? data : data.languages || []
 
     const filtered = languages.filter((lang: TranslatorLanguage) => {
@@ -275,22 +247,9 @@ export async function fetchAvailableLanguages(
       return Number(lang.popularity) >= minPop
     })
 
-    // const totalDuration = Date.now() - startTime
-    // console.debug('[translator-sdk] fetchAvailableLanguages completed', {
-    //   totalDuration: `${totalDuration}ms`,
-    //   originalCount: languages.length,
-    //   filteredCount: filtered.length,
-    //   filteredOut: languages.length - filtered.length
-    // })
-
     return filtered
   } catch (error) {
-    // const totalDuration = Date.now() - startTime
-    console.error('[translator-sdk] Languages fetch error', {
-      error
-      // url: requestUrl,
-      // totalDuration: `${totalDuration}ms`
-    })
+    console.error('[translator-sdk] Languages fetch error', { error })
     throw error
   }
 }

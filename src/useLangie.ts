@@ -2,21 +2,17 @@ import { watch } from 'vue'
 import type { TranslatorOptions, TranslateServiceResponse } from './types'
 import { useLangieCore, __resetLangieCoreForTests } from './composables/useLangie-core'
 import { TranslationBatching } from './composables/useLangie-batching'
-import { devDebug } from './utils/debug'
 
 // Global singleton instance
 let globalLangieInstance: ReturnType<typeof createLangieInstance> | null = null
 
-// Track if singleton was ever created to detect resets
-let singletonWasCreated = false
-
 // Preserve singleton across hot module reloads
-if (typeof window !== 'undefined' && (window as any).__LANGIE_SINGLETON__) {
-  globalLangieInstance = (window as any).__LANGIE_SINGLETON__
-  singletonWasCreated = true
-  if (typeof window !== 'undefined') {
-    console.log('[LangieSDK] Restored singleton from hot module reload')
-  }
+if (
+  typeof window !== 'undefined' &&
+  (window as unknown as Record<string, unknown>).__LANGIE_SINGLETON__
+) {
+  globalLangieInstance = (window as unknown as Record<string, unknown>)
+    .__LANGIE_SINGLETON__ as ReturnType<typeof createLangieInstance>
 }
 
 // Also check if we have a stored singleton in localStorage as backup
@@ -24,9 +20,12 @@ if (!globalLangieInstance && typeof window !== 'undefined') {
   try {
     const stored = localStorage.getItem('__LANGIE_SINGLETON_URL__')
     if (stored) {
-      console.log('[LangieSDK] Found stored singleton URL:', stored)
-      // We can't fully restore the singleton, but we know what URL it should use
-      // This will help prevent recreation with wrong URL
+      // Use stored URL to prevent recreation with wrong options
+      const storedOptions = { translatorHost: stored }
+      globalLangieInstance = createLangieInstance(storedOptions)(
+        // Store on window for hot module reload preservation
+        window as unknown as Record<string, unknown>
+      ).__LANGIE_SINGLETON__ = globalLangieInstance
     }
   } catch (e) {
     // Ignore localStorage errors
@@ -53,11 +52,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     clearTranslations
   } = core
 
-  // Логируем базовый URL при создании singleton
-  if (typeof window !== 'undefined') {
-    console.log('[LangieSDK] createLangieInstance: translatorHost =', translatorHost)
-  }
-
   // Create batching instance
   const batching = new TranslationBatching(
     {
@@ -69,21 +63,15 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     () => currentLanguage.value,
     (results) => {
       // Process batch results and update translations
-      devDebug('[useLangie] Processing batch results:', results.length, 'results')
-      results.forEach((result, resultIndex) => {
-        devDebug('[useLangie] Processing result', resultIndex, ':', result)
-
+      results.forEach((result) => {
         // Check if result is an array (direct translations) or object with translations property
         let translationsArray: TranslationWithContext[] = []
 
         if (Array.isArray(result)) {
-          devDebug('[useLangie] Result is array with', result.length, 'items')
           translationsArray = result
         } else if (result.translations && Array.isArray(result.translations)) {
-          devDebug('[useLangie] Found translations array:', result.translations.length, 'items')
           translationsArray = result.translations
         } else {
-          devDebug('[useLangie] No translations array in result:', result)
           return
         }
 
@@ -245,41 +233,17 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 }
 
 export function useLangie(options: TranslatorOptions = {}) {
-  if (typeof window !== 'undefined') {
-    console.log('[LangieSDK] useLangie called with options:', options)
-    console.log('[LangieSDK] globalLangieInstance before check:', globalLangieInstance ? 'EXISTS' : 'NULL')
-    console.trace('[LangieSDK] useLangie stack')
-  }
-
   // If singleton exists, always return it regardless of options
   if (globalLangieInstance) {
-    if (Object.keys(options).length > 0) {
-      // Если пытаются пересоздать singleton с новыми options, выводим warning
-      if (typeof window !== 'undefined') {
-        console.warn('[LangieSDK] useLangie: singleton already created! New options IGNORED.', {
-          current: globalLangieInstance,
-          attempted: options,
-        })
-      }
-    }
     return globalLangieInstance
   }
 
-  // Check if singleton was reset (was created before but is now null)
-  if (singletonWasCreated && !globalLangieInstance) {
-    if (typeof window !== 'undefined') {
-      console.warn('[LangieSDK] WARNING: Singleton was reset! This should not happen in production.')
-    }
-  }
-
-  // Check if we have a stored URL and prevent recreation with wrong options
-  if (typeof window !== 'undefined' && Object.keys(options).length === 0) {
+  // Check if we have a stored URL and should use it instead of default options
+  if (Object.keys(options).length === 0 && typeof window !== 'undefined') {
     try {
-      const storedUrl = localStorage.getItem('__LANGIE_SINGLETON_URL__')
-      if (storedUrl && storedUrl !== 'https://api.langie.uk/v1') {
-        console.warn('[LangieSDK] WARNING: Attempting to create singleton with default options, but stored URL is:', storedUrl)
-        // Force the correct URL
-        options.translatorHost = storedUrl
+      const stored = localStorage.getItem('__LANGIE_SINGLETON_URL__')
+      if (stored) {
+        options = { translatorHost: stored }
       }
     } catch (e) {
       // Ignore localStorage errors
@@ -287,18 +251,17 @@ export function useLangie(options: TranslatorOptions = {}) {
   }
 
   // Only create new instance if singleton doesn't exist
-  if (typeof window !== 'undefined') {
-    console.log('[LangieSDK] Creating new singleton instance with options:', options)
-  }
   globalLangieInstance = createLangieInstance(options)
-  singletonWasCreated = true
 
   // Store on window for hot module reload preservation
   if (typeof window !== 'undefined') {
-    (window as any).__LANGIE_SINGLETON__ = globalLangieInstance
-    // Also store the URL in localStorage as backup
+    ;(window as unknown as Record<string, unknown>).__LANGIE_SINGLETON__ = globalLangieInstance
+  }
+
+  // Store URL in localStorage for backup
+  if (typeof window !== 'undefined' && options.translatorHost) {
     try {
-      localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost || 'https://api.langie.uk/v1')
+      localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost)
     } catch (e) {
       // Ignore localStorage errors
     }
@@ -312,13 +275,12 @@ export function __resetLangieSingletonForTests() {
     globalLangieInstance.cleanup()
   }
   globalLangieInstance = null
-  singletonWasCreated = false
 
   // Clear localStorage backup
   if (typeof window !== 'undefined') {
     try {
       localStorage.removeItem('__LANGIE_SINGLETON_URL__')
-      delete (window as any).__LANGIE_SINGLETON__
+      delete (window as unknown as Record<string, unknown>).__LANGIE_SINGLETON__
     } catch (e) {
       // Ignore localStorage errors
     }
