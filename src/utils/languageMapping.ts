@@ -14,6 +14,10 @@ export const BROWSER_LANGUAGE_MAP: Record<string, string> = {
 	'sr': 'sr-latn', // Serbian (default to Latin)
 	'me': 'sr-latn', // Montenegrin
 	'sh': 'sr-latn', // Serbo-Croatian
+
+	// Kazakh variants
+	'kaz': 'kk', // Kazakh (browser 'kaz' or 'kk' → 'kk')
+	'kk': 'kk',
 };
 
 /**
@@ -28,21 +32,12 @@ export function detectBrowserLanguage(): string {
 	const locale = navigator.languages?.[0] || navigator.language || '';
 	const browserCode = locale.split('-')[0];
 
-	console.log('[LangieSDK] Browser language detection:', {
-		languages: navigator.languages,
-		language: navigator.language,
-		locale,
-		browserCode
-	});
-
 	// Check if we have a mapping for this browser code
 	const mappedLanguage = BROWSER_LANGUAGE_MAP[browserCode];
 
 	if (mappedLanguage) {
-		console.log('[LangieSDK] Mapped browser language:', browserCode, '→', mappedLanguage);
 		return mappedLanguage;
 	}
 
-	console.log('[LangieSDK] No mapping found for browser language:', browserCode, '→ using fallback: en');
-	return 'en';
+	return browserCode || 'en';
 } 

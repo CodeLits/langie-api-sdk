@@ -52,7 +52,6 @@ export function useLangieCore(options: TranslatorOptions = {}) {
   // Initialize shared currentLanguage with default if not already set
   // Always respect the defaultLanguage option if it's different from 'en'
   if (defaultLanguage !== 'en' && currentLanguage.value === 'en') {
-    console.log('[LangieSDK] Setting defaultLanguage from options:', defaultLanguage)
     currentLanguage.value = defaultLanguage
   }
 
@@ -60,10 +59,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
   if (typeof window !== 'undefined' && currentLanguage.value === 'en') {
     const savedLanguage = localStorage.getItem('interface_language')
     if (savedLanguage) {
-      console.log('[LangieSDK] Restoring saved language from localStorage:', savedLanguage)
       currentLanguage.value = savedLanguage
-    } else {
-      console.log('[LangieSDK] No saved language in localStorage')
     }
   }
 
@@ -176,14 +172,6 @@ export function useLangieCore(options: TranslatorOptions = {}) {
             : ''
         const browserCode = locale.split('-')[0]
 
-        console.log('[LangieSDK] Auto-selection check:', {
-          _autoSelected,
-          hasSavedLanguage: !!localStorage.getItem('interface_language'),
-          locale,
-          browserCode,
-          availableLanguages: mapped.length
-        })
-
         if (browserCode) {
           let pick: TranslatorLanguage | undefined = undefined
 
@@ -205,12 +193,6 @@ export function useLangieCore(options: TranslatorOptions = {}) {
               pick = mapped.find((l) => l.code.startsWith(browserCode))
             }
           }
-
-          console.log('[LangieSDK] Language selection result:', {
-            browserCode,
-            found: pick?.value,
-            foundName: pick?.name
-          })
 
           if (pick && pick.value) {
             setLanguage(pick.value)
