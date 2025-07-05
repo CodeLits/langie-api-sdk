@@ -61,4 +61,5 @@ export interface TranslatorOptions {
   minPopularity?: number
   country?: string
   region?: string
+  ctx?: string // глобальный контекст переводов
 }

@@ -28,6 +28,11 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     clearTranslations
   } = core
 
+  // Логируем базовый URL при создании singleton
+  if (typeof window !== 'undefined') {
+    console.log('[LangieSDK] createLangieInstance: translatorHost =', translatorHost)
+  }
+
   // Create batching instance
   const batching = new TranslationBatching(
     {
@@ -215,6 +220,10 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 }
 
 export function useLangie(options: TranslatorOptions = {}) {
+  // Логируем параметры при каждом вызове useLangie
+  if (typeof window !== 'undefined') {
+    console.log('[LangieSDK] useLangie called with options:', options)
+  }
   // Check if we need to create a new instance or reuse existing one
   const optionsKey = JSON.stringify(options)
 
