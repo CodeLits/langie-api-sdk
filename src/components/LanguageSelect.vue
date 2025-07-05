@@ -117,11 +117,13 @@ const validLanguages = computed(() => {
 
 const fuse = computed(() => {
   if (!validLanguages.value.length) return null
+
   return new Fuse(validLanguages.value, {
     keys: ['name', 'native_name', 'code'],
     includeScore: true,
-    threshold: 0.3,
-    isCaseSensitive: false
+    threshold: 0.6, // Use highest threshold to catch all cases
+    isCaseSensitive: false,
+    minMatchCharLength: 1 // Allow single character matches
   })
 })
 
@@ -200,6 +202,21 @@ const filteredLanguages = computed(() => {
         })
         if (suggestedLang && !results.some((r) => r.code === suggestedLang.code)) {
           results.push(suggestedLang)
+        }
+      })
+    }
+
+    // Special handling for very short queries (e.g. "се")
+    if (query.length === 2) {
+      const lowerQuery = query.toLowerCase()
+      const manualResults = validLanguages.value.filter(
+        (lang) =>
+          lang.name.toLowerCase().startsWith(lowerQuery) ||
+          lang.native_name.toLowerCase().startsWith(lowerQuery)
+      )
+      manualResults.forEach((lang) => {
+        if (!results.some((r) => r.code === lang.code)) {
+          results.push(lang)
         }
       })
     }

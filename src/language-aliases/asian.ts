@@ -62,7 +62,7 @@ export const ASIAN_LANGUAGES: AliasEntry[] = [
   // Central Asian & Turkic Languages
   {
     lang: 'kazakh',
-    match: ['kaz', 'kk', 'kazakh', 'kazakhstan'],
+    match: ['kaz', 'kk', 'kazakh', 'kazakhstan', 'ка', 'каз', 'казах', 'казахский'],
     suggest: ['russian', 'kyrgyz', 'uzbek']
   },
   {
