@@ -13,6 +13,7 @@ if (
 ) {
   globalLangieInstance = (window as unknown as Record<string, unknown>)
     .__LANGIE_SINGLETON__ as ReturnType<typeof createLangieInstance>
+  console.log('[useLangie] Using existing singleton from window')
 }
 
 // Also check if we have a stored singleton in localStorage as backup
@@ -22,10 +23,8 @@ if (!globalLangieInstance && typeof window !== 'undefined') {
     if (stored) {
       // Use stored URL to prevent recreation with wrong options
       const storedOptions = { translatorHost: stored }
-      globalLangieInstance = createLangieInstance(storedOptions)(
-        // Store on window for hot module reload preservation
-        window as unknown as Record<string, unknown>
-      ).__LANGIE_SINGLETON__ = globalLangieInstance
+      globalLangieInstance = createLangieInstance(storedOptions)
+      console.log('[useLangie] Recreated singleton from localStorage URL:', stored)
     }
   } catch (e) {
     // Ignore localStorage errors
@@ -218,6 +217,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     isLoading,
     setLanguage,
     fetchLanguages,
+    translatorHost,
 
     // Translation functions
     l,
@@ -232,42 +232,62 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   }
 }
 
-export function useLangie(options: TranslatorOptions = {}) {
-  // If singleton exists, always return it regardless of options
-  if (globalLangieInstance) {
-    return globalLangieInstance
-  }
-
-  // Check if we have a stored URL and should use it instead of default options
-  if (Object.keys(options).length === 0 && typeof window !== 'undefined') {
-    try {
-      const stored = localStorage.getItem('__LANGIE_SINGLETON_URL__')
-      if (stored) {
-        options = { translatorHost: stored }
-      }
-    } catch (e) {
-      // Ignore localStorage errors
-    }
-  }
-
-  // Only create new instance if singleton doesn't exist
-  globalLangieInstance = createLangieInstance(options)
-
-  // Store on window for hot module reload preservation
+// --- GLOBAL SINGLETON LOGIC ---
+// Always use window.__LANGIE_SINGLETON__ as the source of truth
+function getGlobalLangieInstance(): any {
   if (typeof window !== 'undefined') {
-    ;(window as unknown as Record<string, unknown>).__LANGIE_SINGLETON__ = globalLangieInstance
+    return (window as any).__LANGIE_SINGLETON__ || null
+  }
+  return globalLangieInstance
+}
+function setGlobalLangieInstance(instance: any, options?: TranslatorOptions) {
+  if (typeof window !== 'undefined') {
+    (window as any).__LANGIE_SINGLETON__ = instance
+    if (options && options.translatorHost) {
+      localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost)
+    }
+  }
+  globalLangieInstance = instance
+}
+
+export function useLangie(options: TranslatorOptions = {}) {
+  const globalInstance = getGlobalLangieInstance()
+  console.log('[useLangie] Called with options:', options, 'Global instance exists:', !!globalInstance)
+
+  // If we have a global instance and no specific options, use it
+  if (globalInstance && Object.keys(options).length === 0) {
+    console.log('[useLangie] Using global singleton instance')
+    return globalInstance
   }
 
-  // Store URL in localStorage for backup
-  if (typeof window !== 'undefined' && options.translatorHost) {
-    try {
-      localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost)
-    } catch (e) {
-      // Ignore localStorage errors
+  // If we have a global instance but options are provided, check if they match
+  if (globalInstance) {
+    const currentHost = globalInstance.translatorHost
+    const newHost = options.translatorHost
+    if (currentHost === newHost) {
+      console.log('[useLangie] Using global singleton (hosts match):', currentHost)
+      return globalInstance
+    } else {
+      console.log('[useLangie] Host mismatch, creating new instance:', { currentHost, newHost })
     }
   }
 
-  return globalLangieInstance
+  // Create new instance
+  console.log('[useLangie] Creating new instance with options:', options)
+  const instance = createLangieInstance(options)
+
+  // Store as global singleton ONLY if this is the first instance OR if it has a translatorHost
+  if (!globalInstance) {
+    setGlobalLangieInstance(instance, options)
+    console.log('[useLangie] Set as global singleton (first instance)')
+  } else if (options.translatorHost && !globalInstance.translatorHost) {
+    setGlobalLangieInstance(instance, options)
+    console.log('[useLangie] Set as global singleton (has translatorHost)')
+  } else {
+    console.log('[useLangie] Not overwriting global singleton (empty options)')
+  }
+
+  return instance
 }
 
 export function __resetLangieSingletonForTests() {
