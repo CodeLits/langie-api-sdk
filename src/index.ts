@@ -28,3 +28,5 @@ export { LANGUAGE_ALIAS_TABLE, type AliasEntry } from './language-aliases'
 
 // Import teleport styles to ensure flag styling works out of the box
 import './styles/teleport.css'
+
+export { getCountryCode } from './utils/getCountryCode'
