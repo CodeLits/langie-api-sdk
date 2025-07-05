@@ -37,32 +37,10 @@ if [[ ! -d "dist" || -z "$(ls -A dist)" ]]; then
   exit 1
 fi
 
-# Create a temporary package.json for npm pack
-echo -e "${GREEN}Creating temporary package.json for npm pack...${NC}"
-node -e "
-  const pkg = require('./package.json');
-  const { scripts, devDependencies, ...rest } = pkg;
-  rest.main = 'index.js';
-  rest.module = 'index.mjs';
-  rest.types = 'index.d.ts';
-  console.log(JSON.stringify(rest, null, 2));
-" > dist/package.json
-
-# Copy README and LICENSE
-echo -e "${GREEN}Copying README, LICENSE, and other documentation...${NC}"
-cp README.md dist/
-cp LICENSE dist/
-cp MIGRATION.md dist/ 2>/dev/null || :
-
-# Create a tarball
-echo -e "${GREEN}Creating npm tarball...${NC}"
-cd dist
-npm pack
-cd ..
-
-# Move the tarball to the root
-mv dist/*.tgz ./
-
 echo -e "${GREEN}Release preparation complete!${NC}"
-echo -e "${YELLOW}Tarball created: $(ls *.tgz)${NC}"
-echo -e "${YELLOW}To publish, run: npm publish $(ls *.tgz) --access public${NC}"
+echo -e "${YELLOW}Version: $(node -p "require('./package.json').version")${NC}"
+echo -e "${YELLOW}Ready for GitHub Actions to publish to npm${NC}"
+echo -e "${YELLOW}To create a release:${NC}"
+echo -e "${YELLOW}1. Push changes to main branch${NC}"
+echo -e "${YELLOW}2. Create a new release on GitHub with tag v$(node -p "require('./package.json').version")${NC}"
+echo -e "${YELLOW}3. GitHub Actions will automatically publish to npm${NC}"
