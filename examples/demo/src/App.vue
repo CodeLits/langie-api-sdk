@@ -84,6 +84,12 @@ const handleRateLimit = () => {
   }, 60000)
 }
 
+const refreshUsageWithDelay = () => {
+  setTimeout(() => {
+    refreshUsage.value++
+  }, 1500) // 1.5 секунды задержки
+}
+
 onMounted(async () => {
   initTheme()
 
@@ -154,6 +160,8 @@ const swapLanguages = () => {
   const temp = sourceLang.value
   sourceLang.value = targetLang.value
   targetLang.value = temp
+  // Refresh usage after swap
+  refreshUsageWithDelay()
 }
 
 // Computed
@@ -176,6 +184,8 @@ watch(
         )
         if (alternativeLang) targetLang.value = alternativeLang
       }
+      // Refresh usage after language change
+      refreshUsageWithDelay()
     }
   },
   { deep: true }
@@ -184,7 +194,11 @@ watch(
 watch(
   targetLang,
   (newLang) => {
-    if (newLang?.code) localStorage.setItem('targetLang', newLang.code)
+    if (newLang?.code) {
+      localStorage.setItem('targetLang', newLang.code)
+      // Refresh usage after language change
+      refreshUsageWithDelay()
+    }
   },
   { deep: true }
 )
