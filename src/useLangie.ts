@@ -6,7 +6,6 @@ import { devDebug } from './utils/debug'
 
 // Global singleton instance
 let globalLangieInstance: ReturnType<typeof createLangieInstance> | null = null
-let globalOptions: string | null = null
 
 // Extended type for translation objects that includes context
 interface TranslationWithContext extends TranslateServiceResponse {
@@ -224,14 +223,10 @@ export function useLangie(options: TranslatorOptions = {}) {
   if (typeof window !== 'undefined') {
     console.log('[LangieSDK] useLangie called with options:', options)
   }
-  // Check if we need to create a new instance or reuse existing one
-  const optionsKey = JSON.stringify(options)
-
-  if (!globalLangieInstance || globalOptions !== optionsKey) {
+  // Создаём singleton только если его ещё нет
+  if (!globalLangieInstance) {
     globalLangieInstance = createLangieInstance(options)
-    globalOptions = optionsKey
   }
-
   return globalLangieInstance
 }
 
@@ -240,6 +235,5 @@ export function __resetLangieSingletonForTests() {
     globalLangieInstance.cleanup()
   }
   globalLangieInstance = null
-  globalOptions = null
   __resetLangieCoreForTests()
 }
