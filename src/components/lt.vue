@@ -63,7 +63,13 @@ const translated = computed(() => {
   }
 
   // For other frameworks, always translate
-  return l(keyStr.value, props.ctx, props.orig)
+  const result = l(keyStr.value, props.ctx, props.orig)
+  if (process.env.NODE_ENV === 'development') {
+    console.debug(
+      `[lt] Translating "${keyStr.value}" -> "${result}" (${props.ctx ? 'ctx: ' + props.ctx : ''}${props.orig ? ', orig: ' + props.orig : ''})`
+    )
+  }
+  return result
 })
 </script>
 

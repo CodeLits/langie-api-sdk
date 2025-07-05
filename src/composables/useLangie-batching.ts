@@ -20,7 +20,7 @@ export class TranslationBatching {
     private translatorHost: string,
     private currentLanguage: () => string,
     private onBatchComplete: (results: TranslateServiceResponse[]) => void
-  ) {}
+  ) { }
 
   private get initialBatchDelay() {
     return this.options.initialBatchDelay ?? 100
@@ -171,6 +171,13 @@ export class TranslationBatching {
         }
 
         const result = await response.json()
+        debugOnlyDev('[TranslationBatching] API Response:', {
+          fromLang,
+          toLang,
+          requestCount: batchRequests.length,
+          response: result
+        })
+        console.debug('[TranslationBatching] Full API Response structure:', JSON.stringify(result, null, 2))
         allResults.push(result)
 
         // Clear pending requests for this batch
