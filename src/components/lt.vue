@@ -7,6 +7,7 @@
 <script lang="ts" setup>
 import { computed, useSlots } from 'vue'
 import { useLangie } from '../useLangie'
+import { devDebug } from '../utils/debug'
 
 // Define component name for better debugging
 defineOptions({
@@ -64,11 +65,9 @@ const translated = computed(() => {
 
   // For other frameworks, always translate
   const result = l(keyStr.value, props.ctx, props.orig)
-  if (process.env.NODE_ENV === 'development') {
-    console.debug(
-      `[lt] Translating "${keyStr.value}" -> "${result}" (${props.ctx ? 'ctx: ' + props.ctx : ''}${props.orig ? ', orig: ' + props.orig : ''})`
-    )
-  }
+  devDebug(
+    `[lt] Translating "${keyStr.value}" -> "${result}" (${props.ctx ? 'ctx: ' + props.ctx : ''}${props.orig ? ', orig: ' + props.orig : ''})`
+  )
   return result
 })
 </script>

@@ -9,6 +9,7 @@ import {
   translateBatch
 } from '@/index'
 import { SunIcon, MoonIcon } from '@heroicons/vue/24/solid'
+import { debugOnlyDev } from '@/utils/debug'
 
 // Components
 import ServiceStatus from './components/ServiceStatus.vue'
@@ -96,9 +97,9 @@ onMounted(async () => {
   }
 
   // Fetch available languages
-  console.debug('[App] Fetching languages...')
+  debugOnlyDev('[App] Fetching languages...')
   await fetchLanguages()
-  console.debug('[App] Languages fetched:', availableLanguages.value?.length || 0, 'languages')
+  debugOnlyDev('[App] Languages fetched:', availableLanguages.value?.length || 0, 'languages')
 
   await checkServiceHealth()
   isMounted.value = true
@@ -225,7 +226,7 @@ watch(
 
     // Only log when there's a significant change
     if (newLength > 0 && Math.abs(newLength - oldLength) > 5) {
-      console.debug('[App] availableLanguages changed:', newLength, 'languages')
+      debugOnlyDev('[App] availableLanguages changed:', newLength, 'languages')
     }
   },
   { immediate: true }

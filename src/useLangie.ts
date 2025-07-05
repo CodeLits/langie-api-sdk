@@ -2,6 +2,7 @@ import { watch } from 'vue'
 import type { TranslatorOptions, TranslateServiceResponse } from './types'
 import { useLangieCore, __resetLangieCoreForTests } from './composables/useLangie-core'
 import { TranslationBatching } from './composables/useLangie-batching'
+import { devDebug } from './utils/debug'
 
 // Global singleton instance
 let globalLangieInstance: ReturnType<typeof createLangieInstance> | null = null
@@ -38,21 +39,21 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     () => currentLanguage.value,
     (results) => {
       // Process batch results and update translations
-      console.debug('[useLangie] Processing batch results:', results.length, 'results')
+      devDebug('[useLangie] Processing batch results:', results.length, 'results')
       results.forEach((result, resultIndex) => {
-        console.debug('[useLangie] Processing result', resultIndex, ':', result)
+        devDebug('[useLangie] Processing result', resultIndex, ':', result)
 
         // Check if result is an array (direct translations) or object with translations property
         let translationsArray: TranslationWithContext[] = []
 
         if (Array.isArray(result)) {
-          console.debug('[useLangie] Result is array with', result.length, 'items')
+          devDebug('[useLangie] Result is array with', result.length, 'items')
           translationsArray = result
         } else if (result.translations && Array.isArray(result.translations)) {
-          console.debug('[useLangie] Found translations array:', result.translations.length, 'items')
+          devDebug('[useLangie] Found translations array:', result.translations.length, 'items')
           translationsArray = result.translations
         } else {
-          console.debug('[useLangie] No translations array in result:', result)
+          devDebug('[useLangie] No translations array in result:', result)
           return
         }
 
@@ -63,7 +64,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             translation.translated ||
             translation.t ||
             translation.text
-          console.debug('[useLangie] Translation', translationIndex, ':', {
+          devDebug('[useLangie] Translation', translationIndex, ':', {
             original: translation.text,
             translated: translatedText,
             context: translation.context
@@ -72,9 +73,9 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             const cacheKey = `${translation.text}|${translation.context || 'ui'}`
             const cache = translation.context === 'ui' ? uiTranslations : translations
             cache[cacheKey] = translatedText
-            console.debug('[useLangie] Cached translation:', cacheKey, '->', translatedText)
+            devDebug('[useLangie] Cached translation:', cacheKey, '->', translatedText)
           } else {
-            console.debug('[useLangie] Skipping translation (same text or empty):', {
+            devDebug('[useLangie] Skipping translation (same text or empty):', {
               original: translation.text,
               translated: translatedText
             })
@@ -115,8 +116,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     if (recentlyQueued.has(languageCacheKey)) {
       return text
     }
-
-
 
     // Queue for translation
     batching.queueTranslation(text, context || 'ui', fromLang, toLang, cacheKey)

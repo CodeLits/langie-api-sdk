@@ -1,6 +1,6 @@
 import type { BatchRequest } from './types'
 import type { TranslateServiceResponse } from '../types'
-import { debugOnlyDev } from '../utils/debug'
+import { devDebug } from '../utils/debug'
 
 export interface BatchingOptions {
   initialBatchDelay?: number
@@ -20,7 +20,7 @@ export class TranslationBatching {
     private translatorHost: string,
     private currentLanguage: () => string,
     private onBatchComplete: (results: TranslateServiceResponse[]) => void
-  ) { }
+  ) {}
 
   private get initialBatchDelay() {
     return this.options.initialBatchDelay ?? 100
@@ -66,11 +66,7 @@ export class TranslationBatching {
     if (allRequests.length > 0) {
       // Only log if there are more than 1 request to reduce noise
       if (allRequests.length > 1) {
-        debugOnlyDev(
-          '[TranslationBatching] Sending batch:',
-          allRequests.length,
-          'translation items'
-        )
+        devDebug('[TranslationBatching] Sending batch:', allRequests.length, 'translation items')
       }
 
       // Split large batches into smaller chunks
@@ -80,7 +76,7 @@ export class TranslationBatching {
         try {
           await this.fetchAndCacheBatchMixed(chunk)
         } catch (error) {
-          debugOnlyDev('[TranslationBatching] Batch translation error:', error)
+          devDebug('[TranslationBatching] Batch translation error:', error)
           chunk.forEach((req) => this.pendingRequests.delete(req.cacheKey))
         }
       }
@@ -114,11 +110,11 @@ export class TranslationBatching {
     cacheKey: string
   ) {
     if (this.pendingRequests.has(cacheKey) || this.queuedThisTick.has(cacheKey)) {
-      debugOnlyDev('[TranslationBatching] Skipping duplicate:', cacheKey)
+      devDebug('[TranslationBatching] Skipping duplicate:', cacheKey)
       return
     }
 
-    debugOnlyDev('[TranslationBatching] Adding to queue:', cacheKey)
+    devDebug('[TranslationBatching] Adding to queue:', cacheKey)
 
     this.queuedThisTick.add(cacheKey)
     this.scheduleClearQueuedThisTick()
@@ -162,7 +158,7 @@ export class TranslationBatching {
         })
 
         if (!response.ok) {
-          debugOnlyDev(
+          devDebug(
             '[TranslationBatching] Translation request failed:',
             response.status,
             response.statusText
@@ -171,13 +167,16 @@ export class TranslationBatching {
         }
 
         const result = await response.json()
-        debugOnlyDev('[TranslationBatching] API Response:', {
+        devDebug('[TranslationBatching] API Response:', {
           fromLang,
           toLang,
           requestCount: batchRequests.length,
           response: result
         })
-        console.debug('[TranslationBatching] Full API Response structure:', JSON.stringify(result, null, 2))
+        devDebug(
+          '[TranslationBatching] Full API Response structure:',
+          JSON.stringify(result, null, 2)
+        )
         allResults.push(result)
 
         // Clear pending requests for this batch
@@ -185,7 +184,7 @@ export class TranslationBatching {
           this.pendingRequests.delete(req.cacheKey)
         })
       } catch (error) {
-        debugOnlyDev('[TranslationBatching] Batch request failed for', langPair, ':', error)
+        devDebug('[TranslationBatching] Batch request failed for', langPair, ':', error)
 
         // Clear pending requests for failed batch
         batchRequests.forEach((req) => {

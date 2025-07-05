@@ -42,7 +42,8 @@
             @error="onFlagError"
           />
           <span
-            >{{ option.name }} <span class="native-name">({{ option.native_name || option.name }})</span></span
+            >{{ option.name }}
+            <span class="native-name">({{ option.native_name || option.name }})</span></span
           >
         </div>
       </template>
@@ -74,7 +75,7 @@ import Fuse from 'fuse.js'
 import { applyLanguageAlias } from '../search-utils'
 import { THEME_COLORS, COLORS } from '../constants/colors'
 import type { TranslatorLanguage } from '../types'
-import { debugOnlyDev } from '../utils/debug'
+import { devDebug } from '../utils/debug'
 
 const getFlagCode = (lang: TranslatorLanguage): string => {
   const flagCode = lang.flag_country || lang.code
@@ -251,7 +252,7 @@ watch(
   (val, oldVal) => {
     // Only log when the actual language data changes (dataKey changes) and we haven't logged yet
     if (val.dataKey !== oldVal?.dataKey && !hasLoggedInitialLoad && val.languages.length > 0) {
-      debugOnlyDev('[LanguageSelect] Loaded', val.languages.length, 'valid languages')
+      devDebug('[LanguageSelect] Loaded', val.languages.length, 'valid languages')
       hasLoggedInitialLoad = true
     }
   },
@@ -261,7 +262,7 @@ watch(
 watch(isLoading, (val, oldVal) => {
   // Only log when the loading state actually changes
   if (val !== oldVal) {
-    debugOnlyDev('[LanguageSelect] Loading state:', val)
+    devDebug('[LanguageSelect] Loading state:', val)
   }
 })
 

@@ -2,7 +2,7 @@ import { ref, reactive } from 'vue'
 import type { Ref } from 'vue'
 import type { TranslatorOptions, TranslatorLanguage } from '../types'
 import { DEFAULT_API_HOST } from '../constants'
-import { debugOnlyDev } from '../utils/debug'
+import { devDebug } from '../utils/debug'
 
 const availableLanguages: Ref<TranslatorLanguage[]> = ref([])
 const translations: { [key: string]: string } = reactive({})
@@ -183,7 +183,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
       return filtered
     } catch (error) {
       // const totalDuration = Date.now() - startTime
-      debugOnlyDev('[useLangie] Language fetch error:', { error })
+      devDebug('[useLangie] Language fetch error:', { error })
       return []
     }
   }
