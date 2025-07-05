@@ -5,6 +5,56 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2025-01-18 - TIMEZONE LIBRARY MIGRATION
+
+### 🔄 Changed
+
+- **Timezone Library Migration**: Replaced `country-timezone` with `countries-and-timezones`
+  - **Size Reduction**: 7x smaller dependency (316KB vs 2.3MB)
+  - **Better Accuracy**: Uses official IANA timezone database
+  - **TypeScript Support**: Built-in TypeScript types (no custom declarations needed)
+  - **Popular Library**: 310k+ weekly downloads, actively maintained
+  - **Simpler API**: `ct.getCountryForTimezone(timezone)` returns `{id, name}` object
+
+### 🗑️ Removed
+
+- **Manual Timezone Mapping**: Removed `src/utils/timezoneToCountry.ts` (106 lines of manual code)
+- **Custom Type Declarations**: Removed `src/types/country-timezone.d.ts` (no longer needed)
+- **Old Dependency**: Removed `country-timezone` package dependency
+
+### 🛠️ Fixed
+
+- **Vite Cache Issues**: Cleared Vite cache in demo app after library migration
+- **Import Compatibility**: Updated imports to use new library structure
+- **Build System**: Ensured clean builds with new dependency
+
+### 📚 Documentation
+
+- **Updated Dependencies Section**: Added information about `countries-and-timezones` library
+- **Migration Notes**: Documented the benefits of the new library choice
+
+### 🎯 Technical Benefits
+
+- **Reduced Bundle Size**: Smaller dependency footprint
+- **Better Maintainability**: No custom timezone mapping code to maintain
+- **Improved Accuracy**: Official IANA timezone database ensures correctness
+- **Future-Proof**: Actively maintained library with regular updates
+
+### 📦 Migration Impact
+
+```typescript
+// Before (106 lines of manual code):
+const timezoneToCountry: Record<string, string> = {
+  London: 'GB',
+  Paris: 'FR'
+  // ... 100+ lines
+}
+
+// After (1 line with library):
+const country = ct.getCountryForTimezone(timezone)
+return country?.id || null
+```
+
 ## [1.4.6] - 2025-01-18 - BROWSER LANGUAGE DETECTION & API CONFIGURATION
 
 ### 🚀 Added
