@@ -13,6 +13,13 @@ Lightweight translation SDK for Vue.js applications.
 npm install langie-api-sdk
 ```
 
+### Dependencies
+
+The SDK uses the following external libraries:
+
+- `countries-and-timezones` - For accurate timezone to country mapping (316KB, MIT license)
+- `@vueform/multiselect` - For the language selection dropdown component
+
 ## Quick Start
 
 ### Basic Translation Component

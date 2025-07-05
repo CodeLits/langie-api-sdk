@@ -1,4 +1,4 @@
-import { timezoneToCountry } from './timezoneToCountry'
+import * as ct from 'countries-and-timezones'
 
 // Get country from multiple sources with fallback
 export async function getCountryCode(): Promise<string | null> {
@@ -14,20 +14,24 @@ export async function getCountryCode(): Promise<string | null> {
   return await getCountryFromIP()
 }
 
-// Get country from timezone
+// Get country from timezone using countries-and-timezones library
 function getCountryFromTimezone(): string | null {
   try {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    // Extract country from timezone (e.g., "Europe/London" -> "GB")
-    const parts = timezone.split('/')
-    if (parts.length > 1) {
-      const region = parts[1]
-      return timezoneToCountry[region] || null
-    }
+    return getCountryFromTimezoneString(timezone)
   } catch (error) {
     return null
   }
-  return null
+}
+
+// Helper function to get country code from timezone string
+export function getCountryFromTimezoneString(timezone: string): string | null {
+  try {
+    const country = ct.getCountryForTimezone(timezone)
+    return country?.id || null
+  } catch (error) {
+    return null
+  }
 }
 
 // Get country from IP (requires external service)
