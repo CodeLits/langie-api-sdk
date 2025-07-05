@@ -87,11 +87,12 @@ describe('useLangie batching', () => {
     expect(requestBody.translations).toHaveLength(3)
     expect(requestBody.translations).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ text: 'Hello', context: 'ui' }),
-        expect.objectContaining({ text: 'World', context: 'ui' }),
-        expect.objectContaining({ text: 'Welcome', context: 'ui' })
+        expect.objectContaining({ text: 'Hello' }),
+        expect.objectContaining({ text: 'World' }),
+        expect.objectContaining({ text: 'Welcome' })
       ])
     )
+    expect(requestBody.context).toBe('ui')
     expect(requestBody.from_lang).toBe('en')
     expect(requestBody.to_lang).toBe('fr')
   })
@@ -117,9 +118,8 @@ describe('useLangie batching', () => {
 
     const requestBody = JSON.parse(translateCalls[0][1].body)
     expect(requestBody.translations).toHaveLength(1)
-    expect(requestBody.translations[0]).toEqual(
-      expect.objectContaining({ text: 'Hello', context: 'ui' })
-    )
+    expect(requestBody.translations[0]).toEqual(expect.objectContaining({ text: 'Hello' }))
+    expect(requestBody.context).toBe('ui')
   })
 
   it('should handle different language pairs in the same batch', async () => {
@@ -146,12 +146,10 @@ describe('useLangie batching', () => {
     expect(requestBody1.translations).toHaveLength(1)
     expect(requestBody2.translations).toHaveLength(1)
 
-    expect(requestBody1.translations[0]).toEqual(
-      expect.objectContaining({ text: 'Hello', context: 'ui' })
-    )
-    expect(requestBody2.translations[0]).toEqual(
-      expect.objectContaining({ text: 'Hola', context: 'ui' })
-    )
+    expect(requestBody1.translations[0]).toEqual(expect.objectContaining({ text: 'Hello' }))
+    expect(requestBody2.translations[0]).toEqual(expect.objectContaining({ text: 'Hola' }))
+    expect(requestBody1.context).toBe('ui')
+    expect(requestBody2.context).toBe('ui')
   })
 
   it('should respect the initialBatchDelay setting', async () => {
@@ -233,8 +231,7 @@ describe('useLangie batching', () => {
 
     const requestBody = JSON.parse(translateCalls[0][1].body)
     expect(requestBody.translations).toHaveLength(1)
-    expect(requestBody.translations[0]).toEqual(
-      expect.objectContaining({ text: 'Hello', context: 'ui' })
-    )
+    expect(requestBody.translations[0]).toEqual(expect.objectContaining({ text: 'Hello' }))
+    expect(requestBody.context).toBe('ui')
   })
 })

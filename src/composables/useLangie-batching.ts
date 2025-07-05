@@ -140,6 +140,10 @@ export class TranslationBatching {
       const [fromLang, toLang] = langPair.split('|')
 
       try {
+        // Check if all requests have the same context
+        const contexts = [...new Set(batchRequests.map((req) => req.context))]
+        const useGlobalContext = contexts.length === 1 && contexts[0] === 'ui'
+
         const response = await fetch(`${this.translatorHost}/translate`, {
           method: 'POST',
           headers: {
@@ -148,10 +152,11 @@ export class TranslationBatching {
           body: JSON.stringify({
             translations: batchRequests.map((req) => ({
               text: req.text,
-              context: req.context
+              ...(useGlobalContext ? {} : { context: req.context })
             })),
             from_lang: fromLang,
-            to_lang: toLang
+            to_lang: toLang,
+            ...(useGlobalContext ? { context: 'ui' } : {})
           })
         })
 
