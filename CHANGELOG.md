@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.1] - 2024-12-19
+
+### Fixed
+
+- **Type Safety**: Fixed linter warnings by introducing explicit types for global singleton instance
+- **Code Quality**: Removed `any` types and improved type safety across the SDK
+- **Production Ready**: All tests pass and code is clean for production release
+
 ## [1.9.0] - 2024-12-19
 
 ### Changed
