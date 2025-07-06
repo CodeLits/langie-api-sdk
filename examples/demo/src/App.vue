@@ -6,10 +6,13 @@ import {
   DEV_API_HOST,
   lt,
   InterfaceLanguageSelect,
-  translateBatch
+  API_FIELD_TEXT,
+  API_FIELD_FROM,
+  API_FIELD_TO
 } from '@/index'
 import { SunIcon, MoonIcon } from '@heroicons/vue/24/solid'
 import { devDebug as debugOnlyDev } from '@/utils/debug'
+import { translateBatch } from 'langie-api-sdk/core'
 
 // Components
 import ServiceStatus from './components/ServiceStatus.vue'
@@ -158,9 +161,9 @@ const handleTranslate = async () => {
     const [result] = await translateBatch(
       [
         {
-          text: textToTranslate.value,
-          from_lang: sourceLang.value?.code || 'auto',
-          to_lang: targetLang.value?.code || 'en'
+          [API_FIELD_TEXT]: textToTranslate.value,
+          [API_FIELD_FROM]: sourceLang.value?.code || 'auto',
+          [API_FIELD_TO]: targetLang.value?.code || 'en'
         }
       ],
       {
@@ -168,7 +171,7 @@ const handleTranslate = async () => {
       }
     )
 
-    translation.value = result?.translated || result?.text || result || 'Translation failed'
+    translation.value = result?.[API_FIELD_TEXT] || result || 'Translation failed'
     refreshUsage.value++
   } catch (err) {
     // Translation error

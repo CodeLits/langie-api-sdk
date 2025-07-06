@@ -17,7 +17,15 @@ export { default as lt } from './components/lt.vue'
 export type { TranslatorOptions, TranslatorLanguage, TranslateServiceResponse } from './types'
 
 // Constant exports
-export { DEFAULT_API_HOST, DEV_API_HOST } from './constants'
+export {
+  DEFAULT_API_HOST,
+  DEV_API_HOST,
+  API_FIELD_TEXT,
+  API_FIELD_FROM,
+  API_FIELD_TO,
+  API_FIELD_CTX,
+  API_FIELD_TRANSLATIONS
+} from './constants'
 export { COLORS, THEME_COLORS, CSS_VARS } from './constants/colors'
 
 // Theme utilities
