@@ -10,7 +10,8 @@ To release a new version, follow these steps:
 3. Google the current date.
 4. Read the latest changes in the git log, compare to the last release
 5. Update the corresponding version number in the package.json file, according to the latest changes, minor or major or patch. You decide.
-6. Commit the changes with the corresponding message
-7. Push the changes to the remote repository
-8. Create a new release on GitHub with the tag vx.x.x
-9. Push to github and it will automatically publish to npm
+6. Remove unnecessary logs from the codebase and leave only the ones that are necessary for the release.
+7. Commit the changes with the corresponding message
+8. Push the changes to the remote repository
+9. Create a new release on GitHub with the tag vx.x.x
+10. Push to github and it will automatically publish to npm

@@ -62,7 +62,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       // Handle multiple results from batching
       results.forEach((result) => {
         if (result.translations) {
-          console.log(`[fetchAndCacheBatch] Received ${result.translations.length} translations from server`)
           result.translations.forEach((translation: TranslationWithContext) => {
             // Handle different possible response formats
             const translatedText =
@@ -75,17 +74,13 @@ function createLangieInstance(options: TranslatorOptions = {}) {
               const cache = translation.context === 'ui' ? uiTranslations : translations
               cache[cacheKey] = translatedText
 
-              console.log(`[fetchAndCacheBatch] Cached translation: "${translation.text}" → "${translatedText}"`)
-
               // Force reactivity by triggering a change
               if (translation.context === 'ui' || !translation.context) {
                 // Trigger reactivity for UI translations
                 uiTranslations[cacheKey] = translatedText
-                console.log(`[fetchAndCacheBatch] Updated UI cache for: "${translation.text}"`)
               } else {
                 // Trigger reactivity for regular translations
                 translations[cacheKey] = translatedText
-                console.log(`[fetchAndCacheBatch] Updated regular cache for: "${translation.text}"`)
               }
             }
           })
@@ -154,11 +149,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     const fromLang = originalLang || 'en'
     const toLang = currentLanguage.value
 
-    console.log(`[lr] Computing translation for: "${text}" (${fromLang} → ${toLang})`)
-
     // Skip translation if source and target languages are the same
     if (fromLang === toLang) {
-      console.log(`[lr] Skipping translation - same language: ${fromLang}`)
       return text
     }
 
@@ -167,18 +159,14 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
     // Return cached translation if available
     if (cache[cacheKey]) {
-      console.log(`[lr] Found cached translation: "${text}" → "${cache[cacheKey]}"`)
       return cache[cacheKey]
     }
 
     // Check if we've recently queued this translation
     const languageCacheKey = `${cacheKey}|${fromLang}|${toLang}`
     if (recentlyQueued.has(languageCacheKey)) {
-      console.log(`[lr] Translation already queued: "${text}"`)
       return text
     }
-
-    console.log(`[lr] Queueing translation: "${text}"`)
 
     // Queue for translation
     batching.queueTranslation(text, context || 'ui', fromLang, toLang, cacheKey)
@@ -238,7 +226,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       const result = await response.json()
 
       if (result.translations) {
-        console.log(`[fetchAndCacheBatch] Received ${result.translations.length} translations from server`)
         result.translations.forEach((translation: TranslationWithContext) => {
           // Handle different possible response formats
           const translatedText =
@@ -251,17 +238,13 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             const cache = translation.context === 'ui' ? uiTranslations : translations
             cache[cacheKey] = translatedText
 
-            console.log(`[fetchAndCacheBatch] Cached translation: "${translation.text}" → "${translatedText}"`)
-
             // Force reactivity by triggering a change
             if (translation.context === 'ui' || !translation.context) {
               // Trigger reactivity for UI translations
               uiTranslations[cacheKey] = translatedText
-              console.log(`[fetchAndCacheBatch] Updated UI cache for: "${translation.text}"`)
             } else {
               // Trigger reactivity for regular translations
               translations[cacheKey] = translatedText
-              console.log(`[fetchAndCacheBatch] Updated regular cache for: "${translation.text}"`)
             }
           }
         })
