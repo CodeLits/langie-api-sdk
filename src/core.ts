@@ -149,7 +149,24 @@ export async function translateBatch(
 
       const data = parsed || {}
       serviceResults = Array.isArray(data.translations)
-        ? data.translations
+        ? data.translations.map((translation, index) => {
+          const originalText = serviceTranslations[index]?.text || ''
+
+          // Handle language detection response
+          if (translation.from_lang && !translation.translated) {
+            return {
+              text: originalText,
+              translated: originalText, // For detection, return original text
+              from_lang: translation.from_lang
+            }
+          }
+
+          // Handle translation response
+          return {
+            text: originalText,
+            translated: translation.translated || translation.t || originalText
+          }
+        })
         : data.t
           ? [{ text: serviceTranslations[0].text, translated: data.t }]
           : []

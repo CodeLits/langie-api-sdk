@@ -28,8 +28,8 @@ export interface TranslateRequestBody {
  * Translation service response
  */
 export interface TranslateServiceResponse {
-  text: string
-  translated: string
+  translated?: string
+  from_lang?: string
   translations?: TranslateServiceResponse[]
   t?: string // legacy field for single translation
 }

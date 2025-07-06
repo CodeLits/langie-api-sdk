@@ -54,7 +54,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     {
       initialBatchDelay: options.initialBatchDelay,
       followupBatchDelay: options.followupBatchDelay,
-      maxBatchSize: options.maxBatchSize,
+      maxBatchSize: options.maxBatchSize
     },
     translatorHost,
     () => currentLanguage.value,
@@ -63,25 +63,18 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       results.forEach((result) => {
         if (result.translations) {
           result.translations.forEach((translation: TranslationWithContext) => {
-            // Handle different possible response formats
-            const translatedText =
-              translation.translated_text ||
-              translation.translated ||
-              translation.t ||
-              translation.text
-            if (translatedText && translatedText !== translation.text) {
-              const cacheKey = `${translation.text}|${translation.context || 'ui'}`
-              const cache = translation.context === 'ui' ? uiTranslations : translations
-              cache[cacheKey] = translatedText
+            // Handle language detection response
+            if (translation.from_lang && !translation.translated) {
+              // For language detection, we don't cache anything in batching
+              return
+            }
 
-              // Force reactivity by triggering a change
-              if (translation.context === 'ui' || !translation.context) {
-                // Trigger reactivity for UI translations
-                uiTranslations[cacheKey] = translatedText
-              } else {
-                // Trigger reactivity for regular translations
-                translations[cacheKey] = translatedText
-              }
+            // Handle translation response
+            const translatedText = translation.translated || translation.t
+            if (translatedText) {
+              // Note: In batching, we need to get the original text from the batching queue
+              // This will be handled by the batching system itself
+              // For now, we'll skip this as the main logic is in fetchAndCacheBatch
             }
           })
         }
@@ -226,15 +219,27 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       const result = await response.json()
 
       if (result.translations) {
-        result.translations.forEach((translation: TranslationWithContext) => {
-          // Handle different possible response formats
+        result.translations.forEach((translation: TranslationWithContext, index: number) => {
+          // Use original text from request items array
+          const originalText = items[index]?.text
+          if (!originalText) return
+
+          // Handle language detection response
+          if (translation.from_lang && !translation.translated) {
+            // For language detection, we might want to store the detected language
+            // but for now, we'll just return the original text
+            const cacheKey = `${originalText}|${translation.context || effectiveContext}`
+            const cache = translation.context === 'ui' ? uiTranslations : translations
+            cache[cacheKey] = originalText // Return original text for detection
+            return
+          }
+
+          // Handle translation response
           const translatedText =
-            translation.translated_text ||
-            translation.translated ||
-            translation.t ||
-            translation.text
-          if (translatedText && translatedText !== translation.text) {
-            const cacheKey = `${translation.text}|${translation.context || effectiveContext}`
+            translation.translated_text || translation.translated || translation.t
+
+          if (translatedText) {
+            const cacheKey = `${originalText}|${translation.context || effectiveContext}`
             const cache = translation.context === 'ui' ? uiTranslations : translations
             cache[cacheKey] = translatedText
 
@@ -297,7 +302,7 @@ function getGlobalLangieInstance(): any {
 }
 function setGlobalLangieInstance(instance: any, options?: TranslatorOptions) {
   if (typeof window !== 'undefined') {
-    (window as any).__LANGIE_SINGLETON__ = instance
+    ;(window as any).__LANGIE_SINGLETON__ = instance
     if (options && options.translatorHost) {
       localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost)
     }
