@@ -56,10 +56,10 @@ export async function translateBatch(
   const indexMap: number[] = []
 
   translations.forEach((tr, idx) => {
-    const from = (tr.from_lang || '').toLowerCase()
-    const to = (tr.to_lang || '').toLowerCase()
+    const from = (tr.from || '').toLowerCase()
+    const to = (tr.to || '').toLowerCase()
     if (from === to) {
-      // console.debug('[translator-sdk] Skipping translation (same language)', { from, to, text: tr.text?.slice(0, 20) })
+      // console.debug('[translator-sdk] Skipping translation (same language)', { from, to, text: tr.t?.slice(0, 20) })
       return // no need to translate
     }
     serviceTranslations.push(tr)
@@ -135,23 +135,23 @@ export async function translateBatch(
       const data = parsed || {}
       serviceResults = Array.isArray(data.translations)
         ? data.translations.map((translation, index) => {
-            const originalText = serviceTranslations[index]?.text || ''
+          const originalText = serviceTranslations[index]?.t || ''
 
-            // Handle language detection response
-            if (translation.from_lang && !translation.translated) {
-              return {
-                translated: originalText, // For detection, return original text
-                from_lang: translation.from_lang
-              }
-            }
-
-            // Handle translation response
+          // Handle language detection response
+          if (translation.from && !translation.t) {
             return {
-              translated: translation.translated || translation.t || originalText
+              t: originalText, // For detection, return original text
+              from: translation.from
             }
-          })
+          }
+
+          // Handle translation response
+          return {
+            t: translation.t || originalText
+          }
+        })
         : data.t
-          ? [{ translated: data.t }]
+          ? [{ t: data.t }]
           : []
 
       // console.debug('[translator-sdk] Service results processed', {
@@ -172,13 +172,13 @@ export async function translateBatch(
 
   // Assemble final results in original order
   const final = translations.map((tr, idx) => {
-    const from = (tr.from_lang || '').toLowerCase()
-    const to = (tr.to_lang || '').toLowerCase()
-    if (from === to) return { translated: tr.text }
+    const from = (tr.from || '').toLowerCase()
+    const to = (tr.to || '').toLowerCase()
+    if (from === to) return { t: tr.t }
 
     const svcIdx = indexMap.indexOf(idx)
-    if (svcIdx !== -1) return serviceResults[svcIdx] || { translated: tr.text }
-    return { translated: tr.text }
+    if (svcIdx !== -1) return serviceResults[svcIdx] || { t: tr.t }
+    return { t: tr.t }
   })
 
   // const totalDuration = Date.now() - startTime

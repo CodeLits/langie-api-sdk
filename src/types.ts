@@ -18,20 +18,19 @@ export interface TranslatorLanguage {
  * Translation request body
  */
 export interface TranslateRequestBody {
-  text: string
-  from_lang?: string
-  to_lang?: string
-  context?: string
+  t: string
+  from?: string
+  to?: string
+  ctx?: string
 }
 
 /**
  * Translation service response
  */
 export interface TranslateServiceResponse {
-  translated?: string
-  from_lang?: string
+  t?: string
+  from?: string
   translations?: TranslateServiceResponse[]
-  t?: string // legacy field for single translation
 }
 
 /**
