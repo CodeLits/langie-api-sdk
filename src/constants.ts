@@ -34,5 +34,8 @@ export const API_FIELD_TO = 'to'
 // Context field
 export const API_FIELD_CTX = 'ctx'
 
+// Translated text field (same as text field for response)
+export const API_FIELD_TRANSLATED = 't'
+
 // Translations array field
 export const API_FIELD_TRANSLATIONS = 'translations'
