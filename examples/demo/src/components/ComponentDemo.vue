@@ -20,9 +20,7 @@
           Advanced <span class="text-blue-500">{{ '<LanguageSelect />' }}</span>
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          <lt orig="en">
-            Features: Search, flags, fuzzy matching (requires @vueform/multiselect + fuse.js)
-          </lt>
+          <lt orig="en">Features: Smart search, smart flags detection</lt>
         </p>
         <div class="max-w-md">
           <LanguageSelect
@@ -46,7 +44,8 @@
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
           <lt orig="en">
-            Features: Auto API integration, browser language detection, excludes selected language
+            Features: Auto API integration, browser language detection, smart search, smart flags
+            detection
           </lt>
         </p>
         <div class="max-w-md">
@@ -99,16 +98,19 @@
         <div class="text-sm text-blue-800 dark:text-blue-300 space-y-2">
           <div>
             <strong><lt orig="en">LanguageSelect:</lt></strong>
-            <lt orig="en"
-              >When you want advanced features like search, flags, and fuzzy matching</lt
-            >
+            <br />
+            <lt orig="en">When you want advanced features like search, flags, and smart search</lt>
           </div>
           <div>
             <strong><lt orig="en">InterfaceLanguageSelect:</lt></strong>
-            <lt orig="en">For interface language selection with automatic API integration</lt>
+            <br />
+            <lt orig="en"
+              >For interface language selection with automatic API integration, smart search</lt
+            >
           </div>
           <div>
             <strong><lt orig="en">SimpleLanguageSelect:</lt></strong>
+            <br />
             <lt orig="en">When you want minimal dependencies and a native dropdown</lt>
           </div>
         </div>
