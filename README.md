@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/langie-api-sdk.svg?style=flat)](https://www.npmjs.com/package/langie-api-sdk)
 [![Apache 2.0 License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-Lightweight translation SDK for Vue.js applications.
+Lightweight translation SDK for Vue.js, Nuxt.js, and vanilla JavaScript applications with smart interface language selection and limit monitoring.
 
 ## 🚀 [Live Demo](https://langie-demo.netlify.app/)
 
@@ -22,52 +22,36 @@ The SDK uses the following external libraries:
 
 ## Quick Start
 
-### Basic Translation Component
-
-```vue
-<script setup>
-import { lt } from 'langie-api-sdk/components'
-</script>
-
-<template>
-  <lt>Hello world!</lt>
-  <lt>Welcome {{ username }}!</lt>
-</template>
-```
-
-### Language Selection
-
-```vue
-<script setup>
-import { LanguageSelect, InterfaceLanguageSelect } from 'langie-api-sdk/components'
-import '@vueform/multiselect/themes/default.css'
-import 'langie-api-sdk/dist/index.css'
-</script>
-
-<template>
-  <!-- Manual language selection -->
-  <LanguageSelect v-model="selectedLang" :languages="languages" />
-
-  <!-- Automatic interface language selection -->
-  <InterfaceLanguageSelect />
-</template>
-```
-
-### Translation Function
-
 ```vue
 <script setup>
 import { useLangie } from 'langie-api-sdk'
+import { lt } from 'langie-api-sdk/components'
 
-const { translate, setLanguage } = useLangie({
+const { lr, setLanguage } = useLangie({
   translatorHost: 'https://your-api.com'
 })
 </script>
 
 <template>
-  <p>{{ translate('Hello world!') }}</p>
+  <h1>{{ lr('Welcome to our application') }}</h1>
+  <lt>Hello world!</lt>
+  <button @click="setLanguage('es')">Switch to Spanish</button>
 </template>
 ```
+
+## Documentation
+
+- **[Getting Started](./docs/getting-started.md)** - Installation and basic setup
+- **[Vue.js Usage](./docs/vue.md)** - Vue composables, components, and best practices
+- **[Nuxt.js Integration](./docs/nuxt.md)** - SSR support, plugins, and deployment
+- **[JavaScript Usage](./docs/javascript.md)** - Vanilla JS, React, and Node.js integration
+- **[Components](./docs/components.md)** - Ready-to-use Vue components
+- **[Composables](./docs/composables.md)** - Vue composables and reactive state
+- **[Core API](./docs/core-api.md)** - Core translation functions
+- **[Advanced Usage](./docs/advanced-usage.md)** - Complex patterns and optimization
+- **[Backend Integration](./docs/backend-integration.md)** - API requirements and setup
+- **[TypeScript Support](./docs/typescript.md)** - TypeScript integration guide
+- **[Contributing](./docs/contributing.md)** - Development and contribution guidelines
 
 ## Required CSS
 
@@ -79,87 +63,26 @@ import '@vueform/multiselect/themes/default.css'
 import 'langie-api-sdk/dist/index.css'
 ```
 
-## API
+## Features
 
-### Components
-
-- `<lt>` - Translate text inline
-- `<LanguageSelect>` - Language dropdown with flags
-- `<InterfaceLanguageSelect>` - Automatic interface language selection with API integration
-- `<SimpleLanguageSelect>` - Basic HTML select (no dependencies)
-
-### Composables
-
-- `useLangie(options)` - Main translation composable
-
-### Functions
-
-- `translateBatch(texts, options)` - Batch translation
-- `fetchAvailableLanguages(options)` - Get available languages
+- **Reactive translations** with automatic UI updates
+- **SSR support** for Nuxt.js applications
+- **Smart caching** with context-aware storage
+- **Language detection** with browser locale support
+- **Limit monitoring** with usage tracking
+- **TypeScript support** with full type definitions
+- **Multiple frameworks** - Vue.js, Nuxt.js, vanilla JavaScript
 
 ## Backend Requirements
 
-Your translation service needs:
+Your translation service needs these endpoints:
 
 - `POST /translate` - Translate texts
 - `GET /languages` - Available languages
-- `GET /limit` - API usage limits (returns `{"type":"anonymous","used":0,"limit":100}`)
+- `GET /limit` - API usage limits
 - `GET /health` - Service health check
 
-### Usage Counting
-
-The following endpoints should **NOT** increase usage count:
-
-- `GET /languages` - Language list retrieval
-- `GET /limit` - Usage limits check
-- `GET /health` - Health status check
-
-Only translation requests (`POST /translate`) should increment the usage counter.
-
-## User Types & Request Flow
-
-The SDK supports different user types with different request flows:
-
-### Anonymous Users
-
-- **Chain**: `frontend → api`
-- **Type**: `anonymous`
-- **Usage**: Limited (typically 100 requests)
-
-### Registered & Pro Users
-
-- **Chain**: `frontend → backend → api`
-- **Type**: `user`
-- **Usage**: Higher limits (varies by plan)
-- **Authentication**: Requires API key
-
-The request chain is automatically determined based on your authentication setup. For registered users, you need to provide an API key in your configuration.
-
-**Get your API key**: [https://api.langie.uk/](https://api.langie.uk/)
-
-## Language Loading & Country Detection
-
-### How Language Loading Works
-
-- By default, `<InterfaceLanguageSelect>` and `useLangie` **automatically fetch the list of available languages** from your API (`/languages` endpoint).
-- The SDK will **detect the user's country** from the browser locale (e.g., `'en-US'` → `'US'`) and send it as a `country` parameter to the API. This helps prioritize relevant languages and flags for the user.
-- The base URL for all API requests (including `/languages`) is set via the `translatorHost` option.
-
-### Overriding Language List
-
-If you pass the `languages` prop to `<InterfaceLanguageSelect>`, the SDK **will not make any API request** for languages and will use your provided list instead. This is useful if you want to cache languages globally or customize the list.
-
-```vue
-<InterfaceLanguageSelect :languages="myLanguages" />
-```
-
-### Summary Table
-
-| Prop/Option         | Effect                                                            |
-| ------------------- | ----------------------------------------------------------------- |
-| `languages` (prop)  | Uses your list, disables SDK's API call for languages             |
-| No `languages` prop | SDK fetches languages from API, auto-detects country from browser |
-| `translatorHost`    | Sets base URL for all SDK API requests                            |
+See [Backend Integration](./docs/backend-integration.md) for detailed API specifications and setup guide.
 
 ## License
 

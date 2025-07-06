@@ -10,14 +10,29 @@ The `useLangie` composable provides reactive translation functionality for Vue c
 
 ```typescript
 function useLangie(options?: TranslatorOptions): {
-  translate: (text: string, targetLang?: string) => string
-  translateAsync: (text: string, targetLang?: string) => Promise<string>
-  currentLanguage: Ref<string>
-  setLanguage: (lang: string) => void
+  // Core functionality
   availableLanguages: Ref<TranslatorLanguage[]>
+  translations: Record<string, string>
+  uiTranslations: Record<string, string>
+  currentLanguage: Ref<string>
   isLoading: Ref<boolean>
-  isLanguageSupported: (lang: string) => boolean
-  install: (app: App) => void
+  setLanguage: (lang: string) => void
+  fetchLanguages: (opts?: { force?: boolean; country?: string }) => Promise<void>
+  translatorHost: string
+
+  // Translation functions
+  l: (text: string, context?: string, originalLang?: string) => string
+  lr: (text: string, context?: string, originalLang?: string) => string
+  fetchAndCacheBatch: (
+    items: { text: string; context?: string }[],
+    fromLang?: string,
+    toLang?: string,
+    globalContext?: string
+  ) => Promise<void>
+
+  // Utility functions
+  cleanup: () => void
+  getBatchingStats: () => any
 }
 ```
 
@@ -40,14 +55,27 @@ function useLangie(options?: TranslatorOptions): {
 
 An object containing the following properties and methods:
 
-- `translate`: A function that synchronously translates text using the current language
-- `translateAsync`: A function that asynchronously translates text
-- `currentLanguage`: A reactive reference to the current language code
-- `setLanguage`: A function to change the current language
+#### Core Functionality
+
 - `availableLanguages`: A reactive reference to the list of available languages
+- `translations`: A reactive object containing cached translations for non-UI contexts
+- `uiTranslations`: A reactive object containing cached translations for UI contexts
+- `currentLanguage`: A reactive reference to the current language code
 - `isLoading`: A reactive reference indicating whether translations are loading
-- `isLanguageSupported`: A function to check if a language is supported
-- `install`: A function to install the translator as a Vue plugin
+- `setLanguage`: A function to change the current language
+- `fetchLanguages`: A function to fetch available languages from the API
+- `translatorHost`: The configured translator host URL
+
+#### Translation Functions
+
+- `l`: A synchronous translation function that returns cached translations or queues for translation
+- `lr`: A reactive translation function that automatically updates when translations become available
+- `fetchAndCacheBatch`: A function to manually fetch and cache translations in batches
+
+#### Utility Functions
+
+- `cleanup`: A function to clear all cached translations and cleanup resources
+- `getBatchingStats`: A function to get statistics about the batching system
 
 ### Basic Usage
 
@@ -55,7 +83,7 @@ An object containing the following properties and methods:
 <template>
   <div>
     <p>Current language: {{ currentLanguage }}</p>
-    <p>{{ translate('Hello world!') }}</p>
+    <p>{{ l('Hello world!') }}</p>
     <button @click="setLanguage('fr')">Switch to French</button>
     <button @click="setLanguage('es')">Switch to Spanish</button>
   </div>
@@ -64,7 +92,7 @@ An object containing the following properties and methods:
 <script setup>
 import { useLangie } from 'langie-api-sdk'
 
-const { translate, currentLanguage, setLanguage } = useLangie({
+const { l, currentLanguage, setLanguage } = useLangie({
   translatorHost: 'https://your-translation-api.com',
   apiKey: 'your-api-key',
   defaultLanguage: 'en'
@@ -72,32 +100,28 @@ const { translate, currentLanguage, setLanguage } = useLangie({
 </script>
 ```
 
-### Async Translation
+### Reactive Translation
 
-For longer texts or when you need to handle loading states:
+For UI components that should automatically update when translations become available:
 
 ```vue
 <template>
   <div>
-    <p v-if="isLoading">Translating...</p>
-    <p v-else>{{ translation }}</p>
-    <button @click="translateText">Translate</button>
+    <p v-if="isLoading">Loading translations...</p>
+    <p>{{ lr('Hello world!') }}</p>
+    <p>{{ lr('Welcome to our application') }}</p>
+    <button @click="setLanguage('fr')">Switch to French</button>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useLangie } from 'langie-api-sdk'
 
-const { translateAsync, isLoading } = useLangie()
-const translation = ref('')
+const { lr, isLoading, setLanguage } = useLangie()
 
-async function translateText() {
-  translation.value = await translateAsync(
-    'This is a longer text that might take some time to translate.',
-    'fr'
-  )
-}
+// lr() automatically updates when translations are cached
+// It queues translations and returns the original text initially
+// Then updates reactively when the translation arrives
 </script>
 ```
 
@@ -114,7 +138,7 @@ Working with the available languages:
       </option>
     </select>
 
-    <p>{{ translate('Hello world!') }}</p>
+    <p>{{ l('Hello world!') }}</p>
   </div>
 </template>
 
@@ -122,7 +146,7 @@ Working with the available languages:
 import { computed } from 'vue'
 import { useLangie } from 'langie-api-sdk'
 
-const { translate, currentLanguage, setLanguage, availableLanguages } = useLangie()
+const { l, currentLanguage, setLanguage, availableLanguages } = useLangie()
 
 const selectedLanguage = computed({
   get: () => currentLanguage.value,
@@ -130,6 +154,131 @@ const selectedLanguage = computed({
 })
 </script>
 ```
+
+## Translation Functions
+
+The SDK provides two main translation functions with different behaviors:
+
+### `l()` - Synchronous Translation
+
+The `l()` function provides immediate translation results:
+
+```typescript
+l(text: string, context?: string, originalLang?: string): string
+```
+
+- **Returns immediately**: Returns cached translation or original text
+- **Queues for translation**: If not cached, queues the text for background translation
+- **Use cases**: Buttons, form submissions, immediate feedback
+- **Context handling**: Uses `uiTranslations` cache when context is `'ui'` or `undefined`
+
+```vue
+<template>
+  <button @click="submitForm">{{ l('Submit') }}</button>
+</template>
+
+<script setup>
+import { useLangie } from 'langie-api-sdk'
+
+const { l } = useLangie()
+
+function submitForm() {
+  // l() returns immediately - perfect for button clicks
+  const submitText = l('Submit', 'ui')
+  console.log(submitText) // Returns cached translation or "Submit"
+}
+</script>
+```
+
+### `lr()` - Reactive Translation
+
+The `lr()` function provides reactive translations that update automatically:
+
+```typescript
+lr(text: string, context?: string, originalLang?: string): string
+```
+
+- **Reactive updates**: Automatically updates when translations become available
+- **Perfect for UI**: Ideal for labels, headings, and static text
+- **Context handling**: Uses `uiTranslations` cache when context is `'ui'` or `undefined`
+- **Vue reactivity**: Creates reactive dependencies on translation caches
+
+```vue
+<template>
+  <div>
+    <h1>{{ lr('Welcome to our application') }}</h1>
+    <p>{{ lr('Please select your language') }}</p>
+  </div>
+</template>
+
+<script setup>
+import { useLangie } from 'langie-api-sdk'
+
+const { lr } = useLangie()
+
+// lr() automatically updates when translations are cached
+// Initially shows original text, then updates to translated text
+</script>
+```
+
+### Context and Caching
+
+Both functions use intelligent caching based on context:
+
+- **UI Context** (`'ui'` or `undefined`): Uses `uiTranslations` cache
+- **Other Contexts**: Uses `translations` cache
+- **Cache Keys**: Format is `"text|context"` (e.g., `"Hello|ui"`)
+- **Automatic Batching**: Multiple translations are batched for efficiency
+
+```vue
+<script setup>
+import { useLangie } from 'langie-api-sdk'
+
+const { l, lr } = useLangie()
+
+// UI translations (buttons, labels, etc.)
+const buttonText = l('Click me', 'ui')
+const labelText = lr('Username', 'ui')
+
+// Content translations (articles, descriptions, etc.)
+const articleTitle = l('Breaking News', 'article')
+const description = lr('Product description', 'content')
+</script>
+```
+
+## Important Notes
+
+### Translation Caching (v1.7.2+)
+
+The SDK uses intelligent caching to improve performance and user experience:
+
+- **Separate Caches**: UI translations (`uiTranslations`) and content translations (`translations`) are cached separately
+- **Context-Aware**: Translations are cached based on their context to avoid conflicts
+- **Automatic Updates**: UI components using `lr()` automatically update when translations are cached
+- **Batching**: Multiple translation requests are batched for efficiency
+
+### Cache Selection Logic
+
+The SDK automatically selects the appropriate cache based on context:
+
+```typescript
+// UI context (buttons, labels, etc.) → uiTranslations cache
+l('Submit', 'ui') // Uses uiTranslations
+lr('Username') // Uses uiTranslations (undefined context = 'ui')
+
+// Content context (articles, etc.) → translations cache
+l('Article title', 'article') // Uses translations
+lr('Description', 'content') // Uses translations
+```
+
+### Troubleshooting
+
+If translations aren't appearing in your UI:
+
+1. **Check context**: Ensure you're using the same context when caching and retrieving
+2. **Use `lr()` for UI**: Use `lr()` for reactive UI components that should update automatically
+3. **Check cache contents**: You can inspect `uiTranslations` and `translations` objects for debugging
+4. **Language changes**: Translations are cleared when the language changes
 
 ## Global Configuration
 
@@ -256,7 +405,7 @@ export function provideTranslator(options) {
     ...translator,
     translateWithFallback: (text, targetLang, fallbackText) => {
       try {
-        return translator.translate(text, targetLang)
+        return translator.l(text, 'ui')
       } catch (error) {
         console.error('Translation failed, using fallback', error)
         return fallbackText || text

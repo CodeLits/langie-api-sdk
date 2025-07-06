@@ -236,17 +236,17 @@ function handleLanguageChange(langCode) {
 </style>
 ```
 
-## T Component
+## lt Component
 
-The `T` component is a lightweight wrapper for translating text within templates.
+The `lt` component is a lightweight wrapper for translating text within templates. It uses the reactive `lr()` function internally to automatically update when translations become available.
 
 ### Props
 
-| Prop         | Type      | Default  | Description                                        |
-| ------------ | --------- | -------- | -------------------------------------------------- |
-| `tag`        | `String`  | `'span'` | HTML tag to use for the wrapper element            |
-| `targetLang` | `String`  | `null`   | Target language (defaults to the current language) |
-| `html`       | `Boolean` | `false`  | Whether to render the content as HTML              |
+| Prop   | Type     | Default | Description                                     |
+| ------ | -------- | ------- | ----------------------------------------------- |
+| `ctx`  | `String` | `'ui'`  | Context for the translation (defaults to 'ui')  |
+| `orig` | `String` | `'en'`  | Original language code (defaults to 'en')       |
+| `msg`  | `String` | `''`    | Text to translate (alternative to slot content) |
 
 ### Slots
 
@@ -259,13 +259,13 @@ The `T` component is a lightweight wrapper for translating text within templates
 ```vue
 <template>
   <div>
-    <h1><T>Welcome to our application!</T></h1>
-    <p><T>This text will be translated.</T></p>
+    <h1><lt>Welcome to our application!</lt></h1>
+    <p><lt>This text will be translated.</lt></p>
   </div>
 </template>
 
 <script setup>
-import { T } from 'langie-api-sdk/components'
+import { lt } from 'langie-api-sdk/components'
 </script>
 ```
 
@@ -274,13 +274,13 @@ import { T } from 'langie-api-sdk/components'
 ```vue
 <template>
   <div>
-    <T>Hello {{ username }}!</T>
+    <lt>Hello {{ username }}!</lt>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { T } from 'langie-api-sdk/components'
+import { lt } from 'langie-api-sdk/components'
 
 const username = ref('John')
 </script>
@@ -291,57 +291,74 @@ const username = ref('John')
 ```vue
 <template>
   <div>
-    <T :html="true"> Welcome to <b>our application</b>! </T>
+    <lt :html="true"> Welcome to <b>our application</b>! </lt>
   </div>
 </template>
 
 <script setup>
-import { T } from 'langie-api-sdk/components'
+import { lt } from 'langie-api-sdk/components'
 </script>
 ```
 
-### With Custom Tag
+### With Message Prop
 
 ```vue
 <template>
   <div>
-    <T tag="h1">Welcome!</T>
-    <T tag="p">This is a paragraph.</T>
-    <T tag="button" @click="doSomething">Click me</T>
+    <lt msg="Welcome!" />
+    <lt msg="This is a paragraph." />
+    <lt :msg="dynamicMessage" />
   </div>
 </template>
 
 <script setup>
-import { T } from 'langie-api-sdk/components'
+import { ref } from 'vue'
+import { lt } from 'langie-api-sdk/components'
 
-function doSomething() {
-  alert('Button clicked!')
-}
+const dynamicMessage = ref('Dynamic message')
 </script>
 ```
 
-### With Specific Target Language
+### With Context and Original Language
 
 ```vue
 <template>
   <div>
-    <p>English: <T>Hello</T></p>
-    <p>French: <T target-lang="fr">Hello</T></p>
-    <p>Spanish: <T target-lang="es">Hello</T></p>
+    <p>UI Context: <lt ctx="ui">Hello</lt></p>
+    <p>Content Context: <lt ctx="content">Hello</lt></p>
+    <p>Custom Original: <lt orig="fr">Bonjour</lt></p>
   </div>
 </template>
 
 <script setup>
-import { T } from 'langie-api-sdk/components'
+import { lt } from 'langie-api-sdk/components'
 </script>
 ```
+
+### How lt Component Works
+
+The `lt` component uses the reactive `lr()` function internally, which means:
+
+- **Automatic Updates**: The component automatically updates when translations become available
+- **Context-Aware Caching**: Uses the appropriate cache based on the `ctx` prop
+- **Reactive Dependencies**: Creates reactive dependencies on translation caches and current language
+- **SSR Safe**: Handles server-side rendering gracefully
+
+### Important Notes (v1.7.2+)
+
+The `lt` component now properly handles translation caching:
+
+- **UI Context**: When `ctx="ui"` or `ctx` is undefined, uses `uiTranslations` cache
+- **Other Contexts**: Uses `translations` cache for content contexts
+- **Automatic Reactivity**: Updates automatically when translations are cached
+- **Consistent Caching**: All translation functions now use the same cache selection logic
 
 ## Server-Side Rendering (SSR)
 
 For SSR environments, the SDK provides special versions of the components that work during server rendering:
 
 ```js
-import { LanguageSelectSSR, TSSR } from 'langie-api-sdk/components'
+import { LanguageSelectSSR, ltSSR } from 'langie-api-sdk/components'
 ```
 
 These components render minimal placeholders during server rendering and are replaced with the full components during client hydration.
@@ -358,7 +375,7 @@ These components render minimal placeholders during server rendering and are rep
       </template>
     </client-only>
 
-    <T>Welcome to our application!</T>
+    <lt>Welcome to our application!</lt>
   </div>
 </template>
 
@@ -385,7 +402,7 @@ The components provide minimal styling by default and can be customized using CS
   margin-right: 8px;
 }
 
-/* Style the T component */
+/* Style the lt component */
 :deep(.translator-text) {
   font-style: italic;
 }
@@ -400,7 +417,7 @@ You can create your own custom components that use the translation functionality
 <!-- TranslatedButton.vue -->
 <template>
   <button :class="[customClass, { 'is-loading': isLoading }]" @click="$emit('click', $event)">
-    <T>{{ text }}</T>
+    <lt>{{ text }}</lt>
   </button>
 </template>
 

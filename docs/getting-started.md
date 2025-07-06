@@ -53,7 +53,7 @@ app.mount('#app')
 ```vue
 <template>
   <div>
-    <p>{{ translate('Hello world!') }}</p>
+    <p>{{ lr('Hello world!') }}</p>
     <button @click="setLanguage('fr')">Switch to French</button>
   </div>
 </template>
@@ -61,7 +61,7 @@ app.mount('#app')
 <script setup>
 import { useLangie } from 'langie-api-sdk'
 
-const { translate, setLanguage, currentLanguage } = useLangie()
+const { lr, setLanguage, currentLanguage } = useLangie()
 </script>
 ```
 

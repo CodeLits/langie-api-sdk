@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.2] - 2024-07-05
+
+### Fixed
+
+- **Translation Caching Bug**: Fixed critical issue where UI translations were not appearing despite being cached correctly
+  - Fixed cache selection logic in `lr` function to use `uiTranslations` when context is `undefined` or `'ui'`
+  - Fixed cache selection logic in `onBatchComplete` to consistently use `uiTranslations` for UI context
+  - Fixed cache selection logic in `fetchAndCacheBatch` to match the caching logic
+  - Fixed cache selection logic in `l` function for consistency
+  - All cache selection logic now uses `(context === 'ui' || !context) ? uiTranslations : translations`
+
+### Changed
+
+- **Enhanced Debugging**: Added comprehensive logging to track translation caching and retrieval
+  - Added detailed logging in `onBatchComplete` to show cache contents and keys
+  - Added detailed logging in `lr` function to track cache lookups
+  - Added logging in `l` function for consistency
+  - Improved debugging visibility for translation flow
+
+### Technical
+
+- **Cache Consistency**: Ensured all translation functions use the same cache selection logic
+  - `l`, `lr`, `onBatchComplete`, and `fetchAndCacheBatch` now use consistent cache selection
+  - Fixed the root cause where UI components weren't finding cached translations
+  - Improved reactive translation updates in Vue components
+
 ## [1.7.1] - 2024-07-05
 
 ### Changed

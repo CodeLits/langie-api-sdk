@@ -11,7 +11,7 @@ You can use interpolation in your translations:
 ```vue
 <template>
   <div>
-    <T>Hello {{ username }}!</T>
+    <lt>Hello {{ username }}!</lt>
   </div>
 </template>
 
@@ -30,9 +30,9 @@ For pluralization, you can use conditional rendering:
 ```vue
 <template>
   <div>
-    <T v-if="count === 0">No items</T>
-    <T v-else-if="count === 1">One item</T>
-    <T v-else>{{ count }} items</T>
+    <lt v-if="count === 0">No items</lt>
+    <lt v-else-if="count === 1">One item</lt>
+    <lt v-else>{{ count }} items</lt>
   </div>
 </template>
 
@@ -51,7 +51,7 @@ For more complex formatting, you can use computed properties:
 ```vue
 <template>
   <div>
-    <T>{{ formattedMessage }}</T>
+    <lt>{{ formattedMessage }}</lt>
   </div>
 </template>
 
@@ -206,13 +206,13 @@ For a better user experience, you can handle loading states:
   <div>
     <div v-if="isLoading" class="loading-overlay">
       <span class="loading-spinner"></span>
-      <p><T>Loading translations...</T></p>
+      <p><lt>Loading translations...</lt></p>
     </div>
 
     <div v-else>
       <!-- Your translated content -->
-      <h1><T>Welcome to our application!</T></h1>
-      <p><T>This content is now translated.</T></p>
+      <h1><lt>Welcome to our application!</lt></h1>
+      <p><lt>This content is now translated.</lt></p>
     </div>
   </div>
 </template>
@@ -310,13 +310,13 @@ Then use it in your components:
 <template>
   <div>
     <button @click="loadAdminTranslations">
-      <T>Load Admin Interface</T>
+      <lt>Load Admin Interface</lt>
     </button>
 
     <div v-if="isAdminLoaded">
       <!-- Admin interface with translations -->
-      <h2><T>Admin Dashboard</T></h2>
-      <p><T>Welcome to the admin area.</T></p>
+      <h2><lt>Admin Dashboard</lt></h2>
+      <p><lt>Welcome to the admin area.</lt></p>
     </div>
   </div>
 </template>
@@ -395,7 +395,7 @@ Then use it in your components:
     <p>{{ translate('Hello world!') }}</p>
 
     <div v-if="recentTranslations.length">
-      <h3><T>Recent Translations</T></h3>
+      <h3><lt>Recent Translations</lt></h3>
       <ul>
         <li v-for="(item, index) in recentTranslations" :key="index">
           {{ item.original }} → {{ item.translated }}
@@ -526,13 +526,13 @@ Then use it in your application:
 <template>
   <div>
     <div v-if="!isOnline" class="offline-warning">
-      <T>You are currently offline. Using cached translations.</T>
+      <lt>You are currently offline. Using cached translations.</lt>
     </div>
 
     <p>{{ translate('Hello world!') }}</p>
 
     <button @click="clearCache">
-      <T>Clear Translation Cache</T>
+      <lt>Clear Translation Cache</lt>
     </button>
   </div>
 </template>
