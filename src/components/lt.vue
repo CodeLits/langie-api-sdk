@@ -5,7 +5,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, useSlots } from 'vue'
+import { computed, useSlots, watch } from 'vue'
+import { ref, nextTick } from 'vue'
 import { useLangie } from '../useLangie'
 
 // Define component name for better debugging
@@ -43,7 +44,7 @@ const props = defineProps({
 })
 
 const slots = useSlots()
-const { lr, currentLanguage } = useLangie()
+const { lr, currentLanguage, uiTranslations, translations } = useLangie()
 
 const keyStr = computed(() => {
   if (props.msg) return props.msg
@@ -56,14 +57,32 @@ const keyStr = computed(() => {
   return (slotContent || '').trim()
 })
 
+// Force component update when translations change
+const forceUpdate = ref(0)
+watch(
+  [uiTranslations, translations],
+  () => {
+    // Small delay to ensure translations are cached before updating
+    nextTick(() => {
+      forceUpdate.value++
+    })
+  },
+  { deep: true }
+)
+
 const translated = computed(() => {
   // To prevent SSR hydration mismatches in Nuxt, render the untranslated key on the server
   if (isNuxt.value && typeof window === 'undefined') {
     return keyStr.value
   }
 
-  // Force reactivity by depending on currentLanguage
+  // Force reactivity by depending on currentLanguage and translation caches
   void currentLanguage.value
+  void forceUpdate.value // Force recomputation when translations change
+  // Access properties to create reactive dependencies
+  const cacheKey = `${keyStr.value}|${props.ctx || 'ui'}`
+  const cache = props.ctx === 'ui' ? uiTranslations : translations
+  void cache[cacheKey] // This creates a reactive dependency
 
   // For other frameworks, always translate
   const result = lr(keyStr.value, props.ctx, props.orig)
