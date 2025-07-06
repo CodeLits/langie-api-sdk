@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { useLangie, __resetLangieSingletonForTests } from '../useLangie'
+import { API_FIELD_TEXT, API_FIELD_FROM, API_FIELD_TO, API_FIELD_CTX } from '../constants'
 
 describe('useLangie batching', () => {
   let mockFetch: ReturnType<typeof vi.fn>
@@ -25,9 +26,9 @@ describe('useLangie batching', () => {
         json: () =>
           Promise.resolve({
             translations: [
-              { text: 'Hello', translated: 'Bonjour' },
-              { text: 'World', translated: 'Monde' },
-              { text: 'Welcome', translated: 'Bienvenue' }
+              { [API_FIELD_TEXT]: 'Bonjour' },
+              { [API_FIELD_TEXT]: 'Monde' },
+              { [API_FIELD_TEXT]: 'Bienvenue' }
             ]
           })
       })
@@ -87,14 +88,14 @@ describe('useLangie batching', () => {
     expect(requestBody.translations).toHaveLength(3)
     expect(requestBody.translations).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ text: 'Hello' }),
-        expect.objectContaining({ text: 'World' }),
-        expect.objectContaining({ text: 'Welcome' })
+        expect.objectContaining({ [API_FIELD_TEXT]: 'Hello' }),
+        expect.objectContaining({ [API_FIELD_TEXT]: 'World' }),
+        expect.objectContaining({ [API_FIELD_TEXT]: 'Welcome' })
       ])
     )
-    expect(requestBody.context).toBe('ui')
-    expect(requestBody.from_lang).toBe('en')
-    expect(requestBody.to_lang).toBe('fr')
+    expect(requestBody[API_FIELD_CTX]).toBe('ui')
+    expect(requestBody[API_FIELD_FROM]).toBe('en')
+    expect(requestBody[API_FIELD_TO]).toBe('fr')
   })
 
   it('should not make duplicate requests for the same text', async () => {
@@ -118,8 +119,10 @@ describe('useLangie batching', () => {
 
     const requestBody = JSON.parse(translateCalls[0][1].body)
     expect(requestBody.translations).toHaveLength(1)
-    expect(requestBody.translations[0]).toEqual(expect.objectContaining({ text: 'Hello' }))
-    expect(requestBody.context).toBe('ui')
+    expect(requestBody.translations[0]).toEqual(
+      expect.objectContaining({ [API_FIELD_TEXT]: 'Hello' })
+    )
+    expect(requestBody[API_FIELD_CTX]).toBe('ui')
   })
 
   it('should handle different language pairs in the same batch', async () => {
@@ -146,10 +149,14 @@ describe('useLangie batching', () => {
     expect(requestBody1.translations).toHaveLength(1)
     expect(requestBody2.translations).toHaveLength(1)
 
-    expect(requestBody1.translations[0]).toEqual(expect.objectContaining({ text: 'Hello' }))
-    expect(requestBody2.translations[0]).toEqual(expect.objectContaining({ text: 'Hola' }))
-    expect(requestBody1.context).toBe('ui')
-    expect(requestBody2.context).toBe('ui')
+    expect(requestBody1.translations[0]).toEqual(
+      expect.objectContaining({ [API_FIELD_TEXT]: 'Hello' })
+    )
+    expect(requestBody2.translations[0]).toEqual(
+      expect.objectContaining({ [API_FIELD_TEXT]: 'Hola' })
+    )
+    expect(requestBody1[API_FIELD_CTX]).toBe('ui')
+    expect(requestBody2[API_FIELD_CTX]).toBe('ui')
   })
 
   it('should respect the initialBatchDelay setting', async () => {
@@ -231,7 +238,9 @@ describe('useLangie batching', () => {
 
     const requestBody = JSON.parse(translateCalls[0][1].body)
     expect(requestBody.translations).toHaveLength(1)
-    expect(requestBody.translations[0]).toEqual(expect.objectContaining({ text: 'Hello' }))
-    expect(requestBody.context).toBe('ui')
+    expect(requestBody.translations[0]).toEqual(
+      expect.objectContaining({ [API_FIELD_TEXT]: 'Hello' })
+    )
+    expect(requestBody[API_FIELD_CTX]).toBe('ui')
   })
 })

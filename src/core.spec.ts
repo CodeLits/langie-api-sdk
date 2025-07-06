@@ -33,17 +33,17 @@ describe('translateBatch', () => {
   })
 
   it('does not call fetch for same-language translations', async () => {
-    const translations = [{ text: 'hello', from_lang: 'en', to_lang: 'en' }]
+    const translations = [{ t: 'hello', from: 'en', to: 'en' }]
     const result = await translateBatch(translations)
     expect(mockFetch).not.toHaveBeenCalled()
-    expect(result).toEqual([{ translated: 'hello' }])
+    expect(result).toEqual([{ t: 'hello' }])
   })
 
   it('calls fetch for translations that need it', async () => {
-    const translations = [{ text: 'hello', from_lang: 'en', to_lang: 'es' }]
+    const translations = [{ t: 'hello', from: 'en', to: 'es' }]
     mockFetch.mockResolvedValue(
       createMockResponse({
-        translations: [{ text: 'hello', translated: 'hola' }]
+        translations: [{ t: 'hola' }]
       })
     )
 
@@ -56,19 +56,19 @@ describe('translateBatch', () => {
   })
 
   it('handles successful API response', async () => {
-    const translations = [{ text: 'hello', from_lang: 'en', to_lang: 'es' }]
+    const translations = [{ t: 'hello', from: 'en', to: 'es' }]
     mockFetch.mockResolvedValue(
       createMockResponse({
-        translations: [{ text: 'hello', translated: 'hola' }]
+        translations: [{ t: 'hola' }]
       })
     )
 
     const result = await translateBatch(translations)
-    expect(result).toEqual([{ translated: 'hola' }])
+    expect(result).toEqual([{ t: 'hola' }])
   })
 
   it('handles API error response', async () => {
-    const translations = [{ text: 'hello', from_lang: 'en', to_lang: 'es' }]
+    const translations = [{ t: 'hello', from: 'en', to: 'es' }]
     mockFetch.mockResolvedValue(
       createMockResponse('Server error', false, 500, 'Internal Server Error')
     )
@@ -77,7 +77,7 @@ describe('translateBatch', () => {
   })
 
   it('handles network error', async () => {
-    const translations = [{ text: 'hello', from_lang: 'en', to_lang: 'es' }]
+    const translations = [{ t: 'hello', from: 'en', to: 'es' }]
     mockFetch.mockRejectedValue(new Error('Network failure'))
 
     await expect(translateBatch(translations)).rejects.toThrow(/Failed to connect to translator/)
@@ -85,22 +85,19 @@ describe('translateBatch', () => {
 
   it('reassembles results in correct order', async () => {
     const translations = [
-      { text: 'one', from_lang: 'en', to_lang: 'es' },
-      { text: 'two', from_lang: 'en', to_lang: 'en' },
-      { text: 'three', from_lang: 'en', to_lang: 'fr' }
+      { t: 'one', from: 'en', to: 'es' },
+      { t: 'two', from: 'en', to: 'en' },
+      { t: 'three', from: 'en', to: 'fr' }
     ]
 
     mockFetch.mockResolvedValue(
       createMockResponse({
-        translations: [
-          { text: 'one', translated: 'uno' },
-          { text: 'three', translated: 'trois' }
-        ]
+        translations: [{ t: 'uno' }, { t: 'trois' }]
       })
     )
 
     const result = await translateBatch(translations)
-    expect(result).toEqual([{ translated: 'uno' }, { translated: 'two' }, { translated: 'trois' }])
+    expect(result).toEqual([{ t: 'uno' }, { t: 'two' }, { t: 'trois' }])
   })
 })
 

@@ -11,12 +11,12 @@ export declare function useLangie(options?: TranslatorOptions): {
   isLoading: import('vue').Ref<boolean>
   setLanguage: (lang: string) => void
   fetchLanguages: (opts?: { force?: boolean; country?: string }) => Promise<TranslatorLanguage[]>
-  l: (text: string, context?: string, originalLang?: string) => string
+  l: (text: string, ctx?: string, originalLang?: string) => string
   fetchAndCacheBatch: (
-    items: { text: string; context?: string }[],
-    fromLang?: string,
-    toLang?: string,
-    globalContext?: string
+    items: { text: string; ctx?: string }[],
+    from?: string,
+    to?: string,
+    globalCtx?: string
   ) => Promise<void>
   cleanup: () => void
   getBatchingStats: () => {
@@ -45,14 +45,14 @@ export interface TranslateRequestBody {
   text: string
   from_lang?: string
   to_lang?: string
-  context?: string
+  ctx?: string
 }
 
 export interface TranslateServiceResponse {
   text: string
   translated: string
   translations?: TranslateServiceResponse[]
-  t?: string
+  t: string
 }
 
 export interface TranslatorOptions {
@@ -129,4 +129,4 @@ export declare const InterfaceLanguageSelect: any
 export declare const lt: any
 
 // Runtime translation helper – same as returned from useLangie but accessible directly after global initialisation
-export declare function l(text: string, context?: string, originalLang?: string): string
+export declare function l(text: string, ctx?: string, originalLang?: string): string

@@ -7,6 +7,13 @@ import type {
   TranslatorLanguage,
   TranslatorOptions
 } from './types'
+import {
+  API_FIELD_TEXT,
+  API_FIELD_FROM,
+  API_FIELD_TO,
+  API_FIELD_CTX,
+  API_FIELD_TRANSLATIONS
+} from './constants'
 
 const DEFAULT_TRANSLATOR_HOST = 'http://localhost:8081'
 
@@ -56,8 +63,8 @@ export async function translateBatch(
   const indexMap: number[] = []
 
   translations.forEach((tr, idx) => {
-    const from = (tr.from || '').toLowerCase()
-    const to = (tr.to || '').toLowerCase()
+    const from = (tr[API_FIELD_FROM] || '').toLowerCase()
+    const to = (tr[API_FIELD_TO] || '').toLowerCase()
     if (from === to) {
       // console.debug('[translator-sdk] Skipping translation (same language)', { from, to, text: tr.t?.slice(0, 20) })
       return // no need to translate
@@ -92,7 +99,15 @@ export async function translateBatch(
           'Content-Type': 'application/json',
           ...(apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Api-Key': apiKey } : {})
         },
-        body: JSON.stringify({ translations: serviceTranslations }),
+        body: JSON.stringify({
+          [API_FIELD_TRANSLATIONS]: serviceTranslations.map((t) => ({
+            [API_FIELD_TEXT]: t[API_FIELD_TEXT],
+            [API_FIELD_FROM]: t[API_FIELD_FROM],
+            [API_FIELD_TO]: t[API_FIELD_TO],
+            ...(t[API_FIELD_CTX] && { [API_FIELD_CTX]: t[API_FIELD_CTX] })
+          })),
+          ...(options[API_FIELD_CTX] && { [API_FIELD_CTX]: options[API_FIELD_CTX] })
+        }),
         signal: controller.signal
       })
 
@@ -133,25 +148,25 @@ export async function translateBatch(
       // }
 
       const data = parsed || {}
-      serviceResults = Array.isArray(data.translations)
-        ? data.translations.map((translation, index) => {
-          const originalText = serviceTranslations[index]?.t || ''
+      serviceResults = Array.isArray(data[API_FIELD_TRANSLATIONS])
+        ? data[API_FIELD_TRANSLATIONS].map((translation, index) => {
+            const originalText = serviceTranslations[index]?.[API_FIELD_TEXT] || ''
 
-          // Handle language detection response
-          if (translation.from && !translation.t) {
-            return {
-              t: originalText, // For detection, return original text
-              from: translation.from
+            // Handle language detection response
+            if (translation[API_FIELD_FROM] && !translation[API_FIELD_TEXT]) {
+              return {
+                [API_FIELD_TEXT]: originalText, // For detection, return original text
+                [API_FIELD_FROM]: translation[API_FIELD_FROM]
+              }
             }
-          }
 
-          // Handle translation response
-          return {
-            t: translation.t || originalText
-          }
-        })
-        : data.t
-          ? [{ t: data.t }]
+            // Handle translation response
+            return {
+              [API_FIELD_TEXT]: translation[API_FIELD_TEXT] || originalText
+            }
+          })
+        : data[API_FIELD_TEXT]
+          ? [{ [API_FIELD_TEXT]: data[API_FIELD_TEXT] }]
           : []
 
       // console.debug('[translator-sdk] Service results processed', {
@@ -172,13 +187,13 @@ export async function translateBatch(
 
   // Assemble final results in original order
   const final = translations.map((tr, idx) => {
-    const from = (tr.from || '').toLowerCase()
-    const to = (tr.to || '').toLowerCase()
-    if (from === to) return { t: tr.t }
+    const from = (tr[API_FIELD_FROM] || '').toLowerCase()
+    const to = (tr[API_FIELD_TO] || '').toLowerCase()
+    if (from === to) return { [API_FIELD_TEXT]: tr[API_FIELD_TEXT] }
 
     const svcIdx = indexMap.indexOf(idx)
-    if (svcIdx !== -1) return serviceResults[svcIdx] || { t: tr.t }
-    return { t: tr.t }
+    if (svcIdx !== -1) return serviceResults[svcIdx] || { [API_FIELD_TEXT]: tr[API_FIELD_TEXT] }
+    return { [API_FIELD_TEXT]: tr[API_FIELD_TEXT] }
   })
 
   // const totalDuration = Date.now() - startTime

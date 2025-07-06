@@ -1,6 +1,7 @@
 import type { BatchRequest } from './types'
 import type { TranslateServiceResponse } from '../types'
 import { devDebug } from '../utils/debug'
+import { API_FIELD_TEXT, API_FIELD_FROM, API_FIELD_TO, API_FIELD_CTX } from '../constants'
 
 export interface BatchingOptions {
   initialBatchDelay?: number
@@ -10,7 +11,10 @@ export interface BatchingOptions {
 
 export class TranslationBatching {
   private pendingRequests = new Set<string>()
-  private queueMap = new Map<string, Map<string, { text: string; context: string }>>()
+  private queueMap = new Map<
+    string,
+    Map<string, { [API_FIELD_TEXT]: string; [API_FIELD_CTX]: string }>
+  >()
   private flushTimeout: NodeJS.Timeout | null = null
   private queuedThisTick = new Set<string>()
   private clearQueuedThisTickScheduled = false
@@ -50,13 +54,13 @@ export class TranslationBatching {
         this.queueMap.delete(batchKey)
         continue
       }
-      const [fromLang, toLang] = batchKey.split('|')
+      const [from, to] = batchKey.split('|')
       for (const [cacheKey, item] of map.entries()) {
         allRequests.push({
-          text: item.text,
-          context: item.context,
-          fromLang,
-          toLang,
+          [API_FIELD_TEXT]: item[API_FIELD_TEXT],
+          [API_FIELD_CTX]: item[API_FIELD_CTX],
+          from,
+          to,
           cacheKey
         })
       }
@@ -102,13 +106,7 @@ export class TranslationBatching {
     }, delay)
   }
 
-  public queueTranslation(
-    text: string,
-    context: string,
-    fromLang: string,
-    toLang: string,
-    cacheKey: string
-  ) {
+  public queueTranslation(text: string, ctx: string, from: string, to: string, cacheKey: string) {
     if (this.pendingRequests.has(cacheKey) || this.queuedThisTick.has(cacheKey)) {
       devDebug('[TranslationBatching] Skipping duplicate:', cacheKey)
       return
@@ -118,19 +116,19 @@ export class TranslationBatching {
     this.scheduleClearQueuedThisTick()
     this.pendingRequests.add(cacheKey)
 
-    const batchKey = `${fromLang}|${toLang}`
+    const batchKey = `${from}|${to}`
     if (!this.queueMap.has(batchKey)) {
       this.queueMap.set(batchKey, new Map())
     }
 
-    this.queueMap.get(batchKey)!.set(cacheKey, { text, context })
+    this.queueMap.get(batchKey)!.set(cacheKey, { [API_FIELD_TEXT]: text, [API_FIELD_CTX]: ctx })
     this.scheduleFlush()
   }
 
   private async fetchAndCacheBatchMixed(requests: BatchRequest[]) {
     const grouped: { [key: string]: BatchRequest[] } = {}
     requests.forEach((req) => {
-      const key = `${req.fromLang}|${req.toLang}`
+      const key = `${req.from}|${req.to}`
       if (!grouped[key]) grouped[key] = []
       grouped[key].push(req)
     })
@@ -138,11 +136,11 @@ export class TranslationBatching {
     const allResults: TranslateServiceResponse[] = []
     const allRequests: BatchRequest[] = []
     for (const [langPair, batchRequests] of Object.entries(grouped)) {
-      const [fromLang, toLang] = langPair.split('|')
+      const [from, to] = langPair.split('|')
 
       try {
         // Check if all requests have the same context
-        const contexts = [...new Set(batchRequests.map((req) => req.context))]
+        const contexts = [...new Set(batchRequests.map((req) => req[API_FIELD_CTX]))]
         const useGlobalContext = contexts.length === 1 && contexts[0] === 'ui'
 
         const response = await fetch(`${this.translatorHost}/translate`, {
@@ -152,12 +150,12 @@ export class TranslationBatching {
           },
           body: JSON.stringify({
             translations: batchRequests.map((req) => ({
-              text: req.text,
-              ...(useGlobalContext ? {} : { context: req.context })
+              [API_FIELD_TEXT]: req[API_FIELD_TEXT],
+              ...(useGlobalContext ? {} : { [API_FIELD_CTX]: req[API_FIELD_CTX] })
             })),
-            from_lang: fromLang,
-            to_lang: toLang,
-            ...(useGlobalContext ? { context: 'ui' } : {})
+            [API_FIELD_FROM]: from,
+            [API_FIELD_TO]: to,
+            ...(useGlobalContext ? { [API_FIELD_CTX]: 'ui' } : {})
           })
         })
 

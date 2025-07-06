@@ -16,3 +16,23 @@ export const DEFAULT_TRANSLATOR_OPTIONS = {
   defaultLanguage: 'en',
   fallbackLanguage: 'en'
 } as const
+
+/**
+ * API field constants
+ * Used throughout the SDK to ensure consistency
+ */
+
+// Translation text field
+export const API_FIELD_TEXT = 't'
+
+// Source language field
+export const API_FIELD_FROM = 'from'
+
+// Target language field
+export const API_FIELD_TO = 'to'
+
+// Context field
+export const API_FIELD_CTX = 'ctx'
+
+// Translations array field
+export const API_FIELD_TRANSLATIONS = 'translations'

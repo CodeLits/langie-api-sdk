@@ -2,6 +2,13 @@ import { watch } from 'vue'
 import type { TranslatorOptions, TranslateServiceResponse } from './types'
 import { useLangieCore, __resetLangieCoreForTests } from './composables/useLangie-core'
 import { TranslationBatching } from './composables/useLangie-batching'
+import {
+  API_FIELD_TEXT,
+  API_FIELD_FROM,
+  API_FIELD_TO,
+  API_FIELD_CTX,
+  API_FIELD_TRANSLATIONS
+} from './constants'
 
 // Global singleton instance
 let globalLangieInstance: ReturnType<typeof createLangieInstance> | null = null
@@ -29,9 +36,9 @@ if (!globalLangieInstance && typeof window !== 'undefined') {
   }
 }
 
-// Extended type for translation objects that includes context
+// Extended type for translation objects that includes ctx
 interface TranslationWithContext extends TranslateServiceResponse {
-  context?: string
+  [API_FIELD_CTX]?: string
   translated_text?: string
 }
 
@@ -64,8 +71,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
       // Clear recently queued cache to make translations immediately available
       requests.forEach((req) => {
-        const cacheKey = `${req.text}|${req.context}`
-        const languageCacheKey = `${cacheKey}|${req.fromLang}|${req.toLang}`
+        const cacheKey = `${req.text}|${req[API_FIELD_CTX]}`
+        const languageCacheKey = `${cacheKey}|${req.from}|${req.to}`
         recentlyQueued.delete(languageCacheKey)
       })
 
@@ -84,24 +91,22 @@ function createLangieInstance(options: TranslatorOptions = {}) {
         translationsArray.forEach((translation: TranslationWithContext, index: number) => {
           const reqIdx = batchIdx * translationsArray.length + index
           const originalText = requests[reqIdx]?.text
-          const context = translation.context || requests[reqIdx]?.context || 'ui'
+          const ctx = translation[API_FIELD_CTX] || requests[reqIdx]?.[API_FIELD_CTX] || 'ui'
           if (!originalText) {
             return
           }
 
           // Handle language detection response
-          if (translation.from_lang && !translation.translated) {
+          if (translation[API_FIELD_FROM] && !translation[API_FIELD_TEXT]) {
             return
           }
 
-          const translatedText =
-            translation.translated_text || translation.translated || translation.t
+          const translatedText = translation[API_FIELD_TEXT]
           if (translatedText) {
             // Determine the correct context and cache
-            const effectiveContext = context || requests[reqIdx]?.context || 'ui'
-            const cacheKey = `${originalText}|${effectiveContext}`
-            const cache =
-              effectiveContext === 'ui' || !effectiveContext ? uiTranslations : translations
+            const effectiveCtx = ctx || requests[reqIdx]?.[API_FIELD_CTX] || 'ui'
+            const cacheKey = `${originalText}|${effectiveCtx}`
+            const cache = effectiveCtx === 'ui' || !effectiveCtx ? uiTranslations : translations
 
             // Cache the translation
             cache[cacheKey] = translatedText
@@ -120,17 +125,17 @@ function createLangieInstance(options: TranslatorOptions = {}) {
    * an asynchronous request will be triggered to fetch the translation in the
    * background (this avoids Promise objects leaking into the template).
    */
-  const l = (text: string, context?: string, originalLang?: string) => {
-    const fromLang = originalLang || 'en'
-    const toLang = currentLanguage.value
+  const l = (text: string, ctx?: string, originalLang?: string) => {
+    const from = originalLang || 'en'
+    const to = currentLanguage.value
 
     // Skip translation if source and target languages are the same
-    if (fromLang === toLang) {
+    if (from === to) {
       return text
     }
 
-    const cacheKey = `${text}|${context || 'ui'}`
-    const cache = context === 'ui' || !context ? uiTranslations : translations
+    const cacheKey = `${text}|${ctx || 'ui'}`
+    const cache = ctx === 'ui' || !ctx ? uiTranslations : translations
 
     // Return cached translation if available
     if (cache[cacheKey]) {
@@ -138,13 +143,13 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     }
 
     // Check if we've recently queued this translation
-    const languageCacheKey = `${cacheKey}|${fromLang}|${toLang}`
+    const languageCacheKey = `${cacheKey}|${from}|${to}`
     if (recentlyQueued.has(languageCacheKey)) {
       return text
     }
 
     // Queue for translation
-    batching.queueTranslation(text, context || 'ui', fromLang, toLang, cacheKey)
+    batching.queueTranslation(text, ctx || 'ui', from, to, cacheKey)
 
     // Mark as recently queued
     recentlyQueued.add(languageCacheKey)
@@ -164,20 +169,20 @@ function createLangieInstance(options: TranslatorOptions = {}) {
    * Get a reactive translation that automatically updates when the translation becomes available.
    * This function returns a string directly, making it easier to use in templates and computed properties.
    */
-  const lr = (text: string, context?: string, originalLang?: string) => {
+  const lr = (text: string, ctx?: string, originalLang?: string) => {
     // Force reactivity by depending on currentLanguage
     void currentLanguage.value
 
-    const fromLang = originalLang || 'en'
-    const toLang = currentLanguage.value
+    const from = originalLang || 'en'
+    const to = currentLanguage.value
 
     // Skip translation if source and target languages are the same
-    if (fromLang === toLang) {
+    if (from === to) {
       return text
     }
 
-    const cacheKey = `${text}|${context || 'ui'}`
-    const cache = context === 'ui' || !context ? uiTranslations : translations
+    const cacheKey = `${text}|${ctx || 'ui'}`
+    const cache = ctx === 'ui' || !ctx ? uiTranslations : translations
 
     // Return cached translation if available
     if (cache[cacheKey]) {
@@ -185,13 +190,13 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     }
 
     // Check if we've recently queued this translation
-    const languageCacheKey = `${cacheKey}|${fromLang}|${toLang}`
+    const languageCacheKey = `${cacheKey}|${from}|${to}`
     if (recentlyQueued.has(languageCacheKey)) {
       return text
     }
 
     // Queue for translation
-    batching.queueTranslation(text, context || 'ui', fromLang, toLang, cacheKey)
+    batching.queueTranslation(text, ctx || 'ui', from, to, cacheKey)
 
     // Mark as recently queued
     recentlyQueued.add(languageCacheKey)
@@ -208,15 +213,15 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   }
 
   const fetchAndCacheBatch = async (
-    items: { text: string; context?: string }[],
-    fromLang = 'en',
-    toLang = currentLanguage.value,
-    globalContext?: string
+    items: { text: string; [API_FIELD_CTX]?: string }[],
+    from = 'en',
+    to = currentLanguage.value,
+    globalCtx?: string
   ) => {
     if (items.length === 0) return
 
     // Skip translation if source and target languages are the same
-    if (fromLang === toLang) {
+    if (from === to) {
       return
     }
 
@@ -224,7 +229,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
     try {
       // Use global context if provided, otherwise fall back to individual contexts
-      const effectiveContext = globalContext || 'ui'
+      const effectiveCtx = globalCtx || 'ui'
 
       const response = await fetch(`${translatorHost}/translate`, {
         method: 'POST',
@@ -233,11 +238,11 @@ function createLangieInstance(options: TranslatorOptions = {}) {
         },
         body: JSON.stringify({
           translations: items.map((item) => ({
-            text: item.text,
-            context: item.context || effectiveContext
+            [API_FIELD_TEXT]: item.text,
+            [API_FIELD_CTX]: item[API_FIELD_CTX] || effectiveCtx
           })),
-          from_lang: fromLang,
-          to_lang: toLang
+          [API_FIELD_FROM]: from,
+          [API_FIELD_TO]: to
         })
       })
 
@@ -247,35 +252,39 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
       const result = await response.json()
 
-      if (result.translations) {
-        result.translations.forEach((translation: TranslationWithContext, index: number) => {
-          const originalText = items[index]?.text
-          if (!originalText) {
-            return
-          }
+      if (result[API_FIELD_TRANSLATIONS]) {
+        result[API_FIELD_TRANSLATIONS].forEach(
+          (translation: TranslationWithContext, index: number) => {
+            const originalText = items[index]?.text
+            if (!originalText) {
+              return
+            }
 
-          // Handle language detection response
-          if (translation.from_lang && !translation.translated) {
-            // Не кешируем детекцию
-            return
-          }
+            // Handle language detection response
+            if (translation[API_FIELD_FROM] && !translation[API_FIELD_TEXT]) {
+              // Не кешируем детекцию
+              return
+            }
 
-          // Handle translation response
-          const translatedText = translation.translated || translation.t
-          if (translatedText) {
-            const cacheKey = `${originalText}|${translation.context || effectiveContext}`
-            const cache =
-              translation.context === 'ui' || !translation.context ? uiTranslations : translations
-            cache[cacheKey] = translatedText
+            // Handle translation response
+            const translatedText = translation[API_FIELD_TEXT]
+            if (translatedText) {
+              const cacheKey = `${originalText}|${translation[API_FIELD_CTX] || effectiveCtx}`
+              const cache =
+                translation[API_FIELD_CTX] === 'ui' || !translation[API_FIELD_CTX]
+                  ? uiTranslations
+                  : translations
+              cache[cacheKey] = translatedText
 
-            // Force reactivity by triggering a change
-            if (translation.context === 'ui' || !translation.context) {
-              uiTranslations[cacheKey] = translatedText
-            } else {
-              translations[cacheKey] = translatedText
+              // Force reactivity by triggering a change
+              if (translation[API_FIELD_CTX] === 'ui' || !translation[API_FIELD_CTX]) {
+                uiTranslations[cacheKey] = translatedText
+              } else {
+                translations[cacheKey] = translatedText
+              }
             }
           }
-        })
+        )
       }
     } catch (error) {
       console.error('[useLangie] Translation error:', error)

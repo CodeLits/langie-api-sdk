@@ -1,3 +1,11 @@
+import {
+  API_FIELD_TEXT,
+  API_FIELD_FROM,
+  API_FIELD_TO,
+  API_FIELD_CTX,
+  API_FIELD_TRANSLATIONS
+} from './constants'
+
 /**
  * Type definitions for Vue Translator SDK
  */
@@ -18,19 +26,19 @@ export interface TranslatorLanguage {
  * Translation request body
  */
 export interface TranslateRequestBody {
-  t: string
-  from?: string
-  to?: string
-  ctx?: string
+  [API_FIELD_TEXT]: string
+  [API_FIELD_FROM]?: string
+  [API_FIELD_TO]?: string
+  [API_FIELD_CTX]?: string
 }
 
 /**
  * Translation service response
  */
 export interface TranslateServiceResponse {
-  t?: string
-  from?: string
-  translations?: TranslateServiceResponse[]
+  [API_FIELD_TEXT]?: string
+  [API_FIELD_FROM]?: string
+  [API_FIELD_TRANSLATIONS]?: TranslateServiceResponse[]
 }
 
 /**

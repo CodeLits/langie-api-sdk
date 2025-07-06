@@ -67,9 +67,9 @@ function testLanguageSearch(query: string, languages: TranslatorLanguage[] = moc
 
 describe('LanguageSelect Search Tests', () => {
   describe('Short query tests', () => {
-    it('should find Serbian when searching "се"', () => {
-      const results = testLanguageSearch('се')
-      // Search results for "се"
+    it('should find Serbian when searching "sr"', () => {
+      const results = testLanguageSearch('sr')
+      // Search results for "sr"
 
       const serbianResults = results.filter((r) => r.code === 'sr-latn')
       expect(serbianResults.length).toBeGreaterThan(0)
