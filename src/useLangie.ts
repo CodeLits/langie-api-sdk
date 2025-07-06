@@ -60,8 +60,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     () => currentLanguage.value,
     (results, requests) => {
       // Process batch results and update translations
-      console.debug('[onBatchComplete] results:', results)
-      console.debug('[onBatchComplete] requests:', requests)
+      // Batch complete
 
       // Clear recently queued cache to make translations immediately available
       requests.forEach((req) => {
@@ -87,13 +86,11 @@ function createLangieInstance(options: TranslatorOptions = {}) {
           const originalText = requests[reqIdx]?.text
           const context = translation.context || requests[reqIdx]?.context || 'ui'
           if (!originalText) {
-            console.warn('[onBatchComplete] No originalText for index', reqIdx, requests)
             return
           }
 
           // Handle language detection response
           if (translation.from_lang && !translation.translated) {
-            console.debug('[onBatchComplete] Skipping detection result', translation)
             return
           }
 
@@ -108,21 +105,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
             // Cache the translation
             cache[cacheKey] = translatedText
-
-            console.debug(
-              '[onBatchComplete] Cached in:',
-              effectiveContext === 'ui' || !effectiveContext ? 'uiTranslations' : 'translations'
-            )
-            console.debug('[onBatchComplete] uiTranslations keys:', Object.keys(uiTranslations))
-            console.debug('[onBatchComplete] translations keys:', Object.keys(translations))
-
-            console.debug('[onBatchComplete] Set translation:', {
-              cacheKey,
-              translatedText,
-              context: effectiveContext
-            })
-          } else {
-            console.warn('[onBatchComplete] No translatedText for', translation)
           }
         })
       })
@@ -144,7 +126,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
     // Skip translation if source and target languages are the same
     if (fromLang === toLang) {
-      console.debug('[l] Skip translation (same language)', { text, fromLang, toLang })
       return text
     }
 
@@ -153,19 +134,16 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
     // Return cached translation if available
     if (cache[cacheKey]) {
-      console.debug('[l] Found cached translation', { cacheKey, value: cache[cacheKey] })
       return cache[cacheKey]
     }
 
     // Check if we've recently queued this translation
     const languageCacheKey = `${cacheKey}|${fromLang}|${toLang}`
     if (recentlyQueued.has(languageCacheKey)) {
-      console.debug('[l] Recently queued, returning original', { cacheKey })
       return text
     }
 
     // Queue for translation
-    console.debug('[l] Queue translation', { text, context, fromLang, toLang, cacheKey })
     batching.queueTranslation(text, context || 'ui', fromLang, toLang, cacheKey)
 
     // Mark as recently queued
@@ -179,7 +157,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     }, clearDelay)
 
     // Return original text for now (will be updated when translation arrives)
-    console.debug('[l] No cached translation, returning original', { cacheKey })
     return text
   }
 
@@ -196,32 +173,24 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
     // Skip translation if source and target languages are the same
     if (fromLang === toLang) {
-      console.debug('[lr] Skip translation (same language)', { text, fromLang, toLang })
       return text
     }
 
     const cacheKey = `${text}|${context || 'ui'}`
     const cache = context === 'ui' || !context ? uiTranslations : translations
 
-    console.debug('[lr] Looking for translation', { cacheKey, cacheKeys: Object.keys(cache) })
-    console.debug('[lr] Cache contents:', cache)
-    console.debug('[lr] Looking for key:', cacheKey, 'Found:', cache[cacheKey])
-
     // Return cached translation if available
     if (cache[cacheKey]) {
-      console.debug('[lr] Found cached translation', { cacheKey, value: cache[cacheKey] })
       return cache[cacheKey]
     }
 
     // Check if we've recently queued this translation
     const languageCacheKey = `${cacheKey}|${fromLang}|${toLang}`
     if (recentlyQueued.has(languageCacheKey)) {
-      console.debug('[lr] Recently queued, returning original', { cacheKey })
       return text
     }
 
     // Queue for translation
-    console.debug('[lr] Queue translation', { text, context, fromLang, toLang, cacheKey })
     batching.queueTranslation(text, context || 'ui', fromLang, toLang, cacheKey)
 
     // Mark as recently queued
@@ -235,7 +204,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     }, clearDelay)
 
     // Return original text for now (will be updated when translation arrives)
-    console.debug('[lr] No cached translation, returning original', { cacheKey })
     return text
   }
 
@@ -283,12 +251,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
         result.translations.forEach((translation: TranslationWithContext, index: number) => {
           const originalText = items[index]?.text
           if (!originalText) {
-            console.error(
-              '[fetchAndCacheBatch] No originalText for index',
-              index,
-              items,
-              result.translations
-            )
             return
           }
 

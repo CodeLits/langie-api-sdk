@@ -171,7 +171,7 @@ const handleTranslate = async () => {
     translation.value = result?.translated || result?.text || result || 'Translation failed'
     refreshUsage.value++
   } catch (err) {
-    console.error('Translation error:', err)
+    // Translation error
 
     if (err.message?.includes('429') || err.message?.includes('CORS')) {
       handleRateLimit()

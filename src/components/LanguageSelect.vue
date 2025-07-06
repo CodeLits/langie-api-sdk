@@ -236,7 +236,7 @@ function handleSearch(query: string) {
 
 const onFlagError = (event: Event) => {
   const target = event.target as HTMLImageElement
-  console.error('Flag loading error for:', target.src)
+  // Flag loading error - silent fail
   target.style.display = 'none'
 }
 </script>

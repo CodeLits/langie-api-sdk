@@ -136,6 +136,6 @@ const selectedInterfaceLang = ref(null)
 
 function handleInterfaceLanguageChange(language) {
   selectedInterfaceLang.value = language
-  console.log('Interface language changed to:', language)
+  // Interface language changed
 }
 </script>

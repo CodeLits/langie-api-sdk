@@ -108,18 +108,7 @@ export async function translateBatch(
       // })
 
       if (!resp.ok) {
-        // Attempt to read body for additional diagnostics (may fail if already consumed)
-        let bodyText = ''
-        try {
-          bodyText = await resp.text()
-        } catch {
-          // ignore
-        }
-        console.error('[translator-sdk] Translator error response', {
-          status: resp.status,
-          statusText: resp.statusText,
-          body: bodyText.slice(0, 500)
-        })
+        console.error('[translator-sdk] Translator error response:', resp.status, resp.statusText)
         throw new Error(`Translator service error: ${resp.status} ${resp.statusText}`)
       }
 
@@ -132,11 +121,7 @@ export async function translateBatch(
         //   hasLegacyT: !!parsed?.t
         // })
       } catch (jsonErr) {
-        console.error('[translator-sdk] Failed to parse JSON response', {
-          error: jsonErr,
-          status: resp.status,
-          responseText: await resp.text().catch(() => 'unreadable')
-        })
+        console.error('[translator-sdk] Failed to parse JSON response:', jsonErr)
         throw new Error(`Failed to parse JSON response: ${jsonErr}`)
       }
 
@@ -180,7 +165,7 @@ export async function translateBatch(
         throw new Error(message)
       }
       const message = `Failed to connect to translator at ${translatorHost}. Is the service running?`
-      console.error(message, { error })
+      console.error(message)
       throw new Error(message)
     }
   }
@@ -264,7 +249,7 @@ export async function fetchAvailableLanguages(
 
     return filtered
   } catch (error) {
-    console.error('[translator-sdk] Languages fetch error', { error })
+    console.error('[translator-sdk] Languages fetch error:', error)
     throw error
   }
 }
