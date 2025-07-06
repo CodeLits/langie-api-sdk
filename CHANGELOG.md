@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2024-12-19
+
+### Changed
+
+- **BREAKING**: Unified API field naming across frontend, backend, and SDK
+- **BREAKING**: Replaced legacy field mappings with consistent API constants
+- **BREAKING**: All API requests now use `t`, `from`, `to`, `ctx`, `translations` fields
+- **BREAKING**: Removed support for old field names (`text`, `from_lang`, `to_lang`, `context`)
+- **BREAKING**: Updated all types to use computed property syntax with API constants
+- **BREAKING**: Changed function parameters from `context` to `ctx` for consistency
+
+### Added
+
+- New API field constants: `API_FIELD_TEXT`, `API_FIELD_FROM`, `API_FIELD_TO`, `API_FIELD_CTX`, `API_FIELD_TRANSLATIONS`
+- Exported API constants from main package for external usage
+- Consistent field naming across all SDK components
+
+### Fixed
+
+- Fixed API request format to use correct field names
+- Removed duplicate field mappings and legacy code
+- Updated demo application to use new API format
+- Fixed all test mocks to use consistent field names
+
+### Technical
+
+- Refactored core translation logic to use API constants
+- Updated batching system to use unified field names
+- Improved type safety with computed property syntax
+- Cleaned up all hardcoded string literals
+
 ## [1.8.0] - 2024-12-19
 
 ### Added
