@@ -11,7 +11,8 @@ import {
 } from './constants'
 
 // Global singleton instance
-let globalLangieInstance: ReturnType<typeof createLangieInstance> | null = null
+type LangieInstance = ReturnType<typeof createLangieInstance> & { translatorHost?: string }
+let globalLangieInstance: LangieInstance | null = null
 
 // Preserve singleton across hot module reloads
 if (
@@ -326,15 +327,18 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
 // --- GLOBAL SINGLETON LOGIC ---
 // Always use window.__LANGIE_SINGLETON__ as the source of truth
-function getGlobalLangieInstance(): any {
+function getGlobalLangieInstance(): LangieInstance | null {
   if (typeof window !== 'undefined') {
-    return (window as any).__LANGIE_SINGLETON__ || null
+    return (
+      (window as unknown as { __LANGIE_SINGLETON__?: LangieInstance }).__LANGIE_SINGLETON__ || null
+    )
   }
   return globalLangieInstance
 }
-function setGlobalLangieInstance(instance: any, options?: TranslatorOptions) {
+function setGlobalLangieInstance(instance: LangieInstance, options?: TranslatorOptions) {
   if (typeof window !== 'undefined') {
-    ;(window as any).__LANGIE_SINGLETON__ = instance
+    ;(window as unknown as { __LANGIE_SINGLETON__?: LangieInstance }).__LANGIE_SINGLETON__ =
+      instance
     if (options && options.translatorHost) {
       localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost)
     }
@@ -343,7 +347,7 @@ function setGlobalLangieInstance(instance: any, options?: TranslatorOptions) {
 }
 
 export function useLangie(options: TranslatorOptions = {}) {
-  const globalInstance = getGlobalLangieInstance()
+  const globalInstance: LangieInstance | null = getGlobalLangieInstance()
 
   // If we have a global instance and no specific options, use it
   if (globalInstance && Object.keys(options).length === 0) {
@@ -352,18 +356,18 @@ export function useLangie(options: TranslatorOptions = {}) {
 
   // If we have a global instance but options are provided, check if they match
   if (globalInstance) {
-    const currentHost = globalInstance.translatorHost
+    const currentHost = (globalInstance as LangieInstance).translatorHost
     const newHost = options.translatorHost
     if (currentHost === newHost) {
       return globalInstance
     } else {
       // Create new instance
-      const instance = createLangieInstance(options)
+      const instance: LangieInstance = createLangieInstance(options)
 
       // Store as global singleton ONLY if this is the first instance OR if it has a translatorHost
       if (!globalInstance) {
         setGlobalLangieInstance(instance, options)
-      } else if (options.translatorHost && !globalInstance.translatorHost) {
+      } else if (options.translatorHost && !(globalInstance as LangieInstance).translatorHost) {
         setGlobalLangieInstance(instance, options)
       } else {
         // Remove global instance
@@ -375,12 +379,12 @@ export function useLangie(options: TranslatorOptions = {}) {
   }
 
   // Create new instance
-  const instance = createLangieInstance(options)
+  const instance: LangieInstance = createLangieInstance(options)
 
   // Store as global singleton ONLY if this is the first instance OR if it has a translatorHost
   if (!globalInstance) {
     setGlobalLangieInstance(instance, options)
-  } else if (options.translatorHost && !globalInstance.translatorHost) {
+  } else if (options.translatorHost && !(globalInstance as LangieInstance).translatorHost) {
     setGlobalLangieInstance(instance, options)
   } else {
     // Remove global instance
