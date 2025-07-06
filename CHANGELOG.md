@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2024-12-19
+
+### Added
+
+- **Comprehensive Documentation**: Complete documentation overhaul with framework-specific guides
+  - Vue.js usage guide with composables, components, and best practices
+  - Nuxt.js integration guide with SSR support and deployment
+  - JavaScript usage guide for vanilla JS, React, and Node.js
+  - TypeScript support guide with full type definitions
+  - Advanced usage patterns and optimization techniques
+  - Backend integration guide with API specifications
+
+### Changed
+
+- **Clean README Structure**: Removed duplicate information and organized documentation
+  - Single, clean Quick Start example in README
+  - Complete documentation index with 11 detailed guides
+  - Removed framework-specific examples from README (moved to individual docs)
+  - Removed detailed API documentation from README (moved to appropriate docs)
+  - Removed backend requirements details (moved to backend-integration.md)
+  - Removed installation sections from framework-specific docs to avoid duplication
+
+### Documentation
+
+- **11 New Documentation Files**:
+  - `docs/getting-started.md` - Installation and basic setup
+  - `docs/vue.md` - Vue composables, components, and best practices
+  - `docs/nuxt.md` - SSR support, plugins, and deployment
+  - `docs/javascript.md` - Vanilla JS, React, and Node.js integration
+  - `docs/components.md` - Ready-to-use Vue components
+  - `docs/composables.md` - Vue composables and reactive state
+  - `docs/core-api.md` - Core translation functions
+  - `docs/advanced-usage.md` - Complex patterns and optimization
+  - `docs/backend-integration.md` - API requirements and setup
+  - `docs/typescript.md` - TypeScript integration guide
+  - `docs/contributing.md` - Development and contribution guidelines
+
+### Production Ready
+
+- **Clean Documentation Structure**: No duplicate information across files
+- **Framework-Specific Guides**: Tailored documentation for each framework
+- **Complete API Reference**: Detailed function and component documentation
+- **Best Practices**: Performance optimization and error handling guides
+- **TypeScript Support**: Full type definitions and usage examples
+
 ## [1.7.2] - 2024-07-05
 
 ### Fixed
