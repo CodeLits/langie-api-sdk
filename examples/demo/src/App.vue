@@ -44,7 +44,7 @@ const { isDark, toggleTheme, initTheme } = useTheme()
 // State
 const sourceLang = ref(null)
 const targetLang = ref(null)
-const textToTranslate = ref('Welcome to the application!')
+const textToTranslate = ref('Welcome to the application! Enjoy!')
 const translation = ref('')
 const error = ref('')
 const isMounted = ref(false)
