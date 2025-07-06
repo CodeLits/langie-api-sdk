@@ -19,7 +19,6 @@ Vue Translator SDK is designed specifically for Vue.js applications. This guide 
 import { useLangie } from 'langie-api-sdk'
 
 const { l, lr, setLanguage } = useLangie({
-  translatorHost: 'https://your-translation-api.com',
   apiKey: 'your-api-key',
   defaultLanguage: 'en'
 })
@@ -56,7 +55,6 @@ const {
   cleanup,
   getBatchingStats
 } = useLangie({
-  translatorHost: 'https://your-translation-api.com',
   apiKey: 'your-api-key',
   defaultLanguage: 'en'
 })
@@ -165,7 +163,6 @@ const app = createApp(App)
 
 // Configure globally
 const { install } = useLangie({
-  translatorHost: process.env.VUE_APP_TRANSLATOR_HOST,
   apiKey: process.env.VUE_APP_TRANSLATOR_API_KEY,
   defaultLanguage: 'en'
 })
@@ -180,7 +177,6 @@ app.mount('#app')
 
 ```env
 # .env
-VUE_APP_TRANSLATOR_HOST=https://your-translation-api.com
 VUE_APP_TRANSLATOR_API_KEY=your-api-key
 ```
 
@@ -229,7 +225,6 @@ import { provide } from 'vue'
 import { useLangie } from 'langie-api-sdk'
 
 const translator = useLangie({
-  translatorHost: 'https://your-translation-api.com',
   apiKey: 'your-api-key'
 })
 

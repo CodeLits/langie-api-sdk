@@ -27,9 +27,7 @@ The SDK uses the following external libraries:
 import { useLangie } from 'langie-api-sdk'
 import { lt } from 'langie-api-sdk/components'
 
-const { lr, setLanguage } = useLangie({
-  translatorHost: 'https://your-api.com'
-})
+const { lr, setLanguage } = useLangie()
 </script>
 
 <template>

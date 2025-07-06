@@ -38,7 +38,6 @@ const app = createApp(App)
 
 // Optional: Register globally
 const { install } = useLangie({
-  translatorHost: 'https://your-translation-api.com',
   apiKey: 'your-api-key', // Optional
   defaultLanguage: 'en',
   fallbackLanguage: 'en'
@@ -122,9 +121,6 @@ When initializing the translator, you can provide several configuration options:
 
 ```js
 const { translate } = useLangie({
-  // Required: URL of your translation service
-  translatorHost: 'https://your-translation-api.com',
-
   // Optional: API key for authentication
   apiKey: 'your-api-key',
 
@@ -151,7 +147,6 @@ You can also configure the SDK using environment variables:
 
 ```
 # .env file
-TRANSLATOR_HOST=https://your-translation-api.com
 TRANSLATOR_API_KEY=your-api-key
 MIN_LANGUAGE_POPULARITY=0.1
 ```
