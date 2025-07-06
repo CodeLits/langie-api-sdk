@@ -9,10 +9,10 @@ The SDK exports the following type definitions:
 ```typescript
 // Core types for translation requests and responses
 interface TranslateRequestBody {
-  text: string
-  from_lang?: string
-  to_lang?: string
-  context?: string
+  t: string
+  from?: string
+  to?: string
+  ctx?: string
 }
 
 interface TranslateServiceResponse {
@@ -71,7 +71,7 @@ async function translate() {
     apiKey: 'your-api-key'
   }
 
-  const translations: TranslateRequestBody[] = [{ text: 'Hello', from_lang: 'en', to_lang: 'fr' }]
+  const translations: TranslateRequestBody[] = [{ t: 'Hello', from: 'en', to: 'fr' }]
 
   const results = await translateBatch(translations, options)
   // results is typed as TranslateServiceResponse[]
@@ -132,7 +132,7 @@ import type { TranslatorOptions } from 'langie-api-sdk'
 
 export default defineComponent({
   props: {
-    text: {
+    t: {
       type: String,
       required: true
     },
@@ -150,7 +150,7 @@ export default defineComponent({
 
     return {
       translatedText: computed(() =>
-        translate(props.text, props.targetLang)
+        translate(props.t, props.targetLang)
       )
     }
   }
@@ -167,14 +167,14 @@ import { useLangie } from 'langie-api-sdk'
 import type { TranslatorOptions } from 'langie-api-sdk'
 
 const props = defineProps<{
-  text: string
+  t: string
   targetLang?: string
   options?: TranslatorOptions
 }>()
 
 const { translate } = useLangie(props.options || {})
 
-const translatedText = computed(() => translate(props.text, props.targetLang))
+const translatedText = computed(() => translate(props.t, props.targetLang))
 </script>
 ```
 
@@ -191,7 +191,7 @@ import { ref, computed } from 'vue'
 // Define custom return type
 interface CustomTranslator {
   translate: (text: string, targetLang?: string) => string
-  translateWithContext: (text: string, context: string, targetLang?: string) => string
+  translateWithContext: (text: string, ctx: string, targetLang?: string) => string
   currentLanguage: Ref<string>
   setLanguage: (lang: string) => void
   availableLanguages: Ref<TranslatorLanguage[]>
@@ -210,9 +210,9 @@ export function useCustomTranslator(options?: TranslatorOptions): CustomTranslat
     base.availableLanguages.value.filter((lang) => favoriteLanguageCodes.value.includes(lang.code))
   )
 
-  function translateWithContext(text: string, context: string, targetLang?: string): string {
+  function translateWithContext(text: string, ctx: string, targetLang?: string): string {
     // Add context to translation
-    return base.translate(`${context}: ${text}`, targetLang).replace(`${context}: `, '')
+    return base.translate(`${ctx}: ${text}`, targetLang).replace(`${ctx}: `, '')
   }
 
   function addFavorite(code: string): void {

@@ -59,8 +59,8 @@ export class TranslationBatching {
         allRequests.push({
           [API_FIELD_TEXT]: item[API_FIELD_TEXT],
           [API_FIELD_CTX]: item[API_FIELD_CTX],
-          from,
-          to,
+          [API_FIELD_FROM]: from,
+          [API_FIELD_TO]: to,
           cacheKey
         })
       }

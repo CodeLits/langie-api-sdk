@@ -71,8 +71,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
       // Clear recently queued cache to make translations immediately available
       requests.forEach((req) => {
-        const cacheKey = `${req.text}|${req[API_FIELD_CTX]}`
-        const languageCacheKey = `${cacheKey}|${req.from}|${req.to}`
+        const cacheKey = `${req[API_FIELD_TEXT]}|${req[API_FIELD_CTX]}`
+        const languageCacheKey = `${cacheKey}|${req[API_FIELD_FROM]}|${req[API_FIELD_TO]}`
         recentlyQueued.delete(languageCacheKey)
       })
 
@@ -90,7 +90,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
         translationsArray.forEach((translation: TranslationWithContext, index: number) => {
           const reqIdx = batchIdx * translationsArray.length + index
-          const originalText = requests[reqIdx]?.text
+          const originalText = requests[reqIdx]?.[API_FIELD_TEXT]
           const ctx = translation[API_FIELD_CTX] || requests[reqIdx]?.[API_FIELD_CTX] || 'ui'
           if (!originalText) {
             return
@@ -213,7 +213,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   }
 
   const fetchAndCacheBatch = async (
-    items: { text: string; [API_FIELD_CTX]?: string }[],
+    items: { [API_FIELD_TEXT]: string; [API_FIELD_CTX]?: string }[],
     from = 'en',
     to = currentLanguage.value,
     globalCtx?: string
@@ -238,7 +238,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
         },
         body: JSON.stringify({
           translations: items.map((item) => ({
-            [API_FIELD_TEXT]: item.text,
+            [API_FIELD_TEXT]: item[API_FIELD_TEXT],
             [API_FIELD_CTX]: item[API_FIELD_CTX] || effectiveCtx
           })),
           [API_FIELD_FROM]: from,
@@ -255,7 +255,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       if (result[API_FIELD_TRANSLATIONS]) {
         result[API_FIELD_TRANSLATIONS].forEach(
           (translation: TranslationWithContext, index: number) => {
-            const originalText = items[index]?.text
+            const originalText = items[index]?.[API_FIELD_TEXT]
             if (!originalText) {
               return
             }

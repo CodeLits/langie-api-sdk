@@ -21,10 +21,10 @@ async function translateBatch(
 
   ```typescript
   interface TranslateRequestBody {
-    text: string // The text to translate
-    from_lang?: string // Source language code (optional)
-    to_lang?: string // Target language code
-    context?: string // Optional context for the translation
+    t: string // The text to translate
+    from?: string // Source language code (optional)
+    to?: string // Target language code
+    ctx?: string // Context for translation
   }
   ```
 
@@ -62,8 +62,8 @@ import { translateBatch } from 'langie-api-sdk'
 // Translate multiple texts in a single request
 const results = await translateBatch(
   [
-    { text: 'Hello', from_lang: 'en', to_lang: 'fr' },
-    { text: 'World', from_lang: 'en', to_lang: 'fr' }
+    { t: 'Hello', from: 'en', to: 'fr' },
+    { t: 'World', from: 'en', to: 'fr' }
   ],
   {
     translatorHost: 'https://your-translation-api.com',
@@ -73,8 +73,8 @@ const results = await translateBatch(
 
 console.log(results)
 // [
-//   { text: 'Hello', translated: 'Bonjour' },
-//   { text: 'World', translated: 'Monde' }
+//   { t: 'Hello', t: 'Bonjour' },
+//   { t: 'World', t: 'Monde' }
 // ]
 ```
 
@@ -149,7 +149,7 @@ The core functions throw errors when something goes wrong. You should wrap your 
 import { translateBatch } from 'langie-api-sdk'
 
 try {
-  const results = await translateBatch([{ text: 'Hello', to_lang: 'fr' }])
+  const results = await translateBatch([{ t: 'Hello', to: 'fr' }])
   console.log(results)
 } catch (error) {
   console.error('Translation failed:', error.message)
@@ -187,8 +187,8 @@ async function translateLarge(texts, targetLang, options) {
 
   for (const chunk of chunks) {
     const translations = chunk.map((text) => ({
-      text,
-      to_lang: targetLang
+      t: text,
+      to: targetLang
     }))
 
     const chunkResults = await translateBatch(translations, options)
@@ -224,12 +224,12 @@ async function translateWithCache(text, fromLang, toLang, options) {
   }
 
   // Not in cache, perform translation
-  const [result] = await translateBatch([{ text, from_lang: fromLang, to_lang: toLang }], options)
+  const [result] = await translateBatch([{ t: text, from: fromLang, to: toLang }], options)
 
   // Store in cache
-  translationCache.set(cacheKey, result.translated)
+  translationCache.set(cacheKey, result.t)
 
-  return result.translated
+  return result.t
 }
 ```
 

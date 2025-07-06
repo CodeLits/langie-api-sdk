@@ -360,10 +360,10 @@ const { fetchAndCacheBatch } = useLangie()
 // Pre-load translations
 async function preloadTranslations() {
   await fetchAndCacheBatch([
-    { text: 'Welcome', context: 'ui' },
-    { text: 'Submit', context: 'ui' },
-    { text: 'Cancel', context: 'ui' },
-    { text: 'Loading...', context: 'ui' }
+    { t: 'Welcome', ctx: 'ui' },
+    { t: 'Submit', ctx: 'ui' },
+    { t: 'Cancel', ctx: 'ui' },
+    { t: 'Loading...', ctx: 'ui' }
   ])
 }
 

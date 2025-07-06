@@ -263,8 +263,8 @@ export default defineEventHandler(async (event) => {
   try {
     const results = await translateBatch(
       texts.map((text: string) => ({
-        text,
-        to_lang: targetLang
+        t: text,
+        to: targetLang
       })),
       {
         translatorHost: useRuntimeConfig().public.translatorHost,
@@ -372,10 +372,10 @@ export default defineNuxtPlugin(async () => {
 
   // Preload common translations
   await $translator.fetchAndCacheBatch([
-    { text: 'Welcome', context: 'ui' },
-    { text: 'Submit', context: 'ui' },
-    { text: 'Cancel', context: 'ui' },
-    { text: 'Loading...', context: 'ui' }
+    { t: 'Welcome', ctx: 'ui' },
+    { t: 'Submit', ctx: 'ui' },
+    { t: 'Cancel', ctx: 'ui' },
+    { t: 'Loading...', ctx: 'ui' }
   ])
 })
 ```

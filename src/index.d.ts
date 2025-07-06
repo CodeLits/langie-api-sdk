@@ -2,6 +2,13 @@
  * TypeScript declarations for langie-api-sdk
  */
 
+// API field constants
+declare const API_FIELD_TEXT: 't'
+declare const API_FIELD_FROM: 'from'
+declare const API_FIELD_TO: 'to'
+declare const API_FIELD_CTX: 'ctx'
+declare const API_FIELD_TRANSLATIONS: 'translations'
+
 // Core exports
 export declare function useLangie(options?: TranslatorOptions): {
   availableLanguages: import('vue').Ref<TranslatorLanguage[]>
@@ -42,17 +49,16 @@ export interface TranslatorLanguage {
 }
 
 export interface TranslateRequestBody {
-  text: string
-  from_lang?: string
-  to_lang?: string
-  ctx?: string
+  [API_FIELD_TEXT]: string
+  [API_FIELD_FROM]?: string
+  [API_FIELD_TO]?: string
+  [API_FIELD_CTX]?: string
 }
 
 export interface TranslateServiceResponse {
-  text: string
-  translated: string
-  translations?: TranslateServiceResponse[]
-  t: string
+  [API_FIELD_TEXT]?: string
+  [API_FIELD_FROM]?: string
+  [API_FIELD_TRANSLATIONS]?: TranslateServiceResponse[]
 }
 
 export interface TranslatorOptions {

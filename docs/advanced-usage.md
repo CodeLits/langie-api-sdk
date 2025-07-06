@@ -94,9 +94,9 @@ export function createTranslator(options = {}) {
     ...base,
 
     // Add a method for translating with context
-    translateWithContext: (text, context, targetLang) => {
+    translateWithContext: (text, ctx, targetLang) => {
       // Add context information to the translation
-      return base.translate(`${context}: ${text}`, targetLang).replace(`${context}: `, '')
+      return base.translate(`${ctx}: ${text}`, targetLang).replace(`${ctx}: `, '')
     },
 
     // Add a method for translating with fallback
@@ -166,24 +166,18 @@ When translating multiple items with the same context, you can optimize by using
 ```javascript
 // Instead of repeating context in each item:
 const translations = [
-  { text: 'My API Keys', context: 'ui' },
-  { text: 'Translations', context: 'ui' },
-  { text: 'API Keys', context: 'ui' },
-  { text: 'Docs', context: 'ui' },
-  { text: 'Logout', context: 'ui' }
+  { t: 'My API Keys', ctx: 'ui' },
+  { t: 'Translations', ctx: 'ui' },
+  { t: 'API Keys', ctx: 'ui' },
+  { t: 'Docs', ctx: 'ui' },
+  { t: 'Logout', ctx: 'ui' }
 ]
 
 // Use global context (more efficient):
 const { fetchAndCacheBatch } = useLangie()
 
 await fetchAndCacheBatch(
-  [
-    { text: 'My API Keys' },
-    { text: 'Translations' },
-    { text: 'API Keys' },
-    { text: 'Docs' },
-    { text: 'Logout' }
-  ],
+  [{ t: 'My API Keys' }, { t: 'Translations' }, { t: 'API Keys' }, { t: 'Docs' }, { t: 'Logout' }],
   'en',
   'fr',
   'ui' // Global context for all items
@@ -398,7 +392,7 @@ Then use it in your components:
       <h3><lt>Recent Translations</lt></h3>
       <ul>
         <li v-for="(item, index) in recentTranslations" :key="index">
-          {{ item.original }} → {{ item.translated }}
+          {{ item.original }} → {{ item.t }}
         </li>
       </ul>
     </div>

@@ -18,16 +18,12 @@ POST /api/translate
 {
   "translations": [
     {
-      "text": "Hello world",
-      "from_lang": "en",
-      "to_lang": "fr"
-    },
-    {
-      "text": "How are you?",
-      "from_lang": "en",
-      "to_lang": "fr"
+      "t": "Hello world",
+      "ctx": "ui"
     }
-  ]
+  ],
+  "from": "en",
+  "to": "fr"
 }
 ```
 
@@ -37,14 +33,12 @@ POST /api/translate
 {
   "translations": [
     {
-      "text": "Hello world",
-      "translated": "Bonjour le monde"
-    },
-    {
-      "text": "How are you?",
-      "translated": "Comment allez-vous ?"
+      "t": "Hello world",
+      "ctx": "ui"
     }
-  ]
+  ],
+  "from": "en",
+  "to": "fr"
 }
 ```
 
@@ -161,11 +155,11 @@ app.post('/api/translate', (req, res) => {
   }
 
   const results = translations.map((item) => {
-    const { text, from_lang = 'en', to_lang } = item
+    const { t, from = 'en', to } = item
 
     return {
-      text,
-      translated: translateText(text, from_lang, to_lang)
+      t,
+      translated: translateText(t, from, to)
     }
   })
 
@@ -228,18 +222,18 @@ app.post('/api/translate', async (req, res) => {
   try {
     const results = await Promise.all(
       translations.map(async (item) => {
-        const { text, to_lang } = item
+        const { t, to } = item
 
         const [response] = await translationClient.translateText({
           parent: `projects/${projectId}/locations/${location}`,
-          contents: [text],
+          contents: [t],
           mimeType: 'text/plain',
-          targetLanguageCode: to_lang
+          targetLanguageCode: to
         })
 
         return {
-          text,
-          translated: response.translations[0].translatedText
+          t,
+          translated: response.translations[0].t
         }
       })
     )
@@ -304,13 +298,13 @@ app.post('/api/translate', async (req, res) => {
   try {
     const results = await Promise.all(
       translations.map(async (item) => {
-        const { text, to_lang } = item
+        const { t, to } = item
 
         const response = await axios.post(
           `${DEEPL_API_URL}/translate`,
           {
-            text: [text],
-            target_lang: to_lang.toUpperCase()
+            text: [t],
+            target_lang: to.toUpperCase()
           },
           {
             headers: { Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}` }
@@ -318,8 +312,8 @@ app.post('/api/translate', async (req, res) => {
         )
 
         return {
-          text,
-          translated: response.data.translations[0].text
+          t,
+          translated: response.data.translations[0].t
         }
       })
     )
@@ -412,27 +406,27 @@ app.post('/api/translate', (req, res) => {
   }
 
   const results = translations.map((item) => {
-    const { text, from_lang = 'en', to_lang } = item
-    const cacheKey = `${text}|${from_lang}|${to_lang}`
+    const { t, from = 'en', to } = item
+    const cacheKey = `${t}|${from}|${to}`
 
     // Check cache first
     const cachedResult = cache.get(cacheKey)
     if (cachedResult) {
       return {
-        text,
+        t,
         translated: cachedResult,
         cached: true
       }
     }
 
     // Not in cache, perform translation
-    const translated = translateText(text, from_lang, to_lang)
+    const translated = translateText(t, from, to)
 
     // Store in cache
     cache.set(cacheKey, translated)
 
     return {
-      text,
+      t,
       translated
     }
   })

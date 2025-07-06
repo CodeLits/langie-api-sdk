@@ -12,12 +12,12 @@ The SDK provides core functions that work independently of Vue:
 import { translateBatch, fetchAvailableLanguages } from 'langie-api-sdk'
 
 // Translate a single text
-const results = await translateBatch([{ text: 'Hello world', to_lang: 'es' }], {
+const results = await translateBatch([{ t: 'Hello world', to: 'es' }], {
   translatorHost: 'https://your-translation-api.com',
   apiKey: 'your-api-key'
 })
 
-console.log(results[0].translated) // "Hola mundo"
+console.log(results[0].t) // "Hola mundo"
 
 // Fetch available languages
 const languages = await fetchAvailableLanguages({
@@ -75,9 +75,9 @@ class Translator {
     }
 
     try {
-      const results = await translateBatch([{ text, to_lang: lang }], this.options)
+      const results = await translateBatch([{ t: text, to: lang }], this.options)
 
-      const translated = results[0].translated
+      const translated = results[0].t
       this.cache.set(cacheKey, translated)
       element.textContent = translated
     } catch (error) {
@@ -97,16 +97,16 @@ class Translator {
 
     try {
       const results = await translateBatch(
-        uniqueTexts.map((text) => ({ text, to_lang: targetLang })),
+        uniqueTexts.map((text) => ({ t: text, to: targetLang })),
         this.options
       )
 
       // Update DOM elements
       elements.forEach((element) => {
         const text = element.textContent
-        const result = results.find((r) => r.text === text)
+        const result = results.find((r) => r.t === text)
         if (result) {
-          element.textContent = result.translated
+          element.textContent = result.t
         }
       })
     } catch (error) {
@@ -206,9 +206,9 @@ function useTranslator(options = {}) {
 
     setIsLoading(true)
     try {
-      const results = await translateBatch([{ text, to_lang: targetLang }], translatorOptions)
+      const results = await translateBatch([{ t: text, to: targetLang }], translatorOptions)
 
-      const translated = results[0].translated
+      const translated = results[0].t
       setCache((prev) => new Map(prev).set(cacheKey, translated))
       return translated
     } catch (error) {
@@ -269,11 +269,11 @@ import { translateBatch, fetchAvailableLanguages } from 'langie-api-sdk'
 function translationMiddleware(req, res, next) {
   req.translate = async (text, targetLang) => {
     try {
-      const results = await translateBatch([{ text, to_lang: targetLang }], {
+      const results = await translateBatch([{ t: text, to: targetLang }], {
         translatorHost: process.env.TRANSLATOR_HOST,
         apiKey: process.env.TRANSLATOR_API_KEY
       })
-      return results[0].translated
+      return results[0].t
     } catch (error) {
       console.error('Translation failed:', error)
       return text
@@ -295,7 +295,7 @@ app.post('/api/translate/batch', translationMiddleware, async (req, res) => {
 
   try {
     const results = await translateBatch(
-      texts.map((text) => ({ text, to_lang: targetLang })),
+      texts.map((text) => ({ t: text, to: targetLang })),
       {
         translatorHost: process.env.TRANSLATOR_HOST,
         apiKey: process.env.TRANSLATOR_API_KEY
@@ -316,9 +316,9 @@ import { translateBatch } from 'langie-api-sdk'
 
 async function safeTranslate(text, targetLang, options) {
   try {
-    const results = await translateBatch([{ text, to_lang: targetLang }], options)
+    const results = await translateBatch([{ t: text, to: targetLang }], options)
 
-    return results[0].translated
+    return results[0].t
   } catch (error) {
     // Handle different types of errors
     if (error.message.includes('401')) {
