@@ -1,4 +1,4 @@
-import { watch, ref, computed } from 'vue'
+import { watch } from 'vue'
 import type { TranslatorOptions, TranslateServiceResponse } from './types'
 import { useLangieCore, __resetLangieCoreForTests } from './composables/useLangie-core'
 import { TranslationBatching } from './composables/useLangie-batching'
@@ -220,39 +220,33 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
       if (result.translations) {
         result.translations.forEach((translation: TranslationWithContext, index: number) => {
-          // Use original text from request items array
-          const originalText = items[index]?.text
-          if (!originalText) return
+          const originalText = items[index]?.text;
+          if (!originalText) {
+            console.error('[fetchAndCacheBatch] No originalText for index', index, items, result.translations);
+            return;
+          }
 
           // Handle language detection response
           if (translation.from_lang && !translation.translated) {
-            // For language detection, we might want to store the detected language
-            // but for now, we'll just return the original text
-            const cacheKey = `${originalText}|${translation.context || effectiveContext}`
-            const cache = translation.context === 'ui' ? uiTranslations : translations
-            cache[cacheKey] = originalText // Return original text for detection
-            return
+            // Не кешируем детекцию
+            return;
           }
 
           // Handle translation response
-          const translatedText =
-            translation.translated_text || translation.translated || translation.t
-
+          const translatedText = translation.translated || translation.t;
           if (translatedText) {
-            const cacheKey = `${originalText}|${translation.context || effectiveContext}`
-            const cache = translation.context === 'ui' ? uiTranslations : translations
-            cache[cacheKey] = translatedText
+            const cacheKey = `${originalText}|${translation.context || effectiveContext}`;
+            const cache = translation.context === 'ui' ? uiTranslations : translations;
+            cache[cacheKey] = translatedText;
 
             // Force reactivity by triggering a change
             if (translation.context === 'ui' || !translation.context) {
-              // Trigger reactivity for UI translations
-              uiTranslations[cacheKey] = translatedText
+              uiTranslations[cacheKey] = translatedText;
             } else {
-              // Trigger reactivity for regular translations
-              translations[cacheKey] = translatedText
+              translations[cacheKey] = translatedText;
             }
           }
-        })
+        });
       }
     } catch (error) {
       console.error('[useLangie] Translation error:', error)
@@ -302,7 +296,7 @@ function getGlobalLangieInstance(): any {
 }
 function setGlobalLangieInstance(instance: any, options?: TranslatorOptions) {
   if (typeof window !== 'undefined') {
-    ;(window as any).__LANGIE_SINGLETON__ = instance
+    ; (window as any).__LANGIE_SINGLETON__ = instance
     if (options && options.translatorHost) {
       localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost)
     }
