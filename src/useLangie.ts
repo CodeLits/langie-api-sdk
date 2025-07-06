@@ -1,4 +1,4 @@
-import { watch } from 'vue'
+import { watch, ref, computed } from 'vue'
 import type { TranslatorOptions, TranslateServiceResponse } from './types'
 import { useLangieCore, __resetLangieCoreForTests } from './composables/useLangie-core'
 import { TranslationBatching } from './composables/useLangie-batching'
@@ -138,6 +138,16 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     return text
   }
 
+  /**
+   * Get a reactive ref that contains the translation for the provided key.
+   * The ref will automatically update when the translation becomes available.
+   */
+  const lr = (text: string, context?: string, originalLang?: string) => {
+    return computed(() => {
+      return l(text, context, originalLang)
+    })
+  }
+
   const fetchAndCacheBatch = async (
     items: { text: string; context?: string }[],
     fromLang = 'en',
@@ -219,6 +229,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
     // Translation functions
     l,
+    lr,
     fetchAndCacheBatch,
 
     // Utility functions
