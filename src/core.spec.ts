@@ -36,7 +36,7 @@ describe('translateBatch', () => {
     const translations = [{ text: 'hello', from_lang: 'en', to_lang: 'en' }]
     const result = await translateBatch(translations)
     expect(mockFetch).not.toHaveBeenCalled()
-    expect(result).toEqual([{ text: 'hello', translated: 'hello' }])
+    expect(result).toEqual([{ translated: 'hello' }])
   })
 
   it('calls fetch for translations that need it', async () => {
@@ -64,7 +64,7 @@ describe('translateBatch', () => {
     )
 
     const result = await translateBatch(translations)
-    expect(result).toEqual([{ text: 'hello', translated: 'hola' }])
+    expect(result).toEqual([{ translated: 'hola' }])
   })
 
   it('handles API error response', async () => {
@@ -100,11 +100,7 @@ describe('translateBatch', () => {
     )
 
     const result = await translateBatch(translations)
-    expect(result).toEqual([
-      { text: 'one', translated: 'uno' },
-      { text: 'two', translated: 'two' },
-      { text: 'three', translated: 'trois' }
-    ])
+    expect(result).toEqual([{ translated: 'uno' }, { translated: 'two' }, { translated: 'trois' }])
   })
 })
 

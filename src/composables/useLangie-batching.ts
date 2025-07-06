@@ -19,7 +19,7 @@ export class TranslationBatching {
     private options: BatchingOptions = {},
     private translatorHost: string,
     private currentLanguage: () => string,
-    private onBatchComplete: (results: TranslateServiceResponse[]) => void
+    private onBatchComplete: (results: TranslateServiceResponse[], requests: BatchRequest[]) => void
   ) {}
 
   private get initialBatchDelay() {
@@ -136,6 +136,7 @@ export class TranslationBatching {
     })
 
     const allResults: TranslateServiceResponse[] = []
+    const allRequests: BatchRequest[] = []
     for (const [langPair, batchRequests] of Object.entries(grouped)) {
       const [fromLang, toLang] = langPair.split('|')
 
@@ -171,6 +172,7 @@ export class TranslationBatching {
 
         const result = await response.json()
         allResults.push(result)
+        allRequests.push(...batchRequests)
 
         // Clear pending requests for this batch
         batchRequests.forEach((req) => {
@@ -189,7 +191,7 @@ export class TranslationBatching {
       }
     }
 
-    this.onBatchComplete(allResults)
+    this.onBatchComplete(allResults, allRequests)
   }
 
   public clearPending(cacheKey: string) {

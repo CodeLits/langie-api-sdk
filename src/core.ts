@@ -150,25 +150,23 @@ export async function translateBatch(
       const data = parsed || {}
       serviceResults = Array.isArray(data.translations)
         ? data.translations.map((translation, index) => {
-          const originalText = serviceTranslations[index]?.text || ''
+            const originalText = serviceTranslations[index]?.text || ''
 
-          // Handle language detection response
-          if (translation.from_lang && !translation.translated) {
-            return {
-              text: originalText,
-              translated: originalText, // For detection, return original text
-              from_lang: translation.from_lang
+            // Handle language detection response
+            if (translation.from_lang && !translation.translated) {
+              return {
+                translated: originalText, // For detection, return original text
+                from_lang: translation.from_lang
+              }
             }
-          }
 
-          // Handle translation response
-          return {
-            text: originalText,
-            translated: translation.translated || translation.t || originalText
-          }
-        })
+            // Handle translation response
+            return {
+              translated: translation.translated || translation.t || originalText
+            }
+          })
         : data.t
-          ? [{ text: serviceTranslations[0].text, translated: data.t }]
+          ? [{ translated: data.t }]
           : []
 
       // console.debug('[translator-sdk] Service results processed', {
@@ -191,11 +189,11 @@ export async function translateBatch(
   const final = translations.map((tr, idx) => {
     const from = (tr.from_lang || '').toLowerCase()
     const to = (tr.to_lang || '').toLowerCase()
-    if (from === to) return { text: tr.text, translated: tr.text }
+    if (from === to) return { translated: tr.text }
 
     const svcIdx = indexMap.indexOf(idx)
-    if (svcIdx !== -1) return serviceResults[svcIdx] || { text: tr.text, translated: tr.text }
-    return { text: tr.text, translated: tr.text }
+    if (svcIdx !== -1) return serviceResults[svcIdx] || { translated: tr.text }
+    return { translated: tr.text }
   })
 
   // const totalDuration = Date.now() - startTime

@@ -7,7 +7,6 @@
 <script lang="ts" setup>
 import { computed, useSlots } from 'vue'
 import { useLangie } from '../useLangie'
-import { devDebug } from '../utils/debug'
 
 // Define component name for better debugging
 defineOptions({
@@ -44,7 +43,7 @@ const props = defineProps({
 })
 
 const slots = useSlots()
-const { l } = useLangie()
+const { lr, currentLanguage } = useLangie()
 
 const keyStr = computed(() => {
   if (props.msg) return props.msg
@@ -63,8 +62,11 @@ const translated = computed(() => {
     return keyStr.value
   }
 
+  // Force reactivity by depending on currentLanguage
+  void currentLanguage.value
+
   // For other frameworks, always translate
-  const result = l(keyStr.value, props.ctx, props.orig)
+  const result = lr(keyStr.value, props.ctx, props.orig)
   return result
 })
 </script>
