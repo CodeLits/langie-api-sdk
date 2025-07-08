@@ -136,3 +136,10 @@ export declare const lt: any
 
 // Runtime translation helper – same as returned from useLangie but accessible directly after global initialisation
 export declare function l(text: string, ctx?: string, originalLang?: string): string
+
+// Country code detection utility
+export declare function getCountryCode(): Promise<string>
+
+// Language mapping utilities
+export declare const BROWSER_LANGUAGE_MAP: Record<string, string>
+export declare function detectBrowserLanguage(): string
