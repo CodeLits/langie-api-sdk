@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.2] - 2024-12-19
+
+### Added
+
+- **Global Component Registration**: Users can now register `lt` component globally for easier usage
+  - Added global registration examples in README and documentation
+  - Updated Vue.js documentation with global component setup
+  - Updated Nuxt.js documentation with plugin-based global registration
+  - Updated components documentation with global registration guide
+  - Demo application now uses global component registration
+  - Added tests for global component registration functionality
+
+### Documentation
+
+- **Enhanced README**: Added Global Component Registration section with examples
+- **Updated Vue.js Guide**: Added global component registration and usage examples
+- **Updated Nuxt.js Guide**: Added plugin-based global component registration
+- **Updated Components Guide**: Added comprehensive global registration documentation
+- **Demo Application**: Updated to demonstrate global component registration
+
+### Technical
+
+- **Component Registration**: Simplified component usage across applications
+- **Better Developer Experience**: Reduced need for repeated imports in templates
+- **Consistent API**: Global registration works across Vue.js and Nuxt.js applications
+
 ## [1.9.1] - 2024-12-19
 
 ### Fixed
