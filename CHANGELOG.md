@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.3] - 2024-12-19
+
+### Added
+
+- **TypeScript Definitions**: Added `src/*.d.ts` files to npm package for better TypeScript support
+  - TypeScript definitions are now included in the published package
+  - Improved IDE support and type checking for consumers
+  - Better development experience with full type information
+
+### Technical
+
+- **Package Distribution**: Enhanced npm package to include source TypeScript definitions
+- **Type Safety**: Improved TypeScript support for all exported components and functions
+
 ## [1.9.2] - 2024-12-19
 
 ### Added
