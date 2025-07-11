@@ -22,6 +22,8 @@ The SDK uses the following external libraries:
 
 ## Quick Start
 
+### Basic Usage
+
 ```vue
 <script setup>
 import { useLangie } from 'langie-api-sdk'
@@ -35,6 +37,42 @@ const { lr, setLanguage } = useLangie()
   <lt>Hello world!</lt>
   <button @click="setLanguage('es')">Switch to Spanish</button>
 </template>
+```
+
+### Global Component Registration
+
+You can register the `lt` component globally for easier usage throughout your application:
+
+```javascript
+// main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+import { lt } from 'langie-api-sdk/components'
+
+const app = createApp(App)
+
+// Register lt component globally
+app.component('lt', lt)
+
+app.mount('#app')
+```
+
+Then use it directly in templates without importing:
+
+```vue
+<template>
+  <div>
+    <h1><lt>Welcome to our application!</lt></h1>
+    <p><lt>This text will be translated automatically.</lt></p>
+    <button><lt>Click me</lt></button>
+  </div>
+</template>
+
+<script setup>
+import { useLangie } from 'langie-api-sdk'
+
+const { setLanguage } = useLangie()
+</script>
 ```
 
 ## Documentation

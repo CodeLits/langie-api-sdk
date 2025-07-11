@@ -7,7 +7,45 @@ Vue Translator SDK provides ready-to-use Vue components that you can integrate i
 Components are available through the `/components` subpath:
 
 ```js
-import { LanguageSelect, T } from 'langie-api-sdk/components'
+import { LanguageSelect, lt } from 'langie-api-sdk/components'
+```
+
+## Global Component Registration
+
+You can register components globally for easier usage throughout your application:
+
+```javascript
+// main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+import { lt, LanguageSelect, InterfaceLanguageSelect } from 'langie-api-sdk/components'
+
+const app = createApp(App)
+
+// Register components globally
+app.component('lt', lt)
+app.component('LanguageSelect', LanguageSelect)
+app.component('InterfaceLanguageSelect', InterfaceLanguageSelect)
+
+app.mount('#app')
+```
+
+Then use them directly in templates without importing:
+
+```vue
+<template>
+  <div>
+    <h1><lt>Welcome to our application!</lt></h1>
+    <p><lt>This text will be translated automatically.</lt></p>
+    <InterfaceLanguageSelect />
+  </div>
+</template>
+
+<script setup>
+import { useLangie } from 'langie-api-sdk'
+
+const { setLanguage } = useLangie()
+</script>
 ```
 
 ## LanguageSelect

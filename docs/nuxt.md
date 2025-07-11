@@ -66,13 +66,19 @@ TRANSLATOR_API_KEY=your-api-key
 ```javascript
 // plugins/langie.client.ts
 import { useLangie } from 'langie-api-sdk'
+import { lt, LanguageSelect, InterfaceLanguageSelect } from 'langie-api-sdk/components'
 
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin((nuxtApp) => {
   const translator = useLangie({
     translatorHost: useRuntimeConfig().public.translatorHost,
     apiKey: useRuntimeConfig().translatorApiKey,
     defaultLanguage: 'en'
   })
+
+  // Register components globally
+  nuxtApp.vueApp.component('lt', lt)
+  nuxtApp.vueApp.component('LanguageSelect', LanguageSelect)
+  nuxtApp.vueApp.component('InterfaceLanguageSelect', InterfaceLanguageSelect)
 
   return {
     provide: {
@@ -80,6 +86,29 @@ export default defineNuxtPlugin(() => {
     }
   }
 })
+```
+
+### Global Component Usage
+
+After registering components globally in the plugin, you can use them directly in templates:
+
+```vue
+<template>
+  <div>
+    <h1><lt>Welcome to our Nuxt application</lt></h1>
+    <p><lt>This text will be translated automatically</lt></p>
+    <InterfaceLanguageSelect />
+  </div>
+</template>
+
+<script setup>
+import { useLangie } from 'langie-api-sdk'
+
+const { lr } = useLangie({
+  translatorHost: 'https://your-translation-api.com',
+  apiKey: 'your-api-key'
+})
+</script>
 ```
 
 ### Runtime Config

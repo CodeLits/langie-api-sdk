@@ -158,6 +158,7 @@ const { availableLanguages } = useLangie()
 import { createApp } from 'vue'
 import App from './App.vue'
 import { useLangie } from 'langie-api-sdk'
+import { lt, LanguageSelect, InterfaceLanguageSelect } from 'langie-api-sdk/components'
 
 const app = createApp(App)
 
@@ -170,7 +171,33 @@ const { install } = useLangie({
 // Install as a plugin
 app.use(install)
 
+// Register components globally
+app.component('lt', lt)
+app.component('LanguageSelect', LanguageSelect)
+app.component('InterfaceLanguageSelect', InterfaceLanguageSelect)
+
 app.mount('#app')
+```
+
+### Global Component Usage
+
+After registering components globally, you can use them directly in templates:
+
+```vue
+<template>
+  <div>
+    <h1><lt>Welcome to our application!</lt></h1>
+    <p><lt>This text will be translated automatically.</lt></p>
+    <InterfaceLanguageSelect />
+    <button @click="setLanguage('es')">Switch to Spanish</button>
+  </div>
+</template>
+
+<script setup>
+import { useLangie } from 'langie-api-sdk'
+
+const { setLanguage } = useLangie()
+</script>
 ```
 
 ### Environment Variables
