@@ -135,8 +135,10 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       return text
     }
 
-    const cacheKey = `${text}|${ctx || 'ui'}`
-    const cache = ctx === 'ui' || !ctx ? uiTranslations : translations
+    // Use default context 'ui' if not provided
+    const effectiveCtx = ctx || 'ui'
+    const cacheKey = `${text}|${effectiveCtx}`
+    const cache = effectiveCtx === 'ui' ? uiTranslations : translations
 
     // Return cached translation if available
     if (cache[cacheKey]) {
@@ -150,7 +152,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     }
 
     // Queue for translation
-    batching.queueTranslation(text, ctx || 'ui', from, to, cacheKey)
+    batching.queueTranslation(text, effectiveCtx, from, to, cacheKey)
 
     // Mark as recently queued
     recentlyQueued.add(languageCacheKey)
@@ -182,8 +184,10 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       return text
     }
 
-    const cacheKey = `${text}|${ctx || 'ui'}`
-    const cache = ctx === 'ui' || !ctx ? uiTranslations : translations
+    // Use default context 'ui' if not provided
+    const effectiveCtx = ctx || 'ui'
+    const cacheKey = `${text}|${effectiveCtx}`
+    const cache = effectiveCtx === 'ui' ? uiTranslations : translations
 
     // Return cached translation if available
     if (cache[cacheKey]) {
@@ -197,7 +201,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     }
 
     // Queue for translation
-    batching.queueTranslation(text, ctx || 'ui', from, to, cacheKey)
+    batching.queueTranslation(text, effectiveCtx, from, to, cacheKey)
 
     // Mark as recently queued
     recentlyQueued.add(languageCacheKey)
@@ -214,7 +218,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   }
 
   const fetchAndCacheBatch = async (
-    items: { [API_FIELD_TEXT]: string; [API_FIELD_CTX]?: string }[],
+    items: { [API_FIELD_TEXT]: string;[API_FIELD_CTX]?: string }[],
     from = 'en',
     to = currentLanguage.value,
     globalCtx?: string
@@ -337,7 +341,7 @@ function getGlobalLangieInstance(): LangieInstance | null {
 }
 function setGlobalLangieInstance(instance: LangieInstance, options?: TranslatorOptions) {
   if (typeof window !== 'undefined') {
-    ;(window as unknown as { __LANGIE_SINGLETON__?: LangieInstance }).__LANGIE_SINGLETON__ =
+    ; (window as unknown as { __LANGIE_SINGLETON__?: LangieInstance }).__LANGIE_SINGLETON__ =
       instance
     if (options && options.translatorHost) {
       localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost)
