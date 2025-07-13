@@ -1,11 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import {
-  lt,
-  LanguageSelect,
-  InterfaceLanguageSelect,
-  setLtDefaults
-} from 'langie-api-sdk/components'
+import { lt, LanguageSelect, InterfaceLanguageSelect } from 'langie-api-sdk/components'
+import { setLtDefaults } from 'langie-api-sdk'
 import './input.css'
 
 const app = createApp(App)
