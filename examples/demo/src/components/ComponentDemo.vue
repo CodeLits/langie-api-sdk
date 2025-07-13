@@ -71,7 +71,7 @@
           <span class="text-blue-500">{{ '<SimpleLanguageSelect />' }}</span>
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          <lt orig="en">Features: Basic HTML select, no dependencies, works everywhere</lt>
+          <lt orig="en">Features: HTML select, no dependencies, works everywhere</lt>
         </p>
         <div class="max-w-md">
           <SimpleLanguageSelect
@@ -99,19 +99,17 @@
           <div>
             <strong><lt orig="en">LanguageSelect:</lt></strong>
             <br />
-            <lt orig="en">When you want advanced features like search, flags, and smart search</lt>
+            <lt orig="en">Smart name/code search, flags, autocomplete</lt>
           </div>
           <div>
             <strong><lt orig="en">InterfaceLanguageSelect:</lt></strong>
             <br />
-            <lt orig="en"
-              >For interface language selection with automatic API integration, smart search</lt
-            >
+            <lt orig="en">For switching app interface language (auto API, smart search)</lt>
           </div>
           <div>
             <strong><lt orig="en">SimpleLanguageSelect:</lt></strong>
             <br />
-            <lt orig="en">When you want minimal dependencies and a native dropdown</lt>
+            <lt orig="en">Perfect for native device integration</lt>
           </div>
         </div>
       </div>
