@@ -36,6 +36,7 @@ export function __resetLangieCoreForTests() {
     localStorage.removeItem('interface_language')
     localStorage.removeItem('langie_translations_cache')
     localStorage.removeItem('langie_ui_translations_cache')
+    localStorage.removeItem('langie_languages_cache')
   }
 }
 
@@ -166,6 +167,15 @@ export function useLangieCore(options: TranslatorOptions = {}) {
 
       availableLanguages.value = filtered
 
+      // Save languages to localStorage
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('langie_languages_cache', JSON.stringify(filtered))
+        } catch (error) {
+          console.warn('[useLangie] Failed to save cached languages:', error)
+        }
+      }
+
       // Auto-select browser language only once if not previously saved
       if (!_autoSelected && !localStorage.getItem('interface_language')) {
         const locale =
@@ -217,7 +227,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
     Object.keys(translations).forEach((key) => delete translations[key])
     Object.keys(uiTranslations).forEach((key) => delete uiTranslations[key])
 
-    // Clear localStorage cache
+    // Clear localStorage cache (only when explicitly called)
     if (typeof window !== 'undefined') {
       localStorage.removeItem('langie_translations_cache')
       localStorage.removeItem('langie_ui_translations_cache')

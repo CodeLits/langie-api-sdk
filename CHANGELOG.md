@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.9] - 2024-12-19
+
+### Changed
+
+- **Persistent Translation Caching by Language**: Improved localStorage caching to preserve translations across language switches
+  - Translations are now preserved in localStorage when switching between languages
+  - When switching back to a previously used language, cached translations are immediately available
+  - Only memory cache is cleared on language change, localStorage cache is preserved
+  - Eliminates repeated API calls when switching between languages
+
+### Added
+
+- **Languages Cache**: Added localStorage caching for available languages list
+  - Languages list is now cached in localStorage (`langie_languages_cache`)
+  - Reduces API calls for `/languages` endpoint
+  - Improves initial load performance
+
+### Technical
+
+- **Cache Strategy**: Changed from clearing all caches on language switch to preserving localStorage cache
+- **Memory Management**: Only memory cache is cleared on language change, localStorage cache is reloaded
+- **Performance**: Eliminates redundant API calls when switching between previously used languages
+
 ## [1.9.8] - 2024-12-19
 
 ### Added

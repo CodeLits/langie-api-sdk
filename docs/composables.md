@@ -257,6 +257,7 @@ The SDK uses intelligent caching to improve performance and user experience:
 - **Automatic Updates**: UI components using `lr()` automatically update when translations are cached
 - **Batching**: Multiple translation requests are batched for efficiency
 - **Persistent Storage**: Translations are automatically saved to localStorage and restored between page reloads (v1.9.8+)
+- **Language-Specific Caching**: Translations are preserved when switching between languages (v1.9.9+)
 
 ### Cache Selection Logic
 
@@ -279,7 +280,7 @@ If translations aren't appearing in your UI:
 1. **Check context**: Ensure you're using the same context when caching and retrieving
 2. **Use `lr()` for UI**: Use `lr()` for reactive UI components that should update automatically
 3. **Check cache contents**: You can inspect `uiTranslations` and `translations` objects for debugging
-4. **Language changes**: Translations are cleared when the language changes
+4. **Language changes**: Translations are preserved in localStorage when switching languages (v1.9.9+)
 5. **Check localStorage**: Verify that translations are being saved to localStorage (v1.9.8+)
 6. **Clear cache**: Use `cleanup()` to clear both memory and localStorage caches if needed
 

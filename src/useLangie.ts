@@ -73,6 +73,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   // localStorage cache management
   const CACHE_KEY = 'langie_translations_cache'
   const UI_CACHE_KEY = 'langie_ui_translations_cache'
+  const LANGUAGES_CACHE_KEY = 'langie_languages_cache'
 
   // Load cached translations from localStorage
   const loadCachedTranslations = () => {
@@ -108,8 +109,24 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     }
   }
 
-  // Load cached translations on initialization
+  // Load cached languages from localStorage
+  const loadCachedLanguages = () => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const cachedLanguages = localStorage.getItem(LANGUAGES_CACHE_KEY)
+      if (cachedLanguages) {
+        const parsed = JSON.parse(cachedLanguages)
+        availableLanguages.value = parsed
+      }
+    } catch (error) {
+      console.warn('[useLangie] Failed to load cached languages:', error)
+    }
+  }
+
+  // Load cached translations and languages on initialization
   loadCachedTranslations()
+  loadCachedLanguages()
 
   // Create batching instance
   const batching = new TranslationBatching(
@@ -356,9 +373,15 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     }
   }
 
-  // Watch for language changes and clear translations
+  // Watch for language changes - only clear memory cache, keep localStorage cache
   watch(currentLanguage, () => {
-    clearTranslations()
+    // Clear only memory cache, keep localStorage cache
+    Object.keys(translations).forEach((key) => delete translations[key])
+    Object.keys(uiTranslations).forEach((key) => delete uiTranslations[key])
+
+    // Reload cached translations for current language
+    loadCachedTranslations()
+
     batching.cleanup()
   })
 
