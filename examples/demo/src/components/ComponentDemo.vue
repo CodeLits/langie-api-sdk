@@ -71,7 +71,7 @@
           <span class="text-blue-500">{{ '<SimpleLanguageSelect />' }}</span>
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          <lt orig="en">Features: HTML select, no dependencies, works everywhere</lt>
+          <lt orig="en">Features: Perfect device integration, HTML select, no dependencies</lt>
         </p>
         <div class="max-w-md">
           <SimpleLanguageSelect
