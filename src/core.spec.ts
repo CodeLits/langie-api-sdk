@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { translateBatch, fetchAvailableLanguages } from './core'
+import { translateBatch, fetchAvailableLanguages, clearTranslationCache } from './core'
 
 // Mock fetch globally
 const mockFetch = vi.fn()
@@ -26,6 +26,7 @@ const createMockResponse = (
 describe('translateBatch', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    clearTranslationCache()
   })
 
   it('throws an error for empty translations array', async () => {

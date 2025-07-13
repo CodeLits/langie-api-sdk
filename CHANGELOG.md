@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.8] - 2024-12-19
+
+### Added
+
+- **Persistent Translation Caching**: Added localStorage caching for translations between page reloads
+  - Translations are now automatically saved to localStorage when received from the API
+  - Cached translations are loaded on SDK initialization
+  - Separate caches for UI translations (`langie_ui_translations_cache`) and content translations (`langie_translations_cache`)
+  - Automatic cache clearing when language changes or during cleanup
+  - Improved user experience by avoiding repeated API calls for the same translations
+
+### Technical
+
+- **Cache Management**: Added `loadCachedTranslations()` and `saveCachedTranslations()` functions
+- **Cache Keys**: Uses `langie_translations_cache` and `langie_ui_translations_cache` localStorage keys
+- **Error Handling**: Graceful fallback if localStorage is unavailable or corrupted
+- **Test Support**: Updated test cleanup to clear localStorage translation caches
+
 ## [1.9.7] - 2024-12-19
 
 ### Fixed

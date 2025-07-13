@@ -70,6 +70,47 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
   const getLtDefaults = () => ({ ...ltDefaults })
 
+  // localStorage cache management
+  const CACHE_KEY = 'langie_translations_cache'
+  const UI_CACHE_KEY = 'langie_ui_translations_cache'
+
+  // Load cached translations from localStorage
+  const loadCachedTranslations = () => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const cachedTranslations = localStorage.getItem(CACHE_KEY)
+      const cachedUiTranslations = localStorage.getItem(UI_CACHE_KEY)
+
+      if (cachedTranslations) {
+        const parsed = JSON.parse(cachedTranslations)
+        Object.assign(translations, parsed)
+      }
+
+      if (cachedUiTranslations) {
+        const parsed = JSON.parse(cachedUiTranslations)
+        Object.assign(uiTranslations, parsed)
+      }
+    } catch (error) {
+      console.warn('[useLangie] Failed to load cached translations:', error)
+    }
+  }
+
+  // Save translations to localStorage
+  const saveCachedTranslations = () => {
+    if (typeof window === 'undefined') return
+
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(translations))
+      localStorage.setItem(UI_CACHE_KEY, JSON.stringify(uiTranslations))
+    } catch (error) {
+      console.warn('[useLangie] Failed to save cached translations:', error)
+    }
+  }
+
+  // Load cached translations on initialization
+  loadCachedTranslations()
+
   // Create batching instance
   const batching = new TranslationBatching(
     {
@@ -128,6 +169,9 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
             // Cache the translation
             cache[cacheKey] = translatedText
+
+            // Save to localStorage
+            saveCachedTranslations()
           }
         })
       })
@@ -298,6 +342,9 @@ function createLangieInstance(options: TranslatorOptions = {}) {
               const cacheKey = `${originalText}|${translationCtx}`
               const cache = translationCtx === 'ui' ? uiTranslations : translations
               cache[cacheKey] = translatedText
+
+              // Save to localStorage
+              saveCachedTranslations()
             }
           }
         )

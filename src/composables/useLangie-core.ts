@@ -34,6 +34,8 @@ export function __resetLangieCoreForTests() {
   // Clear localStorage for tests
   if (typeof window !== 'undefined') {
     localStorage.removeItem('interface_language')
+    localStorage.removeItem('langie_translations_cache')
+    localStorage.removeItem('langie_ui_translations_cache')
   }
 }
 
@@ -214,6 +216,12 @@ export function useLangieCore(options: TranslatorOptions = {}) {
   const clearTranslations = () => {
     Object.keys(translations).forEach((key) => delete translations[key])
     Object.keys(uiTranslations).forEach((key) => delete uiTranslations[key])
+
+    // Clear localStorage cache
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('langie_translations_cache')
+      localStorage.removeItem('langie_ui_translations_cache')
+    }
   }
 
   return {
