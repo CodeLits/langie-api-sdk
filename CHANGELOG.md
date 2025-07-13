@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.7] - 2024-12-19
+
+### Fixed
+
+- **TypeScript Definitions**: Added missing `lr` function to TypeScript definitions
+  - Fixed `src/index.d.ts` to include `lr` function type definition
+  - Improved TypeScript support for reactive translation function
+  - Better IDE autocomplete and type checking for `lr` function
+
 ## [1.9.6] - 2024-12-19
 
 ### Fixed
