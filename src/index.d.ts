@@ -32,6 +32,8 @@ export declare function useLangie(options?: TranslatorOptions): {
     queuedThisTick: number
     hasFlushTimeout: boolean
   }
+  setLtDefaults: (defaults: { ctx?: string; orig?: string }) => void
+  getLtDefaults: () => { ctx: string; orig: string }
 }
 
 export declare function translateBatch(
@@ -143,3 +145,7 @@ export declare function getCountryCode(): Promise<string>
 // Language mapping utilities
 export declare const BROWSER_LANGUAGE_MAP: Record<string, string>
 export declare function detectBrowserLanguage(): string
+
+// lt component defaults management
+export declare function setLtDefaults(defaults: { ctx?: string; orig?: string }): void
+export declare function getLtDefaults(): { ctx: string; orig: string }

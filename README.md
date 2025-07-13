@@ -99,6 +99,48 @@ import '@vueform/multiselect/themes/default.css'
 import 'langie-api-sdk/dist/index.css'
 ```
 
+## Advanced Usage
+
+### Global lt Component Defaults
+
+You can set global defaults for the `lt` component to avoid repeating common props:
+
+```javascript
+// main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+import { lt, setLtDefaults } from 'langie-api-sdk/components'
+
+const app = createApp(App)
+
+// Register lt component globally
+app.component('lt', lt)
+
+// Set global defaults (optional)
+setLtDefaults({
+  ctx: 'ui', // default context
+  orig: 'en' // default original language
+})
+
+app.mount('#app')
+```
+
+Now you can use simplified syntax:
+
+```vue
+<template>
+  <!-- Uses global defaults: ctx="ui", orig="en" -->
+  <lt>Cancel</lt>
+
+  <!-- Override specific props -->
+  <lt ctx="content">Article title</lt>
+  <lt orig="fr">Bonjour</lt>
+
+  <!-- Both overrides -->
+  <lt ctx="content" orig="es">Hola mundo</lt>
+</template>
+```
+
 ## Features
 
 - **Reactive translations** with automatic UI updates

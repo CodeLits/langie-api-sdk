@@ -40,7 +40,7 @@ fi
 
 echo
 echo "🎉 Starting demo app..."
-echo "   URL: http://localhost:5174"
+echo "   URL: http://localhost:5175"
 echo "   Press Ctrl+C to stop"
 echo
 

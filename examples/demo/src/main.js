@@ -1,6 +1,11 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import { lt, LanguageSelect, InterfaceLanguageSelect } from 'langie-api-sdk/components'
+import {
+  lt,
+  LanguageSelect,
+  InterfaceLanguageSelect,
+  setLtDefaults
+} from 'langie-api-sdk/components'
 import './input.css'
 
 const app = createApp(App)
@@ -9,5 +14,11 @@ const app = createApp(App)
 app.component('Lt', lt)
 app.component('LanguageSelect', LanguageSelect)
 app.component('InterfaceLanguageSelect', InterfaceLanguageSelect)
+
+// Set global defaults for lt component
+setLtDefaults({
+  ctx: 'ui', // default context
+  orig: 'en' // default original language
+})
 
 app.mount('#app')

@@ -7,6 +7,9 @@
 export { useLangie } from './useLangie'
 export { translateBatch } from './core'
 
+// lt component defaults management
+export { setLtDefaults, getLtDefaults } from './useLangie'
+
 // Component exports
 export { default as LanguageSelect } from './components/LanguageSelect.vue'
 export { default as SimpleLanguageSelect } from './components/SimpleLanguageSelect.vue'

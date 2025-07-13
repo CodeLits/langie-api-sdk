@@ -57,6 +57,19 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     clearTranslations
   } = core
 
+  // Global defaults for lt component
+  const ltDefaults = {
+    ctx: 'ui',
+    orig: ''
+  }
+
+  // Functions to manage lt component defaults
+  const setLtDefaults = (defaults: { ctx?: string; orig?: string }) => {
+    Object.assign(ltDefaults, defaults)
+  }
+
+  const getLtDefaults = () => ({ ...ltDefaults })
+
   // Create batching instance
   const batching = new TranslationBatching(
     {
@@ -218,7 +231,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   }
 
   const fetchAndCacheBatch = async (
-    items: { [API_FIELD_TEXT]: string;[API_FIELD_CTX]?: string }[],
+    items: { [API_FIELD_TEXT]: string; [API_FIELD_CTX]?: string }[],
     from = 'en',
     to = currentLanguage.value,
     globalCtx?: string
@@ -325,7 +338,11 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       clearTranslations()
       batching.cleanup()
     },
-    getBatchingStats: () => batching.getStats()
+    getBatchingStats: () => batching.getStats(),
+
+    // lt component defaults management
+    setLtDefaults,
+    getLtDefaults
   }
 }
 
@@ -341,7 +358,7 @@ function getGlobalLangieInstance(): LangieInstance | null {
 }
 function setGlobalLangieInstance(instance: LangieInstance, options?: TranslatorOptions) {
   if (typeof window !== 'undefined') {
-    ; (window as unknown as { __LANGIE_SINGLETON__?: LangieInstance }).__LANGIE_SINGLETON__ =
+    ;(window as unknown as { __LANGIE_SINGLETON__?: LangieInstance }).__LANGIE_SINGLETON__ =
       instance
     if (options && options.translatorHost) {
       localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost)
@@ -415,4 +432,20 @@ export function __resetLangieSingletonForTests() {
   }
 
   __resetLangieCoreForTests()
+}
+
+// Global lt component defaults management
+export function setLtDefaults(defaults: { ctx?: string; orig?: string }) {
+  const instance = getGlobalLangieInstance()
+  if (instance && instance.setLtDefaults) {
+    instance.setLtDefaults(defaults)
+  }
+}
+
+export function getLtDefaults() {
+  const instance = getGlobalLangieInstance()
+  if (instance && instance.getLtDefaults) {
+    return instance.getLtDefaults()
+  }
+  return { ctx: 'ui', orig: '' }
 }

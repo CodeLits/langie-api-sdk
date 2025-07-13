@@ -283,7 +283,7 @@ The `lt` component is a lightweight wrapper for translating text within template
 | Prop   | Type     | Default | Description                                     |
 | ------ | -------- | ------- | ----------------------------------------------- |
 | `ctx`  | `String` | `'ui'`  | Context for the translation (defaults to 'ui')  |
-| `orig` | `String` | `'en'`  | Original language code (defaults to 'en')       |
+| `orig` | `String` | `''`    | Original language code (defaults to empty)      |
 | `msg`  | `String` | `''`    | Text to translate (alternative to slot content) |
 
 ### Slots
@@ -372,6 +372,52 @@ const dynamicMessage = ref('Dynamic message')
 import { lt } from 'langie-api-sdk/components'
 </script>
 ```
+
+### Global Defaults
+
+You can set global defaults for the `lt` component to avoid repeating common props:
+
+```javascript
+// main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+import { lt, setLtDefaults } from 'langie-api-sdk/components'
+
+const app = createApp(App)
+
+// Register lt component globally
+app.component('lt', lt)
+
+// Set global defaults (optional)
+setLtDefaults({
+  ctx: 'ui', // default context
+  orig: 'en' // default original language
+})
+
+app.mount('#app')
+```
+
+Now you can use simplified syntax:
+
+```vue
+<template>
+  <!-- Uses global defaults: ctx="ui", orig="en" -->
+  <lt>Cancel</lt>
+
+  <!-- Override specific props -->
+  <lt ctx="content">Article title</lt>
+  <lt orig="fr">Bonjour</lt>
+
+  <!-- Both overrides -->
+  <lt ctx="content" orig="es">Hola mundo</lt>
+</template>
+```
+
+### Default Behavior
+
+- **ctx**: Defaults to `'ui'` if not specified globally or in props
+- **orig**: Defaults to empty string if not specified globally or in props
+- **Priority**: Component props > Global defaults > SDK defaults
 
 ### How lt Component Works
 

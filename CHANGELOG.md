@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.4] - 2024-12-19
+
+### Added
+
+- **Global lt Component Defaults**: Added ability to set global defaults for `lt` component
+  - New `setLtDefaults()` and `getLtDefaults()` functions for managing global defaults
+  - Simplified component usage: `<lt>Cancel</lt>` instead of `<lt ctx="ui" orig="en">Cancel</lt>`
+  - Global defaults can be overridden by component props
+  - Priority: Component props > Global defaults > SDK defaults
+
+### Changed
+
+- **lt Component Behavior**: Updated default behavior for `orig` prop
+  - `ctx` defaults to `'ui'` if not specified
+  - `orig` defaults to empty string if not specified
+  - Component now uses global defaults when props are not provided
+
+### Documentation
+
+- **Enhanced README**: Added Global lt Component Defaults section with examples
+- **Updated Components Guide**: Added comprehensive documentation for global defaults
+- **Demo Application**: Updated to demonstrate global defaults functionality
+
+### Technical
+
+- **Component Logic**: Updated `lt` component to use global defaults from `useLangie`
+- **API Enhancement**: Added global defaults management functions to SDK exports
+- **TypeScript Support**: Added proper type definitions for new functions
+
 ## [1.9.3] - 2024-12-19
 
 ### Added

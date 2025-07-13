@@ -46,7 +46,7 @@ const props = defineProps({
 })
 
 const slots = useSlots()
-const { lr, currentLanguage, uiTranslations, translations } = useLangie()
+const { lr, currentLanguage, uiTranslations, translations, getLtDefaults } = useLangie()
 
 const keyStr = computed(() => {
   if (props.msg) return props.msg
@@ -78,16 +78,23 @@ const translated = computed(() => {
     return keyStr.value
   }
 
+  // Get global defaults
+  const globalDefaults = getLtDefaults()
+
+  // Use props or fall back to global defaults
+  const effectiveCtx = props.ctx ?? globalDefaults.ctx
+  const effectiveOrig = props.orig ?? globalDefaults.orig
+
   // Force reactivity by depending on currentLanguage and translation caches
   void currentLanguage.value
   void forceUpdate.value // Force recomputation when translations change
   // Access properties to create reactive dependencies
-  const cacheKey = `${keyStr.value}|${props.ctx}`
-  const cache = props.ctx === 'ui' ? uiTranslations : translations
+  const cacheKey = `${keyStr.value}|${effectiveCtx}`
+  const cache = effectiveCtx === 'ui' ? uiTranslations : translations
   void cache[cacheKey] // This creates a reactive dependency
 
   // For other frameworks, always translate
-  const result = lr(keyStr.value, props.ctx, props.orig)
+  const result = lr(keyStr.value, effectiveCtx, effectiveOrig)
   return result
 })
 </script>
