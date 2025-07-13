@@ -19,6 +19,7 @@ export declare function useLangie(options?: TranslatorOptions): {
   setLanguage: (lang: string) => void
   fetchLanguages: (opts?: { force?: boolean; country?: string }) => Promise<TranslatorLanguage[]>
   l: (text: string, ctx?: string, originalLang?: string) => string
+  lr: (text: string, ctx?: string, originalLang?: string) => string
   fetchAndCacheBatch: (
     items: { text: string; ctx?: string }[],
     from?: string,
