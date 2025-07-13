@@ -1,5 +1,5 @@
 import { watch } from 'vue'
-import type { TranslatorOptions, TranslateServiceResponse } from './types'
+import type { TranslatorOptions, TranslateServiceResponse, TranslatorLanguage } from './types'
 import { useLangieCore, __resetLangieCoreForTests } from './composables/useLangie-core'
 import { TranslationBatching } from './composables/useLangie-batching'
 import {
@@ -9,6 +9,7 @@ import {
   API_FIELD_CTX,
   API_FIELD_TRANSLATIONS
 } from './constants'
+import { setCache, getCache } from './utils/cache'
 
 // Global singleton instance
 type LangieInstance = ReturnType<typeof createLangieInstance> & { translatorHost?: string }
@@ -79,27 +80,21 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   const loadCachedTranslations = () => {
     if (typeof window === 'undefined') return
 
-    try {
-      const cachedTranslations = localStorage.getItem(CACHE_KEY)
-      const cachedUiTranslations = localStorage.getItem(UI_CACHE_KEY)
+    const cachedTranslations = getCache<Record<string, Record<string, string>>>(CACHE_KEY)
+    const cachedUiTranslations = getCache<Record<string, Record<string, string>>>(UI_CACHE_KEY)
 
-      if (cachedTranslations) {
-        const parsed = JSON.parse(cachedTranslations)
-        // Load translations for current language only
-        const currentLang = currentLanguage.value
-        const langTranslations = parsed[currentLang] || {}
-        Object.assign(translations, langTranslations)
-      }
+    if (cachedTranslations) {
+      // Load translations for current language only
+      const currentLang = currentLanguage.value
+      const langTranslations = cachedTranslations[currentLang] || {}
+      Object.assign(translations, langTranslations)
+    }
 
-      if (cachedUiTranslations) {
-        const parsed = JSON.parse(cachedUiTranslations)
-        // Load UI translations for current language only
-        const currentLang = currentLanguage.value
-        const langUiTranslations = parsed[currentLang] || {}
-        Object.assign(uiTranslations, langUiTranslations)
-      }
-    } catch (error) {
-      console.warn('[useLangie] Failed to load cached translations:', error)
+    if (cachedUiTranslations) {
+      // Load UI translations for current language only
+      const currentLang = currentLanguage.value
+      const langUiTranslations = cachedUiTranslations[currentLang] || {}
+      Object.assign(uiTranslations, langUiTranslations)
     }
   }
 
@@ -107,38 +102,28 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   const saveCachedTranslations = () => {
     if (typeof window === 'undefined') return
 
-    try {
-      // Load existing cache
-      const existingTranslations = localStorage.getItem(CACHE_KEY)
-      const existingUiTranslations = localStorage.getItem(UI_CACHE_KEY)
+    // Load existing cache
+    const existingTranslations = getCache<Record<string, Record<string, string>>>(CACHE_KEY) || {}
+    const existingUiTranslations =
+      getCache<Record<string, Record<string, string>>>(UI_CACHE_KEY) || {}
 
-      const allTranslations = existingTranslations ? JSON.parse(existingTranslations) : {}
-      const allUiTranslations = existingUiTranslations ? JSON.parse(existingUiTranslations) : {}
+    // Save current language translations
+    const currentLang = currentLanguage.value
+    existingTranslations[currentLang] = { ...translations }
+    existingUiTranslations[currentLang] = { ...uiTranslations }
 
-      // Save current language translations
-      const currentLang = currentLanguage.value
-      allTranslations[currentLang] = { ...translations }
-      allUiTranslations[currentLang] = { ...uiTranslations }
-
-      localStorage.setItem(CACHE_KEY, JSON.stringify(allTranslations))
-      localStorage.setItem(UI_CACHE_KEY, JSON.stringify(allUiTranslations))
-    } catch (error) {
-      console.warn('[useLangie] Failed to save cached translations:', error)
-    }
+    // Save with TTL (7 days for translations)
+    setCache(CACHE_KEY, existingTranslations, 7 * 24 * 60 * 60 * 1000)
+    setCache(UI_CACHE_KEY, existingUiTranslations, 7 * 24 * 60 * 60 * 1000)
   }
 
   // Load cached languages from localStorage
   const loadCachedLanguages = () => {
     if (typeof window === 'undefined') return
 
-    try {
-      const cachedLanguages = localStorage.getItem(LANGUAGES_CACHE_KEY)
-      if (cachedLanguages) {
-        const parsed = JSON.parse(cachedLanguages)
-        availableLanguages.value = parsed
-      }
-    } catch (error) {
-      console.warn('[useLangie] Failed to load cached languages:', error)
+    const cachedLanguages = getCache<TranslatorLanguage[]>(LANGUAGES_CACHE_KEY)
+    if (cachedLanguages) {
+      availableLanguages.value = cachedLanguages
     }
   }
 

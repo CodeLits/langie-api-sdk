@@ -4,6 +4,7 @@ import type { TranslatorOptions, TranslatorLanguage } from '../types'
 import { DEFAULT_API_HOST } from '../constants'
 import { devDebug } from '../utils/debug'
 import { getCountryCode } from '../utils/getCountryCode'
+import { setCache, getCache, clearCache } from '../utils/cache'
 
 const availableLanguages: Ref<TranslatorLanguage[]> = ref([])
 const translations: { [key: string]: string } = reactive({})
@@ -34,9 +35,7 @@ export function __resetLangieCoreForTests() {
   // Clear localStorage for tests
   if (typeof window !== 'undefined') {
     localStorage.removeItem('interface_language')
-    localStorage.removeItem('langie_translations_cache')
-    localStorage.removeItem('langie_ui_translations_cache')
-    localStorage.removeItem('langie_languages_cache')
+    clearCache() // Clear all langie cache items
   }
 }
 
@@ -68,15 +67,10 @@ export function useLangieCore(options: TranslatorOptions = {}) {
 
   // Load cached languages from localStorage if available
   if (typeof window !== 'undefined' && availableLanguages.value.length === 0) {
-    try {
-      const cachedLanguages = localStorage.getItem('langie_languages_cache')
-      if (cachedLanguages) {
-        const parsed = JSON.parse(cachedLanguages)
-        availableLanguages.value = parsed
-        _languagesCache = parsed
-      }
-    } catch (error) {
-      console.warn('[useLangie] Failed to load cached languages:', error)
+    const cachedLanguages = getCache<TranslatorLanguage[]>('langie_languages_cache')
+    if (cachedLanguages) {
+      availableLanguages.value = cachedLanguages
+      _languagesCache = cachedLanguages
     }
   }
 
@@ -181,13 +175,9 @@ export function useLangieCore(options: TranslatorOptions = {}) {
 
       availableLanguages.value = filtered
 
-      // Save languages to localStorage
+      // Save languages to localStorage with TTL (30 days for languages)
       if (typeof window !== 'undefined') {
-        try {
-          localStorage.setItem('langie_languages_cache', JSON.stringify(filtered))
-        } catch (error) {
-          console.warn('[useLangie] Failed to save cached languages:', error)
-        }
+        setCache('langie_languages_cache', filtered, 30 * 24 * 60 * 60 * 1000)
       }
 
       // Auto-select browser language only once if not previously saved
@@ -243,8 +233,8 @@ export function useLangieCore(options: TranslatorOptions = {}) {
 
     // Clear localStorage cache for translations only (preserve languages cache)
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('langie_translations_cache')
-      localStorage.removeItem('langie_ui_translations_cache')
+      clearCache('translations_cache')
+      clearCache('ui_translations_cache')
     }
   }
 

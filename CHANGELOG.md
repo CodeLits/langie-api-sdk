@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.12] - 2024-12-19
+
+### Added
+
+- **Intelligent Cache Management**: Added comprehensive cache management system with TTL and size limits
+  - **TTL Support**: Cache items now have configurable time-to-live (translations: 7 days, languages: 30 days)
+  - **Size Limits**: Automatic cache size management (max 2MB, 1000 items) to prevent localStorage overflow
+  - **LRU Eviction**: Oldest items are automatically removed when limits are exceeded
+  - **Automatic Cleanup**: Expired items are automatically removed on cache access
+  - **Cache Statistics**: Added `getCacheStats()` function to monitor cache usage
+
+### Enhanced
+
+- **Cache Utilities**: Added comprehensive cache management API
+  - `cacheManager` - Main cache manager instance with configurable options
+  - `setCache(key, data, ttl?)` - Set cache item with optional TTL
+  - `getCache(key)` - Get cache item (automatically handles expiration)
+  - `removeCache(key)` - Remove specific cache item
+  - `clearCache(pattern?)` - Clear cache items (all or by pattern)
+  - `getCacheStats()` - Get cache statistics (size, items, limits)
+
+### Technical
+
+- **Cache Architecture**: Replaced direct localStorage access with intelligent cache manager
+- **Error Handling**: Improved error handling for corrupted cache items
+- **Performance**: Automatic cleanup reduces localStorage bloat
+- **Memory Management**: Prevents localStorage quota exceeded errors
+
 ## [1.9.11] - 2024-12-19
 
 ### Fixed

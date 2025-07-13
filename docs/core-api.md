@@ -171,23 +171,47 @@ The SDK automatically caches translations and language lists to improve performa
 ### Translation Caching
 
 - **Memory Cache**: Translations are cached in memory during the session
-- **Persistent Cache**: Translations are saved to localStorage and persist between page reloads
+- **Persistent Cache**: Translations are saved to localStorage with TTL (7 days) and persist between page reloads
 - **Language-Specific**: Each language has its own cache, so switching languages loads the correct cached translations
+- **Size Limits**: Cache is automatically managed to prevent localStorage overflow (max 2MB, 1000 items)
 
 ### Language List Caching
 
-- **Persistent Cache**: The list of available languages is cached in localStorage
+- **Persistent Cache**: The list of available languages is cached in localStorage with TTL (30 days)
 - **Automatic Loading**: Cached languages are loaded on initialization, avoiding unnecessary API calls
 - **Cache Preservation**: Language cache is preserved when clearing translation cache
 
 ### Cache Management
 
 ```javascript
-import { clearTranslations } from 'langie-api-sdk'
+import { clearTranslations, getCacheStats, clearCache } from 'langie-api-sdk'
 
 // Clear only translation cache (preserves language cache)
 clearTranslations()
+
+// Get cache statistics
+const stats = getCacheStats()
+console.log(`Cache size: ${stats.size} bytes, Items: ${stats.items}`)
+
+// Clear all langie cache
+clearCache()
+
+// Clear specific cache items
+clearCache('translations_cache')
 ```
+
+### Cache Configuration
+
+The SDK uses intelligent cache management with the following defaults:
+
+- **TTL (Time To Live)**:
+  - Translations: 7 days
+  - Languages: 30 days
+- **Size Limits**:
+  - Maximum cache size: 2MB
+  - Maximum items: 1000
+- **Automatic Cleanup**: Expired items are automatically removed
+- **LRU Eviction**: Oldest items are removed when limits are exceeded
 
 ## Advanced Usage
 

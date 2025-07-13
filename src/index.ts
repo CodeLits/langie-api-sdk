@@ -45,3 +45,13 @@ export { getCountryCode } from './utils/getCountryCode'
 
 // Export language mapping utilities
 export { detectBrowserLanguage, BROWSER_LANGUAGE_MAP } from './utils/languageMapping'
+
+// Cache management utilities
+export {
+  cacheManager,
+  setCache,
+  getCache,
+  removeCache,
+  clearCache,
+  getCacheStats
+} from './utils/cache'
