@@ -105,7 +105,11 @@ function createLangieInstance(options: TranslatorOptions = {}) {
         translationsArray.forEach((translation: TranslationWithContext, index: number) => {
           const reqIdx = batchIdx * translationsArray.length + index
           const originalText = requests[reqIdx]?.[API_FIELD_TEXT]
-          const ctx = translation[API_FIELD_CTX] || requests[reqIdx]?.[API_FIELD_CTX] || 'ui'
+          const ctx =
+            translation[API_FIELD_CTX] ||
+            requests[reqIdx]?.[API_FIELD_CTX] ||
+            ltDefaults.ctx ||
+            'ui'
           if (!originalText) {
             return
           }
@@ -118,9 +122,9 @@ function createLangieInstance(options: TranslatorOptions = {}) {
           const translatedText = translation[API_FIELD_TEXT]
           if (translatedText) {
             // Determine the correct context and cache
-            const effectiveCtx = ctx || requests[reqIdx]?.[API_FIELD_CTX] || 'ui'
+            const effectiveCtx = ctx || ltDefaults.ctx || 'ui'
             const cacheKey = `${originalText}|${effectiveCtx}`
-            const cache = effectiveCtx === 'ui' || !effectiveCtx ? uiTranslations : translations
+            const cache = effectiveCtx === 'ui' ? uiTranslations : translations
 
             // Cache the translation
             cache[cacheKey] = translatedText
@@ -140,7 +144,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
    * background (this avoids Promise objects leaking into the template).
    */
   const l = (text: string, ctx?: string, originalLang?: string) => {
-    const from = originalLang || 'en'
+    const from = originalLang || ltDefaults.orig || 'en'
     const to = currentLanguage.value
 
     // Skip translation if source and target languages are the same
@@ -148,8 +152,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       return text
     }
 
-    // Use default context 'ui' if not provided
-    const effectiveCtx = ctx || 'ui'
+    // Use global defaults or fallback to 'ui'
+    const effectiveCtx = ctx || ltDefaults.ctx || 'ui'
     const cacheKey = `${text}|${effectiveCtx}`
     const cache = effectiveCtx === 'ui' ? uiTranslations : translations
 
@@ -189,7 +193,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     // Force reactivity by depending on currentLanguage
     void currentLanguage.value
 
-    const from = originalLang || 'en'
+    const from = originalLang || ltDefaults.orig || 'en'
     const to = currentLanguage.value
 
     // Skip translation if source and target languages are the same
@@ -197,8 +201,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       return text
     }
 
-    // Use default context 'ui' if not provided
-    const effectiveCtx = ctx || 'ui'
+    // Use global defaults or fallback to 'ui'
+    const effectiveCtx = ctx || ltDefaults.ctx || 'ui'
     const cacheKey = `${text}|${effectiveCtx}`
     const cache = effectiveCtx === 'ui' ? uiTranslations : translations
 
@@ -246,8 +250,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     isLoading.value = true
 
     try {
-      // Use global context if provided, otherwise fall back to individual contexts
-      const effectiveCtx = globalCtx || 'ui'
+      // Use global context if provided, otherwise fall back to global defaults or 'ui'
+      const effectiveCtx = globalCtx || ltDefaults.ctx || 'ui'
 
       const response = await fetch(`${translatorHost}/translate`, {
         method: 'POST',
@@ -287,19 +291,10 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             // Handle translation response
             const translatedText = translation[API_FIELD_TEXT]
             if (translatedText) {
-              const cacheKey = `${originalText}|${translation[API_FIELD_CTX] || effectiveCtx}`
-              const cache =
-                translation[API_FIELD_CTX] === 'ui' || !translation[API_FIELD_CTX]
-                  ? uiTranslations
-                  : translations
+              const translationCtx = translation[API_FIELD_CTX] || effectiveCtx
+              const cacheKey = `${originalText}|${translationCtx}`
+              const cache = translationCtx === 'ui' ? uiTranslations : translations
               cache[cacheKey] = translatedText
-
-              // Force reactivity by triggering a change
-              if (translation[API_FIELD_CTX] === 'ui' || !translation[API_FIELD_CTX]) {
-                uiTranslations[cacheKey] = translatedText
-              } else {
-                translations[cacheKey] = translatedText
-              }
             }
           }
         )

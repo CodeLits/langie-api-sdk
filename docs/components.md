@@ -375,7 +375,7 @@ import { lt } from 'langie-api-sdk/components'
 
 ### Global Defaults
 
-You can set global defaults for the `lt` component to avoid repeating common props:
+You can set global defaults for all translation functions and the `lt` component to avoid repeating common parameters:
 
 ```javascript
 // main.js
@@ -415,9 +415,10 @@ Now you can use simplified syntax:
 
 ### Default Behavior
 
-- **ctx**: Defaults to `'ui'` if not specified globally or in props
-- **orig**: Defaults to empty string if not specified globally or in props
-- **Priority**: Component props > Global defaults > SDK defaults
+- **ctx**: Defaults to `'ui'` if not specified globally or in props/parameters
+- **orig**: Defaults to empty string if not specified globally or in props/parameters
+- **Priority**: Component props/Function parameters > Global defaults > SDK defaults
+- **Applies to**: All translation functions (`l`, `lr`, `translateBatch`) and `lt` component
 
 ### How lt Component Works
 

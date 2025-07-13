@@ -104,9 +104,9 @@ export async function translateBatch(
             [API_FIELD_TEXT]: t[API_FIELD_TEXT],
             [API_FIELD_FROM]: t[API_FIELD_FROM],
             [API_FIELD_TO]: t[API_FIELD_TO],
-            ...(t[API_FIELD_CTX] && { [API_FIELD_CTX]: t[API_FIELD_CTX] })
+            [API_FIELD_CTX]: t[API_FIELD_CTX] || options[API_FIELD_CTX] || 'ui'
           })),
-          ...(options[API_FIELD_CTX] && { [API_FIELD_CTX]: options[API_FIELD_CTX] })
+          [API_FIELD_CTX]: options[API_FIELD_CTX] || 'ui'
         }),
         signal: controller.signal
       })

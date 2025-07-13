@@ -101,9 +101,9 @@ import 'langie-api-sdk/dist/index.css'
 
 ## Advanced Usage
 
-### Global lt Component Defaults
+### Global Translation Defaults
 
-You can set global defaults for the `lt` component to avoid repeating common props:
+You can set global defaults for all translation functions and the `lt` component to avoid repeating common parameters:
 
 ```javascript
 // main.js
@@ -139,6 +139,19 @@ Now you can use simplified syntax:
   <!-- Both overrides -->
   <lt ctx="content" orig="es">Hola mundo</lt>
 </template>
+```
+
+```javascript
+// Functions also use global defaults
+const { l, lr } = useLangie()
+
+// Uses global defaults: ctx="ui", orig="en"
+l('Hello world')
+lr('Welcome message')
+
+// Override specific parameters
+l('Article title', 'content')
+lr('French text', 'ui', 'fr')
 ```
 
 ## Features

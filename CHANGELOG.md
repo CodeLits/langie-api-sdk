@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.5] - 2024-12-19
+
+### Changed
+
+- **Global Defaults for All Functions**: Extended global defaults to work with all SDK functions
+  - `l()` function now uses global defaults for `ctx` and `orig` parameters
+  - `lr()` function now uses global defaults for `ctx` and `orig` parameters
+  - `translateBatch()` function now uses global defaults for `ctx` parameter
+  - `fetchAndCacheBatch()` function now uses global defaults for `ctx` parameter
+  - All batching and caching logic now respects global defaults
+
+### Enhanced
+
+- **Consistent Behavior**: All translation functions now follow the same priority order
+  - Priority: Function parameters > Global defaults > SDK defaults
+  - `ctx` defaults to `'ui'` across all functions if not specified
+  - `orig` defaults to empty string across all functions if not specified
+
+### Documentation
+
+- **Updated README**: Renamed section to "Global Translation Defaults" and added function examples
+- **Updated Components Guide**: Clarified that defaults apply to all functions and components
+- **Enhanced Examples**: Added examples showing how functions use global defaults
+
+### Technical
+
+- **Core Functions**: Updated `translateBatch` in core.ts to use global defaults
+- **Batching Logic**: Updated all batching and caching logic to respect global defaults
+- **Consistent API**: Unified default behavior across all translation functions
+
 ## [1.9.4] - 2024-12-19
 
 ### Added
