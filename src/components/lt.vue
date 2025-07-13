@@ -29,7 +29,7 @@ const props = defineProps({
   // Message key (optional, otherwise slot content is used)
   msg: {
     type: String,
-    default: ''
+    default: undefined
   },
   // Translation context shorthand
   ctx: {
@@ -40,7 +40,8 @@ const props = defineProps({
   // Original language shorthand
   orig: {
     type: String,
-    required: false
+    required: false,
+    default: undefined
   }
 })
 
