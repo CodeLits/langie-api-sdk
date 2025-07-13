@@ -94,7 +94,7 @@ describe('useLangie batching', () => {
       ])
     )
     expect(requestBody[API_FIELD_CTX]).toBe('ui')
-    expect(requestBody[API_FIELD_FROM]).toBe('en')
+    expect(requestBody[API_FIELD_FROM]).toBe('')
     expect(requestBody[API_FIELD_TO]).toBe('fr')
   })
 

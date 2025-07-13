@@ -18,7 +18,7 @@ app.component('InterfaceLanguageSelect', InterfaceLanguageSelect)
 // Set global defaults for lt component
 setLtDefaults({
   ctx: 'ui', // default context
-  orig: 'en' // default original language
+  orig: 'en' // optional original language (no default)
 })
 
 app.mount('#app')

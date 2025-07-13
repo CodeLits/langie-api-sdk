@@ -391,7 +391,7 @@ app.component('lt', lt)
 // Set global defaults (optional)
 setLtDefaults({
   ctx: 'ui', // default context
-  orig: 'en' // default original language
+  orig: 'en' // optional original language (no default)
 })
 
 app.mount('#app')
@@ -401,7 +401,7 @@ Now you can use simplified syntax:
 
 ```vue
 <template>
-  <!-- Uses global defaults: ctx="ui", orig="en" -->
+  <!-- Uses global defaults: ctx="ui" -->
   <lt>Cancel</lt>
 
   <!-- Override specific props -->

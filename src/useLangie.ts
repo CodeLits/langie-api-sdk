@@ -144,7 +144,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
    * background (this avoids Promise objects leaking into the template).
    */
   const l = (text: string, ctx?: string, originalLang?: string) => {
-    const from = originalLang || ltDefaults.orig || 'en'
+    const from = originalLang || ltDefaults.orig
     const to = currentLanguage.value
 
     // Skip translation if source and target languages are the same
@@ -193,7 +193,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     // Force reactivity by depending on currentLanguage
     void currentLanguage.value
 
-    const from = originalLang || ltDefaults.orig || 'en'
+    const from = originalLang || ltDefaults.orig
     const to = currentLanguage.value
 
     // Skip translation if source and target languages are the same
@@ -236,14 +236,17 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
   const fetchAndCacheBatch = async (
     items: { [API_FIELD_TEXT]: string; [API_FIELD_CTX]?: string }[],
-    from = 'en',
+    from?: string,
     to = currentLanguage.value,
     globalCtx?: string
   ) => {
     if (items.length === 0) return
 
+    // Use global defaults for from language if not provided
+    const effectiveFrom = from || ltDefaults.orig
+
     // Skip translation if source and target languages are the same
-    if (from === to) {
+    if (effectiveFrom === to) {
       return
     }
 
@@ -263,7 +266,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             [API_FIELD_TEXT]: item[API_FIELD_TEXT],
             [API_FIELD_CTX]: item[API_FIELD_CTX] || effectiveCtx
           })),
-          [API_FIELD_FROM]: from,
+          [API_FIELD_FROM]: effectiveFrom,
           [API_FIELD_TO]: to
         })
       })

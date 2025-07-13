@@ -3,7 +3,8 @@ description:
 globs: 
 alwaysApply: true
 ---
-
-use bun as the main package manager.
+Версию sdk обновляй только когда я скажу.
+Use bun as the main package manager.
 do not spawn a new process of app. i have vite server with auto reload.
 Do not restart server in dev mode.
+Обновляй документацию после изменений SDK.
