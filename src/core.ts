@@ -17,6 +17,23 @@ import {
 
 const DEFAULT_TRANSLATOR_HOST = 'http://localhost:8081'
 
+// --- Translation cache ---
+const translationCache = new Map<string, Promise<TranslateServiceResponse[]>>()
+
+function getTranslationCacheKey(serviceTranslations: TranslateRequestBody[], options: TranslatorOptions): string {
+  // Create a stable cache key based on translations and options
+  return JSON.stringify({
+    translations: serviceTranslations.map(t => ({
+      [API_FIELD_TEXT]: t[API_FIELD_TEXT],
+      [API_FIELD_FROM]: t[API_FIELD_FROM],
+      [API_FIELD_TO]: t[API_FIELD_TO],
+      [API_FIELD_CTX]: t[API_FIELD_CTX] || options[API_FIELD_CTX] || 'ui'
+    })),
+    host: options.translatorHost || DEFAULT_TRANSLATOR_HOST,
+    context: options[API_FIELD_CTX] || 'ui'
+  })
+}
+
 /**
  * Translates a batch of texts
  *
@@ -81,107 +98,125 @@ export async function translateBatch(
 
   let serviceResults: TranslateServiceResponse[] = []
   if (serviceTranslations.length > 0) {
-    // const requestStartTime = Date.now()
-    // console.debug('[translator-sdk] Sending request to translator', {
-    //   host: translatorHost,
-    //   apiKeySnippet: apiKey ? `${apiKey.slice(0, 4)}…${apiKey.slice(-4)}` : 'none',
-    //   batchCount: serviceTranslations.length,
-    //   requestSize: JSON.stringify({ translations: serviceTranslations }).length
-    // })
-
-    try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
-
-      const resp = await fetch(`${translatorHost}/translate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Api-Key': apiKey } : {})
-        },
-        body: JSON.stringify({
-          [API_FIELD_TRANSLATIONS]: serviceTranslations.map((t) => ({
-            [API_FIELD_TEXT]: t[API_FIELD_TEXT],
-            [API_FIELD_FROM]: t[API_FIELD_FROM],
-            [API_FIELD_TO]: t[API_FIELD_TO],
-            [API_FIELD_CTX]: t[API_FIELD_CTX] || options[API_FIELD_CTX] || 'ui'
-          })),
-          [API_FIELD_CTX]: options[API_FIELD_CTX] || 'ui'
-        }),
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-      // const requestDuration = Date.now() - requestStartTime
-
-      // console.debug('[translator-sdk] Translator response received', {
-      //   status: resp.status,
-      //   statusText: resp.statusText,
-      //   duration: `${requestDuration}ms`,
-      //   contentType: resp.headers.get('content-type'),
-      //   contentLength: resp.headers.get('content-length')
+    // Check cache first
+    const cacheKey = getTranslationCacheKey(serviceTranslations, options)
+    if (translationCache.has(cacheKey)) {
+      // console.debug('[translator-sdk] Cache hit for translation batch')
+      serviceResults = await translationCache.get(cacheKey)!
+    } else {
+      // const requestStartTime = Date.now()
+      // console.debug('[translator-sdk] Sending request to translator', {
+      //   host: translatorHost,
+      //   apiKeySnippet: apiKey ? `${apiKey.slice(0, 4)}…${apiKey.slice(-4)}` : 'none',
+      //   batchCount: serviceTranslations.length,
+      //   requestSize: JSON.stringify({ translations: serviceTranslations }).length
       // })
 
-      if (!resp.ok) {
-        console.error('[translator-sdk] Translator error response:', resp.status, resp.statusText)
-        throw new Error(`Translator service error: ${resp.status} ${resp.statusText}`)
-      }
+      const translationPromise = (async () => {
+        try {
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
 
-      let parsed: { translations?: TranslateServiceResponse[]; t?: string } | null
-      try {
-        parsed = await resp.clone().json()
-        // console.debug('[translator-sdk] Response parsed successfully', {
-        //   hasTranslations: !!parsed?.translations,
-        //   translationCount: parsed?.translations?.length || 0,
-        //   hasLegacyT: !!parsed?.t
-        // })
-      } catch (jsonErr) {
-        console.error('[translator-sdk] Failed to parse JSON response:', jsonErr)
-        throw new Error(`Failed to parse JSON response: ${jsonErr}`)
-      }
-
-      // if (parsed) {
-      //   console.debug(
-      //     '[translator-sdk] Translator response sample',
-      //     JSON.stringify(parsed).slice(0, 500)
-      //   )
-      // }
-
-      const data = parsed || {}
-      serviceResults = Array.isArray(data[API_FIELD_TRANSLATIONS])
-        ? data[API_FIELD_TRANSLATIONS].map((translation, index) => {
-            const originalText = serviceTranslations[index]?.[API_FIELD_TEXT] || ''
-
-            // Handle language detection response
-            if (translation[API_FIELD_FROM] && !translation[API_FIELD_TEXT]) {
-              return {
-                [API_FIELD_TEXT]: originalText, // For detection, return original text
-                [API_FIELD_FROM]: translation[API_FIELD_FROM]
-              }
-            }
-
-            // Handle translation response
-            return {
-              [API_FIELD_TEXT]: translation[API_FIELD_TEXT] || originalText
-            }
+          const resp = await fetch(`${translatorHost}/translate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Api-Key': apiKey } : {})
+            },
+            body: JSON.stringify({
+              [API_FIELD_TRANSLATIONS]: serviceTranslations.map((t) => ({
+                [API_FIELD_TEXT]: t[API_FIELD_TEXT],
+                [API_FIELD_FROM]: t[API_FIELD_FROM],
+                [API_FIELD_TO]: t[API_FIELD_TO],
+                [API_FIELD_CTX]: t[API_FIELD_CTX] || options[API_FIELD_CTX] || 'ui'
+              })),
+              [API_FIELD_CTX]: options[API_FIELD_CTX] || 'ui'
+            }),
+            signal: controller.signal
           })
-        : data[API_FIELD_TEXT]
-          ? [{ [API_FIELD_TEXT]: data[API_FIELD_TEXT] }]
-          : []
 
-      // console.debug('[translator-sdk] Service results processed', {
-      //   resultCount: serviceResults.length,
-      //   expectedCount: serviceTranslations.length
-      // })
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        const message = `Translator request to ${translatorHost} timed out after 5 seconds.`
-        console.error(message)
-        throw new Error(message)
-      }
-      const message = `Failed to connect to translator at ${translatorHost}. Is the service running?`
-      console.error(message)
-      throw new Error(message)
+          clearTimeout(timeoutId)
+          // const requestDuration = Date.now() - requestStartTime
+
+          // console.debug('[translator-sdk] Translator response received', {
+          //   status: resp.status,
+          //   statusText: resp.statusText,
+          //   duration: `${requestDuration}ms`,
+          //   contentType: resp.headers.get('content-type'),
+          //   contentLength: resp.headers.get('content-length')
+          // })
+
+          if (!resp.ok) {
+            console.error('[translator-sdk] Translator error response:', resp.status, resp.statusText)
+            throw new Error(`Translator service error: ${resp.status} ${resp.statusText}`)
+          }
+
+          let parsed: { translations?: TranslateServiceResponse[]; t?: string } | null
+          try {
+            parsed = await resp.clone().json()
+            // console.debug('[translator-sdk] Response parsed successfully', {
+            //   hasTranslations: !!parsed?.translations,
+            //   translationCount: parsed?.translations?.length || 0,
+            //   hasLegacyT: !!parsed?.t
+            // })
+          } catch (jsonErr) {
+            console.error('[translator-sdk] Failed to parse JSON response:', jsonErr)
+            throw new Error(`Failed to parse JSON response: ${jsonErr}`)
+          }
+
+          // if (parsed) {
+          //   console.debug(
+          //     '[translator-sdk] Translator response sample',
+          //     JSON.stringify(parsed).slice(0, 500)
+          //   )
+          // }
+
+          const data = parsed || {}
+          const results = Array.isArray(data[API_FIELD_TRANSLATIONS])
+            ? data[API_FIELD_TRANSLATIONS].map((translation, index) => {
+              const originalText = serviceTranslations[index]?.[API_FIELD_TEXT] || ''
+
+              // Handle language detection response
+              if (translation[API_FIELD_FROM] && !translation[API_FIELD_TEXT]) {
+                return {
+                  [API_FIELD_TEXT]: originalText, // For detection, return original text
+                  [API_FIELD_FROM]: translation[API_FIELD_FROM]
+                }
+              }
+
+              // Handle translation response
+              return {
+                [API_FIELD_TEXT]: translation[API_FIELD_TEXT] || originalText
+              }
+            })
+            : data[API_FIELD_TEXT]
+              ? [{ [API_FIELD_TEXT]: data[API_FIELD_TEXT] }]
+              : []
+
+          // console.debug('[translator-sdk] Service results processed', {
+          //   resultCount: results.length,
+          //   expectedCount: serviceTranslations.length
+          // })
+
+          return results
+        } catch (error: unknown) {
+          // Remove from cache on error
+          translationCache.delete(cacheKey)
+
+          if (error instanceof Error && error.name === 'AbortError') {
+            const message = `Translator request to ${translatorHost} timed out after 5 seconds.`
+            console.error(message)
+            throw new Error(message)
+          }
+          const message = `Failed to connect to translator at ${translatorHost}. Is the service running?`
+          console.error(message)
+          throw new Error(message)
+        }
+      })()
+
+      // Cache the promise
+      translationCache.set(cacheKey, translationPromise)
+      serviceResults = await translationPromise
     }
   }
 
@@ -204,6 +239,15 @@ export async function translateBatch(
   // })
 
   return final as TranslateServiceResponse[]
+}
+
+// --- Cache management functions ---
+export function clearTranslationCache(): void {
+  translationCache.clear()
+}
+
+export function getTranslationCacheSize(): number {
+  return translationCache.size
 }
 
 /**

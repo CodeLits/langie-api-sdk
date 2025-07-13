@@ -5,7 +5,7 @@
 
 // Core exports
 export { useLangie } from './useLangie'
-export { translateBatch } from './core'
+export { translateBatch, clearTranslationCache, getTranslationCacheSize } from './core'
 
 // lt component defaults management
 export { setLtDefaults, getLtDefaults } from './useLangie'
