@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.6] - 2024-12-19
+
+### Fixed
+
+- **Import Error**: Fixed incorrect import of `setLtDefaults` from components instead of main SDK
+  - Updated demo application to import `setLtDefaults` from `'langie-api-sdk'` instead of `'langie-api-sdk/components'`
+  - Fixed module resolution error that prevented demo from loading
+
+### Documentation
+
+- **Improved Component Descriptions**: Enhanced component comparison section in demo
+  - Simplified and clarified component usage descriptions
+  - Updated LanguageSelect description to "Smart name/code search, flags, autocomplete"
+  - Updated SimpleLanguageSelect description to "Perfect for device integration"
+  - Removed "Basic" from SimpleLanguageSelect features to improve professional appearance
+  - Enhanced features description to "Perfect device integration, HTML select, no dependencies"
+
 ## [1.9.5] - 2024-12-19
 
 ### Changed
