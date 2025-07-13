@@ -34,7 +34,8 @@ const props = defineProps({
   // Translation context shorthand
   ctx: {
     type: String,
-    required: false
+    required: false,
+    default: 'ui'
   },
   // Original language shorthand
   orig: {
@@ -80,7 +81,7 @@ const translated = computed(() => {
   void currentLanguage.value
   void forceUpdate.value // Force recomputation when translations change
   // Access properties to create reactive dependencies
-  const cacheKey = `${keyStr.value}|${props.ctx || 'ui'}`
+  const cacheKey = `${keyStr.value}|${props.ctx}`
   const cache = props.ctx === 'ui' ? uiTranslations : translations
   void cache[cacheKey] // This creates a reactive dependency
 
