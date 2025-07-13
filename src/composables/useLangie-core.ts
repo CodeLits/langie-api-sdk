@@ -227,7 +227,7 @@ export function useLangieCore(options: TranslatorOptions = {}) {
     Object.keys(translations).forEach((key) => delete translations[key])
     Object.keys(uiTranslations).forEach((key) => delete uiTranslations[key])
 
-    // Clear localStorage cache (only when explicitly called)
+    // Clear localStorage cache for all languages (only when explicitly called)
     if (typeof window !== 'undefined') {
       localStorage.removeItem('langie_translations_cache')
       localStorage.removeItem('langie_ui_translations_cache')

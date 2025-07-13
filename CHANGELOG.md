@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.10] - 2024-12-19
+
+### Fixed
+
+- **Translation Updates on Language Change**: Fixed issue where translations weren't updating when switching languages
+  - Changed localStorage structure to store translations separately for each language
+  - Translations now properly update when switching between languages
+  - Cached translations are preserved for each language individually
+  - Fixed logic to load correct translations for current language from localStorage
+
+### Technical
+
+- **Cache Structure**: Changed from flat cache to language-specific cache structure
+  - localStorage now stores: `{ "en": {...}, "es": {...}, "fr": {...} }`
+  - Each language has its own translation cache
+  - Proper loading of language-specific translations on language change
+
 ## [1.9.9] - 2024-12-19
 
 ### Changed
