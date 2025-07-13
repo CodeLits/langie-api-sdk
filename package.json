@@ -1,6 +1,6 @@
 {
 	"name": "langie-api-sdk",
-	"version": "1.9.10",
+	"version": "1.9.11",
 	"description": "Lightweight translation SDK for Vue.js applications with smart interface language selection and limit monitoring",
 	"type": "module",
 	"main": "dist/index.cjs",

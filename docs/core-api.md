@@ -164,6 +164,31 @@ Common errors include:
 - Timeout errors when the request takes too long
 - Service errors when the translation service returns an error
 
+## Caching
+
+The SDK automatically caches translations and language lists to improve performance and reduce API calls:
+
+### Translation Caching
+
+- **Memory Cache**: Translations are cached in memory during the session
+- **Persistent Cache**: Translations are saved to localStorage and persist between page reloads
+- **Language-Specific**: Each language has its own cache, so switching languages loads the correct cached translations
+
+### Language List Caching
+
+- **Persistent Cache**: The list of available languages is cached in localStorage
+- **Automatic Loading**: Cached languages are loaded on initialization, avoiding unnecessary API calls
+- **Cache Preservation**: Language cache is preserved when clearing translation cache
+
+### Cache Management
+
+```javascript
+import { clearTranslations } from 'langie-api-sdk'
+
+// Clear only translation cache (preserves language cache)
+clearTranslations()
+```
+
 ## Advanced Usage
 
 ### Batch Processing

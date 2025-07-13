@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.11] - 2024-12-19
+
+### Fixed
+
+- **Languages Cache Loading**: Fixed issue where cached languages weren't loaded on initialization
+  - Added automatic loading of cached languages from localStorage on SDK initialization
+  - Languages list is now properly restored from cache after page reload
+  - Eliminates unnecessary API calls for `/languages` endpoint on page reload
+  - Improved performance by avoiding repeated language list requests
+
+### Technical
+
+- **Cache Initialization**: Added localStorage loading logic in `useLangieCore` initialization
+- **Cache Preservation**: Language cache is preserved when clearing translation cache
+- **Performance**: Reduced API calls by properly utilizing cached language data
+
 ## [1.9.10] - 2024-12-19
 
 ### Fixed
