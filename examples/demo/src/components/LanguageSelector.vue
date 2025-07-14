@@ -3,7 +3,7 @@
     <div class="grid grid-cols-5 gap-4 items-end">
       <div class="col-span-2">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          <lt orig="en">Source Language</lt>
+          <lt>Source Language</lt>
         </label>
         <LanguageSelect
           :model-value="sourceLang"
@@ -26,7 +26,7 @@
       </div>
       <div class="col-span-2">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          <lt orig="en">Target Language</lt>
+          <lt>Target Language</lt>
         </label>
         <LanguageSelect
           :model-value="targetLang"

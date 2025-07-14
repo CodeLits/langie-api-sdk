@@ -3,4 +3,4 @@ description: Enchance the code with the following rules
 globs:
 alwaysApply: false
 ---
-Remove duplicating code and spaghetti from entire project. Introduce constants. Rewrite structure if you see mistakes. Add types, rewriting js to ts where its possible. Start with pages. Check project deps usage. Remove unused deps. Find the vulnerabilities in code, security issues, duplicates. All docs should have refs in readme. No dupe information allowed. Should be clean and prod-ready.
+Remove duplicating code and spaghetti from entire project. Introduce constants. Rewrite structure if you see mistakes. Add types, rewriting js to ts where its possible. Start with documentation. Check project deps usage. Remove unused deps. Find the vulnerabilities in code, security issues, duplicates. All docs should have refs in readme. No dupe information allowed. Should be clean and prod-ready.

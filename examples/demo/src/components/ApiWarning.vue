@@ -13,14 +13,14 @@
     <ExclamationTriangleIcon v-else class="w-6 h-6 mt-0.5 flex-shrink-0" />
     <div>
       <span class="font-medium">
-        <lt v-if="serviceStatus.includes('Offline')" orig="en">API Offline</lt>
-        <lt v-else orig="en">Rate Limit</lt>
+        <lt v-if="serviceStatus.includes('Offline')">API Offline</lt>
+        <lt v-else>Rate Limit</lt>
       </span>
       <div class="mt-1">
-        <lt v-if="serviceStatus.includes('Offline')" orig="en">
+        <lt v-if="serviceStatus.includes('Offline')">
           The translation service is currently offline. Using a fallback list of languages.
         </lt>
-        <lt v-else orig="en">
+        <lt v-else>
           API rate limit may have been reached. Language list may be incomplete. Please wait a
           moment.
         </lt>

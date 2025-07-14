@@ -2,7 +2,7 @@
   <div>
     <div class="mb-6">
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-        <lt orig="en">Text to translate</lt>
+        <lt>Text to translate</lt>
       </label>
       <input
         :value="textToTranslate"
@@ -20,15 +20,15 @@
       class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
       @click="$emit('translate')"
     >
-      <span v-if="isLoading"><lt orig="en">Translating...</lt></span>
+      <span v-if="isLoading"><lt>Translating...</lt></span>
       <span v-else-if="rateLimited && !isRateLimitExpired">
-        <lt orig="en">Rate Limited - Please Wait</lt>
+        <lt>Rate Limited - Please Wait</lt>
       </span>
-      <span v-else><lt orig="en">Translate</lt></span>
+      <span v-else><lt>Translate</lt></span>
     </button>
 
     <div v-if="translation" class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
-      <h2 class="text-lg font-semibold mb-2"><lt orig="en">Translation</lt></h2>
+      <h2 class="text-lg font-semibold mb-2"><lt>Translation</lt></h2>
       <p class="text-gray-800 dark:text-gray-100">{{ translation }}</p>
     </div>
 

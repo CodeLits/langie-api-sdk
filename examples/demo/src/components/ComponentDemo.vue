@@ -2,14 +2,14 @@
   <div class="mt-8 border-t pt-6 dark:border-gray-700">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-        <lt orig="en">Vue Components Demo</lt>
+        <lt>Vue Components Demo</lt>
       </h2>
       <button
         class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
         @click="showDemo = !showDemo"
       >
-        <lt v-if="showDemo" orig="en">Hide Demo</lt>
-        <lt v-else orig="en">Show Demo</lt>
+        <lt v-if="showDemo">Hide Demo</lt>
+        <lt v-else>Show Demo</lt>
       </button>
     </div>
 
@@ -20,7 +20,7 @@
           Advanced <span class="text-blue-500">{{ '<LanguageSelect />' }}</span>
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          <lt orig="en">Features: Smart search, smart flags detection</lt>
+          <lt>Features: Smart search, smart flags detection</lt>
         </p>
         <div class="max-w-md">
           <LanguageSelect
@@ -32,7 +32,7 @@
           />
         </div>
         <div v-if="demoLangAdvanced" class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-          <lt orig="en">Selected:</lt> {{ demoLangAdvanced.name }} ({{ demoLangAdvanced.code }})
+          <lt>Selected:</lt> {{ demoLangAdvanced.name }} ({{ demoLangAdvanced.code }})
           <span v-if="demoLangAdvanced.native_name"> - {{ demoLangAdvanced.native_name }}</span>
         </div>
       </div>
@@ -43,7 +43,7 @@
           <span class="text-blue-500">{{ '<InterfaceLanguageSelect />' }}</span>
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          <lt orig="en">
+          <lt>
             Features: Auto API integration, browser language detection, smart search, smart flags
             detection
           </lt>
@@ -56,9 +56,7 @@
           />
         </div>
         <div v-if="selectedInterfaceLang" class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-          <lt orig="en">Selected:</lt> {{ selectedInterfaceLang.name }} ({{
-            selectedInterfaceLang.code
-          }})
+          <lt>Selected:</lt> {{ selectedInterfaceLang.name }} ({{ selectedInterfaceLang.code }})
           <span v-if="selectedInterfaceLang.native_name">
             - {{ selectedInterfaceLang.native_name }}</span
           >
@@ -71,7 +69,7 @@
           <span class="text-blue-500">{{ '<SimpleLanguageSelect />' }}</span>
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          <lt orig="en">Features: Perfect device integration, HTML select, no dependencies</lt>
+          <lt>Features: Perfect device integration, HTML select, no dependencies</lt>
         </p>
         <div class="max-w-md">
           <SimpleLanguageSelect
@@ -83,7 +81,7 @@
           />
         </div>
         <div v-if="demoLangSimple" class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-          <lt orig="en">Selected:</lt> {{ demoLangSimple.name }} ({{ demoLangSimple.code }})
+          <lt>Selected:</lt> {{ demoLangSimple.name }} ({{ demoLangSimple.code }})
           <span v-if="demoLangSimple.native_name"> - {{ demoLangSimple.native_name }}</span>
         </div>
       </div>
@@ -93,23 +91,23 @@
         class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
       >
         <h4 class="font-medium text-blue-900 dark:text-blue-200 mb-2">
-          <lt orig="en">When to use which component?</lt>
+          <lt>When to use which component?</lt>
         </h4>
         <div class="text-sm text-blue-800 dark:text-blue-300 space-y-2">
           <div>
-            <strong><lt orig="en">LanguageSelect:</lt></strong>
+            <strong><lt>LanguageSelect:</lt></strong>
             <br />
-            <lt orig="en">Smart name/code search, flags, autocomplete</lt>
+            <lt>Smart name/code search, flags, autocomplete</lt>
           </div>
           <div>
-            <strong><lt orig="en">InterfaceLanguageSelect:</lt></strong>
+            <strong><lt>InterfaceLanguageSelect:</lt></strong>
             <br />
-            <lt orig="en">For switching app interface language (auto API, smart search)</lt>
+            <lt>For switching app interface language (auto API, smart search)</lt>
           </div>
           <div>
-            <strong><lt orig="en">SimpleLanguageSelect:</lt></strong>
+            <strong><lt>SimpleLanguageSelect:</lt></strong>
             <br />
-            <lt orig="en">Perfect for native device integration</lt>
+            <lt>Perfect for native device integration</lt>
           </div>
         </div>
       </div>

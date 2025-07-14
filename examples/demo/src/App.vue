@@ -313,7 +313,7 @@ watch(
 
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          <lt orig="en">Interface Language</lt>
+          <lt>Interface Language</lt>
         </label>
         <InterfaceLanguageSelect
           placeholder="UI Language"
