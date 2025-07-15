@@ -193,9 +193,9 @@ export function useLangieCore(options: TranslatorOptions = {}) {
       availableLanguages.value = filtered
       devDebug('[useLangie] Set availableLanguages:', filtered.length)
 
-      // Save languages to localStorage with TTL (30 days for languages)
+      // Save languages to localStorage with TTL (7 days for languages)
       if (typeof window !== 'undefined') {
-        const saved = setCache('langie_languages_cache', filtered, 30 * 24 * 60 * 60 * 1000)
+        const saved = setCache('langie_languages_cache', filtered, 7 * 24 * 60 * 60 * 1000)
         devDebug(
           '[useLangie] Saved languages to cache:',
           saved ? 'success' : 'failed',

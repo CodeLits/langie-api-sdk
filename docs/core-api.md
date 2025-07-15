@@ -177,7 +177,7 @@ The SDK automatically caches translations and language lists to improve performa
 
 ### Language List Caching
 
-- **Persistent Cache**: The list of available languages is cached in localStorage with TTL (30 days)
+- **Persistent Cache**: The list of available languages is cached in localStorage with TTL (7 days)
 - **Automatic Loading**: Cached languages are loaded on initialization, avoiding unnecessary API calls
 - **Cache Preservation**: Language cache is preserved when clearing translation cache
 
@@ -206,7 +206,7 @@ The SDK uses intelligent cache management with the following defaults:
 
 - **TTL (Time To Live)**:
   - Translations: 7 days
-  - Languages: 30 days
+  - Languages: 7 days
 - **Size Limits**:
   - Maximum cache size: 2MB
   - Maximum items: 1000

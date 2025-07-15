@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.14] - 2024-12-19
+
+### Changed
+
+- **Languages Cache TTL**: Reduced TTL for languages cache from 30 days to 7 days
+  - Languages list now expires after 7 days instead of 30 days
+  - More frequent updates ensure users get the latest language list
+  - Balances performance with data freshness
+
+### Documentation
+
+- **Updated Core API**: Updated documentation to reflect new 7-day TTL for languages
+- **Consistent TTL**: Both translations and languages now use 7-day TTL
+
 ## [1.9.13] - 2024-12-19
 
 ### Fixed
