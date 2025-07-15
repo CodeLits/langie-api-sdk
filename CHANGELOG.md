@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.15] - 2024-12-19
+
+### Fixed
+
+- **Translation Context Conflicts**: Fixed issue where translations could appear on wrong elements
+  - Improved context handling to use original request context instead of response context
+  - Fixed context fallback logic to respect explicitly provided contexts
+  - Enhanced cache key generation to prevent translation conflicts
+  - Added debug logging to track translation caching operations
+
+### Enhanced
+
+- **Context Handling**: Improved context resolution logic
+  - Explicitly provided contexts are now properly respected
+  - Global defaults are only used when context is not explicitly provided
+  - Better separation between UI and content translations
+
+### Technical
+
+- **Cache Key Generation**: More robust cache key generation prevents conflicts
+- **Debug Support**: Added comprehensive logging for translation caching
+- **Request Tracking**: Better tracking of original request context through translation pipeline
+
 ## [1.9.14] - 2024-12-19
 
 ### Changed

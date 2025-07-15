@@ -10,6 +10,7 @@ import {
   API_FIELD_TRANSLATIONS
 } from './constants'
 import { setCache, getCache } from './utils/cache'
+import { devDebug } from './utils/debug'
 
 // Global singleton instance
 type LangieInstance = ReturnType<typeof createLangieInstance> & { translatorHost?: string }
@@ -165,12 +166,9 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
         translationsArray.forEach((translation: TranslationWithContext, index: number) => {
           const reqIdx = batchIdx * translationsArray.length + index
-          const originalText = requests[reqIdx]?.[API_FIELD_TEXT]
-          const ctx =
-            translation[API_FIELD_CTX] ||
-            requests[reqIdx]?.[API_FIELD_CTX] ||
-            ltDefaults.ctx ||
-            'ui'
+          const request = requests[reqIdx]
+          const originalText = request?.[API_FIELD_TEXT]
+
           if (!originalText) {
             return
           }
@@ -182,13 +180,22 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
           const translatedText = translation[API_FIELD_TEXT]
           if (translatedText) {
-            // Determine the correct context and cache
-            const effectiveCtx = ctx || ltDefaults.ctx || 'ui'
+            // Use the context from the original request, not from the response
+            const originalCtx = request[API_FIELD_CTX]
+            const effectiveCtx = originalCtx !== undefined ? originalCtx : ltDefaults.ctx || 'ui'
             const cacheKey = `${originalText}|${effectiveCtx}`
             const cache = effectiveCtx === 'ui' ? uiTranslations : translations
 
             // Cache the translation
             cache[cacheKey] = translatedText
+
+            // Debug logging
+            devDebug('[useLangie] Cached translation:', {
+              original: originalText,
+              translated: translatedText,
+              context: effectiveCtx,
+              cacheKey
+            })
 
             // Save to localStorage
             saveCachedTranslations()
@@ -216,8 +223,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       return text
     }
 
-    // Use global defaults or fallback to 'ui'
-    const effectiveCtx = ctx || ltDefaults.ctx || 'ui'
+    // Use provided context or global defaults, but don't fallback to 'ui' if ctx is explicitly provided
+    const effectiveCtx = ctx !== undefined ? ctx : ltDefaults.ctx || 'ui'
     const cacheKey = `${text}|${effectiveCtx}`
     const cache = effectiveCtx === 'ui' ? uiTranslations : translations
 
@@ -265,8 +272,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       return text
     }
 
-    // Use global defaults or fallback to 'ui'
-    const effectiveCtx = ctx || ltDefaults.ctx || 'ui'
+    // Use provided context or global defaults, but don't fallback to 'ui' if ctx is explicitly provided
+    const effectiveCtx = ctx !== undefined ? ctx : ltDefaults.ctx || 'ui'
     const cacheKey = `${text}|${effectiveCtx}`
     const cache = effectiveCtx === 'ui' ? uiTranslations : translations
 
@@ -344,7 +351,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       if (result[API_FIELD_TRANSLATIONS]) {
         result[API_FIELD_TRANSLATIONS].forEach(
           (translation: TranslationWithContext, index: number) => {
-            const originalText = items[index]?.[API_FIELD_TEXT]
+            const item = items[index]
+            const originalText = item?.[API_FIELD_TEXT]
             if (!originalText) {
               return
             }
@@ -358,10 +366,20 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             // Handle translation response
             const translatedText = translation[API_FIELD_TEXT]
             if (translatedText) {
-              const translationCtx = translation[API_FIELD_CTX] || effectiveCtx
+              // Use the context from the original item, not from the response
+              const originalCtx = item[API_FIELD_CTX]
+              const translationCtx = originalCtx !== undefined ? originalCtx : effectiveCtx
               const cacheKey = `${originalText}|${translationCtx}`
               const cache = translationCtx === 'ui' ? uiTranslations : translations
               cache[cacheKey] = translatedText
+
+              // Debug logging
+              devDebug('[useLangie] Cached translation (batch):', {
+                original: originalText,
+                translated: translatedText,
+                context: translationCtx,
+                cacheKey
+              })
 
               // Save to localStorage
               saveCachedTranslations()
