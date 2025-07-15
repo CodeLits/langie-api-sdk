@@ -66,11 +66,19 @@ export function useLangieCore(options: TranslatorOptions = {}) {
   }
 
   // Load cached languages from localStorage if available
-  if (typeof window !== 'undefined' && availableLanguages.value.length === 0) {
+  if (typeof window !== 'undefined') {
     const cachedLanguages = getCache<TranslatorLanguage[]>('langie_languages_cache')
-    if (cachedLanguages) {
+    if (cachedLanguages && availableLanguages.value.length === 0) {
       availableLanguages.value = cachedLanguages
       _languagesCache = cachedLanguages
+      devDebug('[useLangie] Loaded languages from cache:', cachedLanguages.length)
+    } else if (cachedLanguages) {
+      devDebug(
+        '[useLangie] Cache exists but languages already loaded:',
+        availableLanguages.value.length
+      )
+    } else {
+      devDebug('[useLangie] No cached languages found')
     }
   }
 
@@ -90,11 +98,20 @@ export function useLangieCore(options: TranslatorOptions = {}) {
     const { force = false, country: explicitCountry } = opts
     // const startTime = Date.now()
 
+    devDebug('[useLangie] fetchLanguages called:', {
+      force,
+      hasCache: !!_languagesCache,
+      hasPromise: !!_languagesPromise,
+      availableLanguagesLength: availableLanguages.value.length
+    })
+
     if (!force) {
       if (_languagesCache) {
+        devDebug('[useLangie] Returning cached languages:', _languagesCache.length)
         return _languagesCache
       }
       if (_languagesPromise) {
+        devDebug('[useLangie] Returning existing promise')
         return _languagesPromise
       }
     }
@@ -174,10 +191,16 @@ export function useLangieCore(options: TranslatorOptions = {}) {
       })
 
       availableLanguages.value = filtered
+      devDebug('[useLangie] Set availableLanguages:', filtered.length)
 
       // Save languages to localStorage with TTL (30 days for languages)
       if (typeof window !== 'undefined') {
-        setCache('langie_languages_cache', filtered, 30 * 24 * 60 * 60 * 1000)
+        const saved = setCache('langie_languages_cache', filtered, 30 * 24 * 60 * 60 * 1000)
+        devDebug(
+          '[useLangie] Saved languages to cache:',
+          saved ? 'success' : 'failed',
+          filtered.length
+        )
       }
 
       // Auto-select browser language only once if not previously saved

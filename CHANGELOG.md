@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.13] - 2024-12-19
+
+### Fixed
+
+- **Languages Cache Loading**: Fixed issue where cached languages weren't properly loaded on initialization
+  - Improved cache loading logic to check for cached languages regardless of availableLanguages state
+  - Added comprehensive debug logging to track cache loading and saving operations
+  - Enhanced cache loading to work correctly in all initialization scenarios
+  - Fixed race condition where cache could be overwritten during initialization
+
+### Enhanced
+
+- **Debug Logging**: Added detailed debug information for cache operations
+  - Cache loading status is now logged with language count
+  - Cache saving status is logged with success/failure indication
+  - fetchLanguages calls are logged with cache state information
+  - Better visibility into cache behavior for debugging
+
+### Technical
+
+- **Cache Logic**: Improved cache loading condition to be more robust
+- **Debug Support**: Enhanced debugging capabilities for cache-related issues
+- **Performance**: Better cache utilization reduces unnecessary API calls
+
 ## [1.9.12] - 2024-12-19
 
 ### Added
