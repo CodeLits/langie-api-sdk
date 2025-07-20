@@ -10,7 +10,8 @@ Lightweight translation SDK for Vue.js, Nuxt.js, and vanilla JavaScript applicat
 ## Requirements
 
 - Node.js 18.0.0 or higher
-- Vue 3.x
+- Vue 3.2.0 or higher
+- Nuxt 3.0.0 or higher (optional)
 - Modern browser with ES2020+ support
 
 ## Installation
@@ -94,6 +95,7 @@ const { setLanguage } = useLangie()
 - **[Backend Integration](./docs/backend-integration.md)** - API requirements and setup
 - **[TypeScript Support](./docs/typescript.md)** - TypeScript integration guide
 - **[Contributing](./docs/contributing.md)** - Development and contribution guidelines
+- **[Compatibility Guide](./COMPATIBILITY.md)** - Version requirements and compatibility
 
 ## Required CSS
 

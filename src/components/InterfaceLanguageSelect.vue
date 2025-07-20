@@ -118,9 +118,6 @@ async function handleLanguageChange(selectedLanguage: TranslatorLanguage | null)
     isChangingLanguage.value = true
 
     try {
-      // Simulate language change delay (in real app this would be actual translation loading)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
       setLanguage(selectedLanguage.code)
       // Save to localStorage when user manually changes language
       localStorage.setItem('interface_language', selectedLanguage.code)

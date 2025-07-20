@@ -328,12 +328,12 @@ const onFlagError = (event: Event) => {
 :deep(.lang-flag) {
   width: 20px;
   height: 15px;
-  margin-right: 10px;
   border: 1px solid v-bind('COLORS.border.flag');
   border-radius: 2px;
   object-fit: cover;
   flex-shrink: 0;
   display: block;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .is-dark :deep(.lang-flag) {
@@ -346,12 +346,13 @@ const onFlagError = (event: Event) => {
   align-items: center;
   min-width: 0;
   width: 100%;
-  padding-left: 0;
-  padding-right: 0;
+  padding: 12px 16px !important;
+  gap: 8px;
 }
 
 :deep(.multiselect-option) {
   text-align: left;
+  transition: background-color 0.15s ease;
 }
 
 :deep(.multiselect-single-label span),
@@ -361,8 +362,8 @@ const onFlagError = (event: Event) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-left: 0;
   flex: 1;
+  line-height: 1.4;
 }
 
 :deep(.native-name) {
@@ -373,6 +374,15 @@ const onFlagError = (event: Event) => {
 
 .is-dark :deep(.native-name) {
   color: v-bind('COLORS.neutral.gray400');
+}
+
+:deep(.multiselect) {
+  width: 100%;
+  min-width: 200px;
+}
+
+:deep(.multiselect-dropdown) {
+  padding: 8px 0;
 }
 
 :deep(.multiselect-no-results),

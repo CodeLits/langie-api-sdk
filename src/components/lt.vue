@@ -10,9 +10,9 @@ import { ref, nextTick } from 'vue'
 import { useLangie } from '../useLangie'
 
 // Define component name for better debugging
-defineOptions({
-  name: 'LangieTranslate'
-})
+// Component name for Vue devtools
+// Note: defineOptions requires Vue 3.3+, but we support Vue 3.2+
+// The component will work without explicit name
 
 // Detect if we're running in Nuxt
 const isNuxt = computed(() => {

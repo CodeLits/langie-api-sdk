@@ -19,9 +19,9 @@ import type { PropType } from 'vue'
 import { COLORS } from '../constants/colors'
 import type { TranslatorLanguage } from '../types'
 
-defineOptions({
-  name: 'SimpleLanguageSelect'
-})
+// Component name for Vue devtools
+// Note: defineOptions requires Vue 3.3+, but we support Vue 3.2+
+// The component will work without explicit name
 
 const props = defineProps({
   modelValue: {

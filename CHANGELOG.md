@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.21] - 2024-12-19
+
+### Added
+
+- **Framework Compatibility**: Added support for oldest LTS versions
+  - Vue 3.2.0+ support (minimum required for defineProps/defineEmits)
+  - Nuxt 3.0.0+ support (optional peer dependency)
+  - Removed defineOptions usage for better compatibility
+  - Added comprehensive compatibility guide
+
+### Enhanced
+
+- **Documentation**: Added detailed compatibility information
+  - Created COMPATIBILITY.md with version requirements
+  - Updated README with clear version requirements
+  - Added troubleshooting guide for common issues
+  - Documented migration paths from older versions
+
+### Technical
+
+- **Vue Compatibility**: Ensured compatibility with Vue 3.2.0+
+  - Removed defineOptions (requires Vue 3.3+)
+  - Kept defineProps/defineEmits (requires Vue 3.2+)
+  - Added Nuxt as optional peer dependency
+- **Documentation**: Comprehensive compatibility documentation
+
 ## [1.9.20] - 2024-12-19
 
 ### Added
