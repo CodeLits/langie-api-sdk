@@ -223,11 +223,11 @@ watch(
 }
 
 .interface-language-select-wrapper :deep(.multiselect-dropdown) {
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
 .interface-language-select-wrapper :deep(.multiselect-option) {
-  padding: 8px 12px;
+  padding: 4px 8px;
   margin: 0;
   border-radius: 0;
 }

@@ -84,18 +84,29 @@ const { setLanguage } = useLangie()
 
 ## Documentation
 
+📚 **[Full Documentation](./docs/README.md)** - Complete documentation with learning paths
+
+### Quick Links
+
 - **[Getting Started](./docs/getting-started.md)** - Installation and basic setup
 - **[Vue.js Usage](./docs/vue.md)** - Vue composables, components, and best practices
-- **[Nuxt.js Integration](./docs/nuxt.md)** - SSR support, plugins, and deployment
-- **[JavaScript Usage](./docs/javascript.md)** - Vanilla JS, React, and Node.js integration
 - **[Components](./docs/components.md)** - Ready-to-use Vue components
 - **[Composables](./docs/composables.md)** - Vue composables and reactive state
-- **[Core API](./docs/core-api.md)** - Core translation functions
 - **[Advanced Usage](./docs/advanced-usage.md)** - Complex patterns and optimization
-- **[Backend Integration](./docs/backend-integration.md)** - API requirements and setup
-- **[TypeScript Support](./docs/typescript.md)** - TypeScript integration guide
-- **[Contributing](./docs/contributing.md)** - Development and contribution guidelines
+- **[Best Practices](./docs/best-practices.md)** - Performance, security, and testing guidelines
 - **[Compatibility Guide](./COMPATIBILITY.md)** - Version requirements and compatibility
+
+### Framework Guides
+
+- **[Nuxt.js Integration](./docs/nuxt.md)** - SSR support, plugins, and deployment
+- **[JavaScript Usage](./docs/javascript.md)** - Vanilla JS, React, and Node.js integration
+- **[TypeScript Support](./docs/typescript.md)** - TypeScript integration guide
+
+### API & Development
+
+- **[Core API](./docs/core-api.md)** - Core translation functions
+- **[Backend Integration](./docs/backend-integration.md)** - API requirements and setup
+- **[Contributing](./docs/contributing.md)** - Development and contribution guidelines
 
 ## Required CSS
 
