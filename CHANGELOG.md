@@ -27,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added quick reference and search index
   - Updated main README with improved documentation structure
 
+- **Project Structure**: Simplified project organization
+  - Created CONTRIBUTING.md for quick contribution guidelines
+  - Added CODE_OF_CONDUCT.md for community standards
+  - Created SECURITY.md for security policy and reporting
+  - Updated .npmignore to exclude development files
+
 ### Technical
 
 - **Vue Compatibility**: Ensured compatibility with Vue 3.2.0+

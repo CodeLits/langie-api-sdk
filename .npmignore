@@ -5,6 +5,12 @@ vitest.config.ts
 .eslintrc.js
 .prettierrc.json
 
+# Development files
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+COMPATIBILITY.md
+
 # Tests
 **/__tests__
 **/*.spec.ts
