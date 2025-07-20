@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.18] - 2024-12-19
+
+### Fixed
+
+- **Cache Preservation**: Removed unnecessary cache clearing when switching languages
+  - Cache is now preserved for each language to improve performance
+  - Translations are loaded from cache when returning to previously used language
+  - Only pending requests are cancelled to prevent race conditions
+
+### Enhanced
+
+- **Performance**: Improved language switching performance
+  - No more unnecessary cache clearing on language change
+  - Faster switching back to previously used languages
+  - Better user experience with instant translations from cache
+
 ## [1.9.17] - 2024-12-19
 
 ### Fixed

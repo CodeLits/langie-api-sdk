@@ -441,10 +441,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
   // Watch for language changes - load translations for new language
   watch(currentLanguage, () => {
-    // Clear memory cache
-    Object.keys(translations).forEach((key) => delete translations[key])
-    Object.keys(uiTranslations).forEach((key) => delete uiTranslations[key])
-
     // Clear recently queued cache to prevent race conditions
     recentlyQueued.clear()
 
