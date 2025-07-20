@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.17] - 2024-12-19
+
+### Fixed
+
+- **Race Condition in Language Switching**: Fixed issue where translations from previous language could override current language
+  - Added language validation to prevent outdated translations from being cached
+  - Clear pending requests when language changes to prevent race conditions
+  - Enhanced debug logging to track language mismatches
+
+### Enhanced
+
+- **Language Change Handling**: Improved language switching reliability
+  - Translations are now validated against current language before caching
+  - Pending requests are cancelled when language changes
+  - Better cleanup of translation queues on language switch
+
+### Technical
+
+- **Race Condition Prevention**: Added checks to ensure translations match current language
+- **Request Management**: Improved cleanup of pending translation requests
+- **Debug Support**: Enhanced logging for language validation and request cancellation
+
 ## [1.9.16] - 2024-12-19
 
 ### Enhanced

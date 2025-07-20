@@ -180,6 +180,18 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
           const translatedText = translation[API_FIELD_TEXT]
           if (translatedText) {
+            // Check if the target language is still current
+            const requestedLanguage = request[API_FIELD_TO]
+            if (requestedLanguage !== currentLanguage.value) {
+              devDebug('[useLangie] Skipping outdated translation:', {
+                original: originalText,
+                translated: translatedText,
+                requestedLanguage,
+                currentLanguage: currentLanguage.value
+              })
+              return
+            }
+
             // Skip caching if translation equals original text
             if (translatedText === originalText) {
               devDebug('[useLangie] Skipping cache for identical translation:', {
@@ -204,7 +216,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
               original: originalText,
               translated: translatedText,
               context: effectiveCtx,
-              cacheKey
+              cacheKey,
+              language: requestedLanguage
             })
 
             // Save to localStorage
@@ -376,6 +389,17 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             // Handle translation response
             const translatedText = translation[API_FIELD_TEXT]
             if (translatedText) {
+              // Check if the target language is still current
+              if (to !== currentLanguage.value) {
+                devDebug('[useLangie] Skipping outdated translation (batch):', {
+                  original: originalText,
+                  translated: translatedText,
+                  requestedLanguage: to,
+                  currentLanguage: currentLanguage.value
+                })
+                return
+              }
+
               // Skip caching if translation equals original text
               if (translatedText === originalText) {
                 devDebug('[useLangie] Skipping cache for identical translation (batch):', {
@@ -398,7 +422,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
                 original: originalText,
                 translated: translatedText,
                 context: translationCtx,
-                cacheKey
+                cacheKey,
+                language: to
               })
 
               // Save to localStorage
@@ -420,9 +445,13 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     Object.keys(translations).forEach((key) => delete translations[key])
     Object.keys(uiTranslations).forEach((key) => delete uiTranslations[key])
 
+    // Clear recently queued cache to prevent race conditions
+    recentlyQueued.clear()
+
     // Load cached translations for new language
     loadCachedTranslations()
 
+    // Cleanup batching to cancel pending requests
     batching.cleanup()
   })
 
