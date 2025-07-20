@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.16] - 2024-12-19
+
+### Enhanced
+
+- **Cache Optimization**: Skip caching when translation equals original text
+  - Prevents unnecessary cache entries for identical translations
+  - Reduces cache size and potential conflicts
+  - Added debug logging for skipped identical translations
+
+### Technical
+
+- **Cache Efficiency**: Improved cache management by avoiding redundant entries
+- **Debug Support**: Enhanced logging to track when translations are skipped
+
 ## [1.9.15] - 2024-12-19
 
 ### Fixed

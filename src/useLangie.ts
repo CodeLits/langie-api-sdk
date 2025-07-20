@@ -180,6 +180,16 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
           const translatedText = translation[API_FIELD_TEXT]
           if (translatedText) {
+            // Skip caching if translation equals original text
+            if (translatedText === originalText) {
+              devDebug('[useLangie] Skipping cache for identical translation:', {
+                original: originalText,
+                translated: translatedText,
+                context: request[API_FIELD_CTX] || ltDefaults.ctx || 'ui'
+              })
+              return
+            }
+
             // Use the context from the original request, not from the response
             const originalCtx = request[API_FIELD_CTX]
             const effectiveCtx = originalCtx !== undefined ? originalCtx : ltDefaults.ctx || 'ui'
@@ -366,6 +376,16 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             // Handle translation response
             const translatedText = translation[API_FIELD_TEXT]
             if (translatedText) {
+              // Skip caching if translation equals original text
+              if (translatedText === originalText) {
+                devDebug('[useLangie] Skipping cache for identical translation (batch):', {
+                  original: originalText,
+                  translated: translatedText,
+                  context: item[API_FIELD_CTX] || effectiveCtx
+                })
+                return
+              }
+
               // Use the context from the original item, not from the response
               const originalCtx = item[API_FIELD_CTX]
               const translationCtx = originalCtx !== undefined ? originalCtx : effectiveCtx
