@@ -13,9 +13,9 @@ NC='\033[0m' # No Color
 
 echo -e "${GREEN}🧪 Running tests for langie-api-sdk${NC}"
 
-# Check if bun is available
-if ! command -v bun &> /dev/null; then
-    echo -e "${RED}❌ Bun is not installed. Please install bun first.${NC}"
+# Check if pnpm is available
+if ! command -v pnpm &> /dev/null; then
+    echo -e "${RED}❌ pnpm is not installed. Please install pnpm first.${NC}"
     exit 1
 fi
 
@@ -55,10 +55,10 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Build the command
-CMD="bun test"
+CMD="pnpm test"
 
 if [ "$WATCH" = true ]; then
-    CMD="bun test:watch"
+    CMD="pnpm test:watch"
     echo -e "${YELLOW}📺 Running tests in watch mode...${NC}"
 elif [ "$COVERAGE" = true ]; then
     CMD="$CMD --coverage"

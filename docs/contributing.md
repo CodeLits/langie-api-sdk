@@ -7,11 +7,11 @@ Thank you for your interest in contributing to Langie API SDK! This document pro
 1. Fork and clone the repository
 2. Install dependencies:
    ```bash
-   bun install
+   pnpm install
    ```
 3. Start development:
    ```bash
-   cd examples/demo && bun run dev
+   cd examples/demo && pnpm run dev
    ```
 
 ## Project Structure
@@ -51,28 +51,28 @@ langie-api-sdk/
 2. Make your changes and ensure they follow the coding standards:
 
    ```bash
-   bun run lint
-   bun run format
+   pnpm run lint
+   pnpm run format
    ```
 
 3. Write tests for your changes:
 
    ```bash
-   bun run test
+   pnpm run test
    ```
 
 4. Test the demo application:
 
    ```bash
    cd examples/demo
-   bun install
-   bun run dev
+   pnpm install
+   pnpm run dev
    ```
 
 5. Build the package to ensure it works:
 
    ```bash
-   bun run build
+   pnpm run build
    ```
 
 6. Commit your changes following [Conventional Commits](https://www.conventionalcommits.org/):
@@ -107,13 +107,13 @@ Run tests with:
 
 ```bash
 # Run all tests
-bun run test
+pnpm run test
 
 # Watch mode
-bun run test:watch
+pnpm run test:watch
 
 # Coverage
-bun run test -- --coverage
+pnpm run test -- --coverage
 ```
 
 ## Building
@@ -121,7 +121,7 @@ bun run test -- --coverage
 Build the package with:
 
 ```bash
-bun run build
+pnpm run build
 ```
 
 This creates:
@@ -143,8 +143,8 @@ To work on the demo:
 
 ```bash
 cd examples/demo
-bun install
-bun run dev
+pnpm install
+pnpm run dev
 ```
 
 ## Documentation

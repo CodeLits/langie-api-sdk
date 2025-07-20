@@ -29,11 +29,14 @@
             :alt="`${value.native_name || value.name} flag`"
             @error="onFlagError"
           />
-          <span>{{ value.native_name || value.name }}</span>
+          <span
+            >{{ value.name }}
+            <span class="native-name">({{ value.native_name || value.name }})</span></span
+          >
         </div>
       </template>
       <template #option="{ option }">
-        <div class="multiselect-option">
+        <div class="multiselect-option" :data-lang-code="option.code">
           <img
             :key="`${option.code}-${option.flag_country || 'fallback'}`"
             :src="`https://flagcdn.com/${getFlagCode(option)}.svg`"
@@ -329,6 +332,8 @@ const onFlagError = (event: Event) => {
   border: 1px solid v-bind('COLORS.border.flag');
   border-radius: 2px;
   object-fit: cover;
+  flex-shrink: 0;
+  display: block;
 }
 
 .is-dark :deep(.lang-flag) {
@@ -339,6 +344,34 @@ const onFlagError = (event: Event) => {
 :deep(.multiselect-option) {
   display: flex;
   align-items: center;
+  min-width: 0;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+:deep(.multiselect-option) {
+  text-align: left;
+}
+
+:deep(.multiselect-single-label span),
+:deep(.multiselect-option span) {
+  display: block;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 0;
+  flex: 1;
+}
+
+/* Debug styles for specific languages */
+:deep(.multiselect-option[data-lang-code='it']) {
+  background-color: rgba(255, 0, 0, 0.1) !important;
+}
+
+:deep(.multiselect-option[data-lang-code='pl']) {
+  background-color: rgba(0, 255, 0, 0.1) !important;
 }
 
 :deep(.native-name) {

@@ -1,20 +1,36 @@
 <template>
-  <LanguageSelect
-    :model-value="currentLanguageObject"
-    :languages="effectiveLanguages"
-    :placeholder="props.placeholder"
-    :disabled="props.disabled"
-    :is-dark="props.isDark"
-    @update:model-value="handleLanguageChange"
-  />
+  <div class="interface-language-select-wrapper">
+    <LanguageSelect
+      :key="`interface-lang-${effectiveLanguages.length}`"
+      :model-value="currentLanguageObject"
+      :languages="effectiveLanguages"
+      :placeholder="props.placeholder"
+      :disabled="props.disabled || isChangingLanguage"
+      :is-dark="props.isDark"
+      @update:model-value="handleLanguageChange"
+    />
+
+    <!-- Loading overlay -->
+    <div
+      v-if="isChangingLanguage"
+      class="language-change-loader"
+      :class="{ 'is-dark': props.isDark }"
+    >
+      <div class="loader-spinner"></div>
+      <span class="loader-text">Changing language...</span>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, onMounted } from 'vue'
+import { computed, watch, onMounted, ref } from 'vue'
 import LanguageSelect from './LanguageSelect.vue'
 import { useLangie } from '../useLangie'
 import type { TranslatorLanguage } from '../types'
 import { getCountryCode } from '../utils/getCountryCode'
+
+// Loading state for language change
+const isChangingLanguage = ref(false)
 
 const props = defineProps({
   placeholder: {
@@ -50,10 +66,17 @@ const { availableLanguages, currentLanguage, setLanguage, fetchLanguages } = use
 
 // Use provided languages if available, otherwise use SDK's languages
 const effectiveLanguages = computed(() => {
-  if (props.languages && props.languages.length > 0) {
-    return props.languages
-  }
-  return availableLanguages.value
+  const languages =
+    props.languages && props.languages.length > 0 ? props.languages : availableLanguages.value
+
+  // Ensure all languages have required fields to prevent jumping
+  return languages
+    .map((lang) => ({
+      ...lang,
+      native_name: lang.native_name || lang.name,
+      flag_country: lang.flag_country || lang.code
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name)) // Stable sorting
 })
 
 const currentLanguageObject = computed(() => {
@@ -89,12 +112,23 @@ function detectBrowserLanguage(languages: TranslatorLanguage[]): string | null {
   return null
 }
 
-function handleLanguageChange(selectedLanguage: TranslatorLanguage | null) {
+async function handleLanguageChange(selectedLanguage: TranslatorLanguage | null) {
   if (selectedLanguage) {
-    setLanguage(selectedLanguage.code)
-    // Save to localStorage when user manually changes language
-    localStorage.setItem('interface_language', selectedLanguage.code)
-    emit('update:modelValue', selectedLanguage)
+    // Start loading
+    isChangingLanguage.value = true
+
+    try {
+      // Simulate language change delay (in real app this would be actual translation loading)
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      setLanguage(selectedLanguage.code)
+      // Save to localStorage when user manually changes language
+      localStorage.setItem('interface_language', selectedLanguage.code)
+      emit('update:modelValue', selectedLanguage)
+    } finally {
+      // End loading
+      isChangingLanguage.value = false
+    }
   }
 }
 
@@ -177,3 +211,64 @@ watch(
   { immediate: true }
 )
 </script>
+
+<style scoped>
+.interface-language-select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.language-change-loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+}
+
+.language-change-loader.is-dark {
+  background: rgba(30, 30, 30, 0.9);
+}
+
+.loader-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 8px;
+}
+
+.language-change-loader.is-dark .loader-spinner {
+  border-color: #374151;
+  border-top-color: #3b82f6;
+}
+
+.loader-text {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.language-change-loader.is-dark .loader-text {
+  color: #9ca3af;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>

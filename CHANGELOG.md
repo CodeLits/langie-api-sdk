@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.19] - 2024-12-19
+
+### Changed
+
+- **Package Manager**: Migrated from Bun to pnpm
+  - Updated all scripts, documentation, and CI/CD workflows
+  - Replaced bun.lock with pnpm-lock.yaml
+  - Updated GitHub Actions to use pnpm instead of Bun
+  - Updated Netlify deployment configuration
+  - Updated development documentation and scripts
+
+### Technical
+
+- **CI/CD**: Updated GitHub Actions workflows to use pnpm
+- **Deployment**: Updated Netlify configuration for pnpm
+- **Documentation**: Updated all documentation to use pnpm commands
+- **Scripts**: Updated test and demo scripts to use pnpm
+
 ## [1.9.18] - 2024-12-19
 
 ### Fixed

@@ -18,7 +18,7 @@ fi
 # In dev mode, we no longer need to build the package first.
 # Vite will resolve dependencies from the source files.
 # echo "📦 Building package..."
-# bun run build
+# pnpm run build
 
 # Navigate to demo directory
 cd examples/demo
@@ -26,7 +26,7 @@ cd examples/demo
 # Install demo dependencies if needed
 if [ ! -d "node_modules" ]; then
     echo "📥 Installing demo dependencies..."
-    bun install
+    pnpm install
 fi
 
 # Check if API server is running
@@ -45,4 +45,4 @@ echo "   Press Ctrl+C to stop"
 echo
 
 # Start the demo server
-bun run dev 
+pnpm run dev 
