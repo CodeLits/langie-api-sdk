@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.20] - 2024-12-19
+
+### Added
+
+- **Node.js Version Support**: Added explicit Node.js version requirements
+  - Added `engines` field to package.json requiring Node.js >=18.0.0
+  - Updated CI/CD to use Node.js 18.20.8 (latest LTS)
+  - Updated Netlify deployment to use Node.js 18.20.8
+  - Added Node.js requirements to README
+
+### Technical
+
+- **Compatibility**: Ensured compatibility with Node.js 18 LTS
+- **CI/CD**: Updated GitHub Actions to use specific Node.js version
+- **Documentation**: Added clear Node.js version requirements
+
 ## [1.9.19] - 2024-12-19
 
 ### Changed

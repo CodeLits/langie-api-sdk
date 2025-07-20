@@ -4,7 +4,7 @@
   command = "cd ../.. && pnpm install && cd examples/demo && pnpm run build"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "18.20.8"
 
 # Redirect all routes to index.html for SPA
 [[redirects]]

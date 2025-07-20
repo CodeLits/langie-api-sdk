@@ -1,6 +1,6 @@
 {
 	"name": "langie-api-sdk",
-	"version": "1.9.19",
+	"version": "1.9.20",
 	"description": "Lightweight translation SDK for Vue.js applications with smart interface language selection and limit monitoring",
 	"type": "module",
 	"main": "dist/index.cjs",
@@ -54,6 +54,9 @@
 	"homepage": "https://github.com/VivaProgress/langie-api-sdk#readme",
 	"publishConfig": {
 		"access": "public"
+	},
+	"engines": {
+		"node": ">=18.0.0"
 	},
 	"peerDependencies": {
 		"vue": "^3.0.0"

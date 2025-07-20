@@ -216,6 +216,31 @@ watch(
 .interface-language-select-wrapper {
   position: relative;
   display: inline-block;
+  width: 100%;
+}
+
+/* Fix spacing for the language select component */
+.interface-language-select-wrapper :deep(.multiselect) {
+  width: 100%;
+  min-width: 200px;
+}
+
+.interface-language-select-wrapper :deep(.multiselect-dropdown) {
+  padding: 8px 0;
+}
+
+.interface-language-select-wrapper :deep(.multiselect-option) {
+  padding: 8px 12px;
+  margin: 0;
+  border-radius: 0;
+}
+
+.interface-language-select-wrapper :deep(.multiselect-option:hover) {
+  background-color: #f3f4f6;
+}
+
+.is-dark .interface-language-select-wrapper :deep(.multiselect-option:hover) {
+  background-color: #374151;
 }
 
 .language-change-loader {
@@ -224,25 +249,27 @@ watch(
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 10;
   backdrop-filter: blur(2px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .language-change-loader.is-dark {
-  background: rgba(30, 30, 30, 0.9);
+  background: rgba(30, 30, 30, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .loader-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #e5e7eb;
-  border-top: 2px solid #3b82f6;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 8px;
@@ -257,6 +284,7 @@ watch(
   font-size: 12px;
   color: #6b7280;
   font-weight: 500;
+  text-align: center;
 }
 
 .language-change-loader.is-dark .loader-text {

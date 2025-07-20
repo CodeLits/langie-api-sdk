@@ -7,6 +7,12 @@ Lightweight translation SDK for Vue.js, Nuxt.js, and vanilla JavaScript applicat
 
 ## 🚀 [Live Demo](https://langie-demo.netlify.app/)
 
+## Requirements
+
+- Node.js 18.0.0 or higher
+- Vue 3.x
+- Modern browser with ES2020+ support
+
 ## Installation
 
 ```bash

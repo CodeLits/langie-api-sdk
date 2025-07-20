@@ -365,15 +365,6 @@ const onFlagError = (event: Event) => {
   flex: 1;
 }
 
-/* Debug styles for specific languages */
-:deep(.multiselect-option[data-lang-code='it']) {
-  background-color: rgba(255, 0, 0, 0.1) !important;
-}
-
-:deep(.multiselect-option[data-lang-code='pl']) {
-  background-color: rgba(0, 255, 0, 0.1) !important;
-}
-
 :deep(.native-name) {
   color: v-bind('COLORS.text.secondary');
   margin-left: 0.5rem;
