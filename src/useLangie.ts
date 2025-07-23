@@ -187,9 +187,10 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
         const translatedText = translation[API_FIELD_TEXT]
         if (translatedText) {
-          // Check if the target language is still current
+          // PATCH: Only skip as outdated if toLang was not explicitly set
           const requestedLanguage = request[API_FIELD_TO]
-          if (requestedLanguage !== currentLanguage.value) {
+          const explicitToLang = request.__explicitToLang
+          if (!explicitToLang && requestedLanguage !== currentLanguage.value) {
             devDebug('[useLangie] Skipping outdated translation:', {
               original: originalText,
               translated: translatedText,
@@ -266,8 +267,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       return text
     }
 
-    // Queue for translation
-    batching.queueTranslation(text, effectiveCtx, from, to, cacheKey)
+    // Queue for translation, pass __explicitToLang if toLang is set
+    batching.queueTranslation(text, effectiveCtx, from, to, cacheKey, toLang !== undefined)
 
     // Mark as recently queued
     recentlyQueued.add(languageCacheKey)
@@ -315,8 +316,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       return text
     }
 
-    // Queue for translation
-    batching.queueTranslation(text, effectiveCtx, from, to, cacheKey)
+    // Queue for translation, pass __explicitToLang if toLang is set
+    batching.queueTranslation(text, effectiveCtx, from, to, cacheKey, toLang !== undefined)
 
     // Mark as recently queued
     recentlyQueued.add(languageCacheKey)

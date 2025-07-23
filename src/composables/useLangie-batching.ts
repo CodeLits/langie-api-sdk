@@ -1,4 +1,3 @@
-import type { BatchRequest } from './types'
 import type { TranslateServiceResponse } from '../types'
 import { devDebug } from '../utils/debug'
 import { API_FIELD_TEXT, API_FIELD_FROM, API_FIELD_TO, API_FIELD_CTX } from '../constants'
@@ -9,11 +8,20 @@ export interface BatchingOptions {
   maxBatchSize?: number
 }
 
+export interface BatchRequest {
+  [API_FIELD_TEXT]: string
+  [API_FIELD_CTX]: string
+  [API_FIELD_FROM]: string
+  [API_FIELD_TO]: string
+  cacheKey: string
+  __explicitToLang?: boolean
+}
+
 export class TranslationBatching {
   private pendingRequests = new Set<string>()
   private queueMap = new Map<
     string,
-    Map<string, { [API_FIELD_TEXT]: string; [API_FIELD_CTX]: string }>
+    Map<string, { [API_FIELD_TEXT]: string; [API_FIELD_CTX]: string; __explicitToLang?: boolean }>
   >()
   private flushTimeout: NodeJS.Timeout | null = null
   private queuedThisTick = new Set<string>()
@@ -61,7 +69,8 @@ export class TranslationBatching {
           [API_FIELD_CTX]: item[API_FIELD_CTX],
           [API_FIELD_FROM]: from,
           [API_FIELD_TO]: to,
-          cacheKey
+          cacheKey,
+          __explicitToLang: item.__explicitToLang
         })
       }
       this.queueMap.delete(batchKey)
@@ -117,7 +126,14 @@ export class TranslationBatching {
     }, delay)
   }
 
-  public queueTranslation(text: string, ctx: string, from: string, to: string, cacheKey: string) {
+  public queueTranslation(
+    text: string,
+    ctx: string,
+    from: string,
+    to: string,
+    cacheKey: string,
+    explicitToLang?: boolean
+  ) {
     if (this.pendingRequests.has(cacheKey) || this.queuedThisTick.has(cacheKey)) {
       // devDebug('[TranslationBatching] Skipping duplicate:', cacheKey)
       devDebug('[TranslationBatching] Skipping duplicate:', cacheKey)
@@ -133,7 +149,11 @@ export class TranslationBatching {
       this.queueMap.set(batchKey, new Map())
     }
 
-    this.queueMap.get(batchKey)!.set(cacheKey, { [API_FIELD_TEXT]: text, [API_FIELD_CTX]: ctx })
+    this.queueMap.get(batchKey)!.set(cacheKey, {
+      [API_FIELD_TEXT]: text,
+      [API_FIELD_CTX]: ctx,
+      __explicitToLang: explicitToLang
+    })
     // devDebug('[TranslationBatching] Queued translation:', { text, ctx, from, to, cacheKey, batchKey })
     devDebug('[TranslationBatching] Queued translation:', {
       text,
@@ -141,7 +161,8 @@ export class TranslationBatching {
       from,
       to,
       cacheKey,
-      batchKey
+      batchKey,
+      explicitToLang
     })
     this.scheduleFlush()
   }
