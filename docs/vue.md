@@ -22,6 +22,10 @@ const { l, lr, setLanguage } = useLangie({
   apiKey: 'your-api-key',
   defaultLanguage: 'en'
 })
+
+// Example: translate from English to French
+const translated = l('Hello', 'ui', 'en', 'fr')
+const translatedReactive = lr('Hello', 'ui', 'en', 'fr')
 </script>
 ```
 
@@ -311,12 +315,12 @@ import { useLangie } from 'langie-api-sdk'
 const { l, lr } = useLangie()
 
 // UI context (buttons, labels, etc.) → uiTranslations cache
-const buttonText = l('Submit', 'ui')
-const labelText = lr('Username', 'ui')
+const buttonText = l('Submit', 'ui', 'en', 'es')
+const labelText = lr('Username', 'ui', 'en', 'es')
 
 // Content context (articles, descriptions, etc.) → translations cache
-const articleTitle = l('Breaking News', 'article')
-const description = lr('Product description', 'content')
+const articleTitle = l('Breaking News', 'article', 'en', 'fr')
+const description = lr('Product description', 'content', 'en', 'fr')
 
 // No context specified → defaults to 'ui' → uiTranslations cache
 const defaultText = l('Hello') // Same as l('Hello', 'ui')

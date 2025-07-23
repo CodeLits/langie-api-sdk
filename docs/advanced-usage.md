@@ -18,6 +18,9 @@ You can use interpolation in your translations:
 <script setup>
 import { ref } from 'vue'
 import { T } from 'langie-api-sdk/components'
+import { useLangie } from 'langie-api-sdk'
+
+const { l, lr } = useLangie()
 
 const username = ref('John')
 </script>
@@ -39,6 +42,9 @@ For pluralization, you can use conditional rendering:
 <script setup>
 import { ref } from 'vue'
 import { T } from 'langie-api-sdk/components'
+import { useLangie } from 'langie-api-sdk'
+
+const { l, lr } = useLangie()
 
 const count = ref(2)
 </script>
@@ -60,7 +66,7 @@ import { computed } from 'vue'
 import { T } from 'langie-api-sdk/components'
 import { useLangie } from 'langie-api-sdk'
 
-const { translate } = useLangie()
+const { l, lr } = useLangie()
 
 const props = defineProps({
   username: String,

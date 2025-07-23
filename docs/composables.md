@@ -21,8 +21,8 @@ function useLangie(options?: TranslatorOptions): {
   translatorHost: string
 
   // Translation functions
-  l: (text: string, context?: string, originalLang?: string) => string
-  lr: (text: string, context?: string, originalLang?: string) => string
+  l: (text: string, context?: string, originalLang?: string, toLang?: string) => string
+  lr: (text: string, context?: string, originalLang?: string, toLang?: string) => string
   fetchAndCacheBatch: (
     items: { text: string; context?: string }[],
     fromLang?: string,
@@ -164,7 +164,7 @@ The SDK provides two main translation functions with different behaviors:
 The `l()` function provides immediate translation results:
 
 ```typescript
-l(text: string, context?: string, originalLang?: string): string
+l(text: string, context?: string, originalLang?: string, toLang?: string): string
 ```
 
 - **Returns immediately**: Returns cached translation or original text
@@ -184,7 +184,7 @@ const { l } = useLangie()
 
 function submitForm() {
   // l() returns immediately - perfect for button clicks
-  const submitText = l('Submit', 'ui')
+  const submitText = l('Submit', 'ui', 'en', 'fr') // translate from English to French
   console.log(submitText) // Returns cached translation or "Submit"
 }
 </script>
@@ -195,7 +195,7 @@ function submitForm() {
 The `lr()` function provides reactive translations that update automatically:
 
 ```typescript
-lr(text: string, context?: string, originalLang?: string): string
+lr(text: string, context?: string, originalLang?: string, toLang?: string): string
 ```
 
 - **Reactive updates**: Automatically updates when translations become available
@@ -237,8 +237,8 @@ import { useLangie } from 'langie-api-sdk'
 const { l, lr } = useLangie()
 
 // UI translations (buttons, labels, etc.)
-const buttonText = l('Click me', 'ui')
-const labelText = lr('Username', 'ui')
+const buttonText = l('Click me', 'ui', 'en', 'es')
+const labelText = lr('Username', 'ui', 'en', 'es')
 
 // Content translations (articles, descriptions, etc.)
 const articleTitle = l('Breaking News', 'article')
