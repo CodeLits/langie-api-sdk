@@ -69,9 +69,13 @@ export class TranslationBatching {
 
     if (allRequests.length > 0) {
       // Only log if there are more than 1 request to reduce noise
-      if (allRequests.length > 1) {
-        devDebug('[TranslationBatching] Sending batch:', allRequests.length, 'translation items')
-      }
+      // devDebug('[TranslationBatching] Sending batch:', allRequests.length, 'translation items')
+      devDebug(
+        '[TranslationBatching] Sending batch:',
+        allRequests.length,
+        'translation items',
+        allRequests
+      )
 
       // Split large batches into smaller chunks
       const chunks = this.chunkArray(allRequests, this.maxBatchSize)
@@ -100,6 +104,13 @@ export class TranslationBatching {
       clearTimeout(this.flushTimeout)
     }
     const delay = this.queueMap.size === 1 ? this.initialBatchDelay : this.followupBatchDelay
+    // devDebug('[TranslationBatching] Scheduling flush in', delay, 'ms')
+    devDebug(
+      '[TranslationBatching] Scheduling flush in',
+      delay,
+      'ms',
+      Array.from(this.queueMap.entries())
+    )
     this.flushTimeout = setTimeout(() => {
       this.flushQueues()
       this.flushTimeout = null
@@ -108,6 +119,7 @@ export class TranslationBatching {
 
   public queueTranslation(text: string, ctx: string, from: string, to: string, cacheKey: string) {
     if (this.pendingRequests.has(cacheKey) || this.queuedThisTick.has(cacheKey)) {
+      // devDebug('[TranslationBatching] Skipping duplicate:', cacheKey)
       devDebug('[TranslationBatching] Skipping duplicate:', cacheKey)
       return
     }
@@ -122,6 +134,15 @@ export class TranslationBatching {
     }
 
     this.queueMap.get(batchKey)!.set(cacheKey, { [API_FIELD_TEXT]: text, [API_FIELD_CTX]: ctx })
+    // devDebug('[TranslationBatching] Queued translation:', { text, ctx, from, to, cacheKey, batchKey })
+    devDebug('[TranslationBatching] Queued translation:', {
+      text,
+      ctx,
+      from,
+      to,
+      cacheKey,
+      batchKey
+    })
     this.scheduleFlush()
   }
 
@@ -142,6 +163,16 @@ export class TranslationBatching {
         // Check if all requests have the same context
         const contexts = [...new Set(batchRequests.map((req) => req[API_FIELD_CTX]))]
         const useGlobalContext = contexts.length === 1 && contexts[0] === 'ui'
+
+        // devDebug('[TranslationBatching] Sending batch for', langPair, 'with', batchRequests.length, 'items')
+        devDebug(
+          '[TranslationBatching] Sending batch for',
+          langPair,
+          'with',
+          batchRequests.length,
+          'items',
+          batchRequests
+        )
 
         const response = await fetch(`${this.translatorHost}/translate`, {
           method: 'POST',
