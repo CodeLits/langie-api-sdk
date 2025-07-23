@@ -160,78 +160,74 @@ function createLangieInstance(options: TranslatorOptions = {}) {
         recentlyQueued.delete(languageCacheKey)
       })
 
-      results.forEach((result, batchIdx) => {
-        // Check if result is an array (direct translations) or object with translations property
-        let translationsArray: TranslationWithContext[] = []
-
+      // --- PATCH: Map translations to requests by index (since ctx is not present in response) ---
+      // Flatten all translation arrays from results
+      let translationsArray: TranslationWithContext[] = []
+      results.forEach((result) => {
         if (Array.isArray(result)) {
-          translationsArray = result
+          translationsArray = translationsArray.concat(result)
         } else if (result.translations && Array.isArray(result.translations)) {
-          translationsArray = result.translations
-        } else {
+          translationsArray = translationsArray.concat(result.translations)
+        }
+      })
+
+      translationsArray.forEach((translation, idx) => {
+        const request = requests[idx]
+        if (!request) {
+          devDebug('[useLangie] No matching request for translation:', translation)
+          return
+        }
+        const originalText = request[API_FIELD_TEXT]
+        const originalCtx = request[API_FIELD_CTX] ?? (ltDefaults.ctx || 'ui')
+
+        // Handle language detection response
+        if (translation[API_FIELD_FROM] && !translation[API_FIELD_TEXT]) {
           return
         }
 
-        translationsArray.forEach((translation: TranslationWithContext, index: number) => {
-          const reqIdx = batchIdx * translationsArray.length + index
-          const request = requests[reqIdx]
-          const originalText = request?.[API_FIELD_TEXT]
-
-          if (!originalText) {
-            return
-          }
-
-          // Handle language detection response
-          if (translation[API_FIELD_FROM] && !translation[API_FIELD_TEXT]) {
-            return
-          }
-
-          const translatedText = translation[API_FIELD_TEXT]
-          if (translatedText) {
-            // Check if the target language is still current
-            const requestedLanguage = request[API_FIELD_TO]
-            if (requestedLanguage !== currentLanguage.value) {
-              devDebug('[useLangie] Skipping outdated translation:', {
-                original: originalText,
-                translated: translatedText,
-                requestedLanguage,
-                currentLanguage: currentLanguage.value
-              })
-              return
-            }
-
-            // Skip caching if translation equals original text
-            if (translatedText === originalText) {
-              devDebug('[useLangie] Skipping cache for identical translation:', {
-                original: originalText,
-                translated: translatedText,
-                context: request[API_FIELD_CTX] || ltDefaults.ctx || 'ui'
-              })
-              return
-            }
-
-            // Use the context from the original request, not from the response
-            const originalCtx = request[API_FIELD_CTX]
-            const effectiveCtx = originalCtx !== undefined ? originalCtx : ltDefaults.ctx || 'ui'
-            const cacheKey = `${originalText}|${effectiveCtx}`
-            const cache = effectiveCtx === 'ui' ? uiTranslations : translations
-
-            // Cache the translation
-            cache[cacheKey] = translatedText
-
-            // Debug logging
-            devDebug('[useLangie] Cached translation:', {
+        const translatedText = translation[API_FIELD_TEXT]
+        if (translatedText) {
+          // Check if the target language is still current
+          const requestedLanguage = request[API_FIELD_TO]
+          if (requestedLanguage !== currentLanguage.value) {
+            devDebug('[useLangie] Skipping outdated translation:', {
               original: originalText,
               translated: translatedText,
-              context: effectiveCtx,
-              cacheKey,
-              language: requestedLanguage
+              requestedLanguage,
+              currentLanguage: currentLanguage.value
             })
-
-            // Save to localStorage
-            saveCachedTranslations()
+            return
           }
-        })
+
+          // Skip caching if translation equals original text
+          if (translatedText === originalText) {
+            devDebug('[useLangie] Skipping cache for identical translation:', {
+              original: originalText,
+              translated: translatedText,
+              context: originalCtx
+            })
+            return
+          }
+
+          const effectiveCtx = originalCtx
+          const cacheKey = `${originalText}|${effectiveCtx}`
+          const cache = effectiveCtx === 'ui' ? uiTranslations : translations
+
+          // Cache the translation
+          cache[cacheKey] = translatedText
+
+          // Debug logging
+          devDebug('[useLangie] Cached translation:', {
+            original: originalText,
+            translated: translatedText,
+            context: effectiveCtx,
+            cacheKey,
+            language: requestedLanguage
+          })
+
+          // Save to localStorage
+          saveCachedTranslations()
+        }
       })
     }
   )
@@ -337,7 +333,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   }
 
   const fetchAndCacheBatch = async (
-    items: { [API_FIELD_TEXT]: string;[API_FIELD_CTX]?: string }[],
+    items: { [API_FIELD_TEXT]: string; [API_FIELD_CTX]?: string }[],
     from?: string,
     to = currentLanguage.value,
     globalCtx?: string
@@ -500,7 +496,7 @@ function getGlobalLangieInstance(): LangieInstance | null {
 }
 function setGlobalLangieInstance(instance: LangieInstance, options?: TranslatorOptions) {
   if (typeof window !== 'undefined') {
-    ; (window as unknown as { __LANGIE_SINGLETON__?: LangieInstance }).__LANGIE_SINGLETON__ =
+    ;(window as unknown as { __LANGIE_SINGLETON__?: LangieInstance }).__LANGIE_SINGLETON__ =
       instance
     if (options && options.translatorHost) {
       localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost)
