@@ -1,18 +1,8 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import {
-  useLangie,
-  DEFAULT_API_HOST,
-  DEV_API_HOST,
-  lt,
-  InterfaceLanguageSelect,
-  API_FIELD_TEXT,
-  API_FIELD_FROM,
-  API_FIELD_TO
-} from '@/index'
+import { useLangie, DEFAULT_API_HOST, DEV_API_HOST, InterfaceLanguageSelect } from '@/index'
 import { SunIcon, MoonIcon } from '@heroicons/vue/24/solid'
 import { devDebug as debugOnlyDev } from '@/utils/debug'
-import { translateBatch } from 'langie-api-sdk/core'
 
 // Components
 import ServiceStatus from './components/ServiceStatus.vue'
@@ -95,17 +85,6 @@ const fetchUsageInfo = async () => {
   }
 }
 
-const handleRateLimit = () => {
-  rateLimited.value = true
-  isLimitReached.value = true
-  lastRateLimitTime.value = Date.now()
-  setTimeout(() => {
-    rateLimited.value = false
-    isLimitReached.value = false
-    lastRateLimitTime.value = null
-  }, 60000)
-}
-
 const refreshUsageWithDelay = () => {
   setTimeout(() => {
     refreshUsage.value++
@@ -135,58 +114,7 @@ onMounted(async () => {
   isMounted.value = true
 })
 
-const handleTranslate = async () => {
-  if (!textToTranslate.value.trim()) {
-    error.value = 'Please enter text to translate'
-    return
-  }
-
-  if (rateLimited.value && !isRateLimitExpired.value) {
-    error.value = 'API rate limit exceeded. Please wait a moment before trying again.'
-    return
-  }
-
-  if (isUsageLimitReached.value) {
-    const resetTime = usageInfo.value?.next_reset_at
-      ? ` until ${new Date(usageInfo.value.next_reset_at).toLocaleString()}`
-      : ''
-    error.value = `Usage limit exceeded${resetTime}. Please wait before trying again.`
-    return
-  }
-
-  error.value = ''
-  translation.value = ''
-
-  try {
-    const [result] = await translateBatch(
-      [
-        {
-          [API_FIELD_TEXT]: textToTranslate.value,
-          [API_FIELD_FROM]: sourceLang.value?.code || 'auto',
-          [API_FIELD_TO]: targetLang.value?.code || 'en'
-        }
-      ],
-      {
-        translatorHost: API_HOST
-      }
-    )
-
-    translation.value = result?.[API_FIELD_TEXT] || result || 'Translation failed'
-    refreshUsage.value++
-  } catch (err) {
-    // Translation error
-
-    if (err.message?.includes('429') || err.message?.includes('CORS')) {
-      handleRateLimit()
-      isLimitReached.value = true
-      error.value = err.message?.includes('CORS')
-        ? 'CORS error: The translation API needs CORS headers configured for this domain.'
-        : 'API rate limit exceeded. Please wait a moment before trying again.'
-    } else {
-      error.value = err.message || 'Translation failed'
-    }
-  }
-}
+// Remove handleTranslate and all usages of translateBatch
 
 const swapLanguages = () => {
   const temp = sourceLang.value
