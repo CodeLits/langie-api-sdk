@@ -41,19 +41,12 @@ const isMounted = ref(false)
 const serviceStatus = ref('Checking...')
 const rateLimited = ref(false)
 const lastRateLimitTime = ref(null)
-const refreshUsage = ref(0)
-const isLimitReached = ref(false)
-const usageInfo = ref(null)
 
 const isLoading = computed(() => isTranslatorLoading.value)
 
 const isRateLimitExpired = computed(() => {
   if (!lastRateLimitTime.value) return true
   return Date.now() - lastRateLimitTime.value > 60000
-})
-
-const isUsageLimitReached = computed(() => {
-  return usageInfo.value && usageInfo.value.used >= usageInfo.value.limit
 })
 
 const checkServiceHealth = async () => {
@@ -69,27 +62,6 @@ const checkServiceHealth = async () => {
   } catch (error) {
     serviceStatus.value = 'Offline'
   }
-}
-
-const fetchUsageInfo = async () => {
-  try {
-    // Note: /limit endpoint should NOT increase usage count
-    const response = await fetch(`${API_HOST}/limit`)
-    if (response.ok) {
-      usageInfo.value = await response.json()
-    } else if (response.status === 429) {
-      usageInfo.value = null
-    }
-  } catch (error) {
-    usageInfo.value = null
-  }
-}
-
-const refreshUsageWithDelay = () => {
-  setTimeout(() => {
-    refreshUsage.value++
-    fetchUsageInfo() // Also refresh usage info
-  }, 1500) // 1.5 секунды задержки
 }
 
 onMounted(async () => {
@@ -110,7 +82,6 @@ onMounted(async () => {
   debugOnlyDev('[App] Languages fetched:', availableLanguages.value?.length || 0, 'languages')
 
   await checkServiceHealth()
-  await fetchUsageInfo()
   isMounted.value = true
 })
 
@@ -120,8 +91,6 @@ const swapLanguages = () => {
   const temp = sourceLang.value
   sourceLang.value = targetLang.value
   targetLang.value = temp
-  // Refresh usage after swap
-  refreshUsageWithDelay()
 }
 
 // Computed
@@ -145,7 +114,6 @@ watch(
         if (alternativeLang) targetLang.value = alternativeLang
       }
       // Refresh usage after language change
-      refreshUsageWithDelay()
     }
   },
   { deep: true }
@@ -157,7 +125,6 @@ watch(
     if (newLang?.code) {
       localStorage.setItem('targetLang', newLang.code)
       // Refresh usage after language change
-      refreshUsageWithDelay()
     }
   },
   { deep: true }
@@ -205,6 +172,16 @@ watch(
   },
   { immediate: true }
 )
+
+const handleTranslate = () => {
+  if (!textToTranslate.value.trim()) {
+    translation.value = ''
+    return
+  }
+  // Use selected targetLang as the translation target
+  const to = targetLang.value?.code || 'en'
+  translation.value = l(textToTranslate.value, 'ui', 'en', to)
+}
 </script>
 
 <template>
@@ -218,12 +195,7 @@ watch(
         <div class="flex items-center space-x-4">
           <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Langie API SDK</h1>
           <div class="flex flex-col">
-            <ServiceStatus
-              :status="serviceStatus"
-              :refresh-usage="refreshUsage"
-              :api-host="API_HOST"
-              :is-limit-reached="isLimitReached || isUsageLimitReached"
-            />
+            <ServiceStatus :status="serviceStatus" :api-host="API_HOST" />
           </div>
         </div>
         <div class="flex items-center space-x-2">

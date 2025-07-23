@@ -241,9 +241,9 @@ function createLangieInstance(options: TranslatorOptions = {}) {
    * an asynchronous request will be triggered to fetch the translation in the
    * background (this avoids Promise objects leaking into the template).
    */
-  const l = (text: string, ctx?: string, originalLang?: string) => {
-    const from = originalLang || ltDefaults.orig
-    const to = currentLanguage.value
+  const l = (text: string, ctx?: string, originalLang?: string, toLang?: string) => {
+    const from = originalLang || ltDefaults.orig || 'en'
+    const to = toLang || currentLanguage.value
 
     // Skip translation if source and target languages are the same
     if (from === to) {
@@ -287,12 +287,12 @@ function createLangieInstance(options: TranslatorOptions = {}) {
    * Get a reactive translation that automatically updates when the translation becomes available.
    * This function returns a string directly, making it easier to use in templates and computed properties.
    */
-  const lr = (text: string, ctx?: string, originalLang?: string) => {
+  const lr = (text: string, ctx?: string, originalLang?: string, toLang?: string) => {
     // Force reactivity by depending on currentLanguage
     void currentLanguage.value
 
-    const from = originalLang || ltDefaults.orig
-    const to = currentLanguage.value
+    const from = originalLang || ltDefaults.orig || 'en'
+    const to = toLang || currentLanguage.value
 
     // Skip translation if source and target languages are the same
     if (from === to) {
