@@ -243,7 +243,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
    * background (this avoids Promise objects leaking into the template).
    */
   const l = (text: string, ctx?: string, originalLang?: string, toLang?: string) => {
-    const from = originalLang || ltDefaults.orig || 'en'
+    const from = originalLang || ltDefaults.orig || ''
     const to = toLang || currentLanguage.value
 
     // Skip translation if source and target languages are the same
@@ -292,7 +292,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     // Force reactivity by depending on currentLanguage
     void currentLanguage.value
 
-    const from = originalLang || ltDefaults.orig || 'en'
+    const from = originalLang || ltDefaults.orig || ''
     const to = toLang || currentLanguage.value
 
     // Skip translation if source and target languages are the same
@@ -342,7 +342,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     if (items.length === 0) return
 
     // Use global defaults for from language if not provided
-    const effectiveFrom = from || ltDefaults.orig
+    const effectiveFrom = from || ltDefaults.orig || ''
 
     // Skip translation if source and target languages are the same
     if (effectiveFrom === to) {

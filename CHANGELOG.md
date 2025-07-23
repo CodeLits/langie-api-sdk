@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.22] - 2024-06-10
+
+### Fixed
+
+- **Batching Logic**: Default source language ('from') is now an empty string ('') if not specified, for better API compatibility and test consistency.
+- **Tests**: All tests pass after batching logic update.
+
+### Internal
+
+- Minor documentation and internal improvements.
+
 ## [1.9.21] - 2024-12-19
 
 ### Added
