@@ -323,7 +323,7 @@ watch(
       </div>
 
       <h2 class="text-2xl font-semibold text-center text-gray-800 dark:text-gray-200 mb-6">
-        <lt orig="en">Translation</lt>
+        <lt>Translation</lt>
       </h2>
 
       <LanguageSelector
@@ -332,7 +332,7 @@ watch(
         :languages="displayLanguages"
         :is-loading="isLoading"
         :is-dark="isDark"
-        :swap-title="l('Swap languages', 'ui button title for swapping languages', 'en')"
+        :swap-title="l('Swap languages', 'ui button title for swapping languages')"
         @swap="swapLanguages"
       />
 
