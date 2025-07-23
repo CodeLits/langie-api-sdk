@@ -20,6 +20,7 @@ const API_HOST = import.meta.env.PROD ? DEFAULT_API_HOST : DEV_API_HOST
 const {
   availableLanguages,
   l,
+  lr,
   isLoading: isTranslatorLoading,
   setLanguage,
   currentLanguage,
@@ -180,7 +181,7 @@ const handleTranslate = () => {
   }
   // Use selected targetLang as the translation target
   const to = targetLang.value?.code || 'en'
-  translation.value = l(textToTranslate.value, 'ui', 'en', to)
+  translation.value = lr(textToTranslate.value, 'ui', 'en', to)
 }
 </script>
 
