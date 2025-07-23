@@ -18,6 +18,7 @@
       value-prop="code"
       :filter-results="false"
       @search-change="handleSearch"
+      @keydown="handleKeydown"
     >
       <template #singlelabel="{ value }">
         <div v-if="value" class="multiselect-single-label">
@@ -71,7 +72,7 @@
 <script lang="ts" setup>
 import '@vueform/multiselect/themes/default.css'
 import '../styles/teleport.css'
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import type { PropType } from 'vue'
 import Multiselect from '@vueform/multiselect'
 import Fuse from 'fuse.js'
@@ -235,6 +236,40 @@ const filteredLanguages = computed(() => {
 
 function handleSearch(query: string) {
   searchQuery.value = query
+
+  // Auto-scroll to first result when typing
+  if (query.trim()) {
+    nextTick(() => {
+      const dropdown = document.querySelector('.multiselect-dropdown')
+      const firstOption = dropdown?.querySelector('.multiselect-option')
+      if (firstOption) {
+        firstOption.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        // Highlight the first option
+        firstOption.classList.add('multiselect-option-is-pointed')
+      }
+    })
+  }
+}
+
+// Handle keyboard navigation
+function handleKeydown(event: Event) {
+  const keyboardEvent = event as KeyboardEvent
+  if (keyboardEvent.key === 'Tab' || keyboardEvent.key === 'Enter') {
+    const dropdown = document.querySelector('.multiselect-dropdown')
+    const firstOption = dropdown?.querySelector('.multiselect-option')
+    if (firstOption && searchQuery.value.trim()) {
+      // Get the language data from the first option
+      const langCode = firstOption.getAttribute('data-lang-code')
+      if (langCode) {
+        const language = validLanguages.value.find((lang) => lang.code === langCode)
+        if (language) {
+          selectedLanguage.value = language
+          searchQuery.value = ''
+          keyboardEvent.preventDefault()
+        }
+      }
+    }
+  }
 }
 
 const onFlagError = (event: Event) => {
@@ -289,8 +324,8 @@ const onFlagError = (event: Event) => {
   /* Options */
   --ms-option-font-size: 1rem;
   --ms-option-line-height: 1;
-  --ms-option-py: 0.35rem;
-  --ms-option-px: 0.875rem;
+  --ms-option-py: 0.2rem;
+  --ms-option-px: 0.5rem;
   --ms-option-bg-pointed: v-bind('THEME_COLORS.light.optionPointed');
   --ms-option-color-pointed: v-bind('THEME_COLORS.light.optionPointedText');
   --ms-option-bg-selected: v-bind('THEME_COLORS.light.optionSelected');
@@ -346,7 +381,7 @@ const onFlagError = (event: Event) => {
   align-items: center;
   min-width: 0;
   width: 100%;
-  padding: 12px 16px !important;
+  padding: 4px 8px;
   gap: 8px;
 }
 
@@ -382,7 +417,12 @@ const onFlagError = (event: Event) => {
 }
 
 :deep(.multiselect-dropdown) {
-  padding: 8px 0;
+  padding: 2px 0 !important;
+}
+
+:deep(.multiselect-dropdown .multiselect-option) {
+  padding: 4px 8px !important;
+  margin: 0 !important;
 }
 
 :deep(.multiselect-no-results),

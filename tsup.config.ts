@@ -10,6 +10,7 @@ export default defineConfig([
   {
     entry: {
       index: 'src/index.ts',
+      core: 'src/core.ts',
       teleport: 'src/styles/teleport.css'
     },
     format: ['esm', 'cjs'],

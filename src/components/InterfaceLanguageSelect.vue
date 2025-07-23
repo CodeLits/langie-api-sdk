@@ -17,7 +17,7 @@
       :class="{ 'is-dark': props.isDark }"
     >
       <div class="loader-spinner"></div>
-      <span class="loader-text">Changing language...</span>
+      <span class="loader-text">{{ lr('Changing language...', 'ui') }}</span>
     </div>
   </div>
 </template>
@@ -62,7 +62,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 // Use the same SDK instance as the main app
-const { availableLanguages, currentLanguage, setLanguage, fetchLanguages } = useLangie()
+const { availableLanguages, currentLanguage, setLanguage, fetchLanguages, lr } = useLangie()
 
 // Use provided languages if available, otherwise use SDK's languages
 const effectiveLanguages = computed(() => {
@@ -214,30 +214,23 @@ watch(
   position: relative;
   display: inline-block;
   width: 100%;
-}
-
-/* Fix spacing for the language select component */
-.interface-language-select-wrapper :deep(.multiselect) {
-  width: 100%;
   min-width: 200px;
 }
 
-.interface-language-select-wrapper :deep(.multiselect-dropdown) {
-  padding: 4px 0;
-}
-
+/* Override styles for the language select component */
 .interface-language-select-wrapper :deep(.multiselect-option) {
-  padding: 4px 8px;
+  padding: 5px 10px !important;
   margin: 0;
   border-radius: 0;
 }
 
-.interface-language-select-wrapper :deep(.multiselect-option:hover) {
-  background-color: #f3f4f6;
+.interface-language-select-wrapper :deep(.multiselect-option > div) {
+  padding: 0 !important;
+  margin: 0;
 }
 
-.is-dark .interface-language-select-wrapper :deep(.multiselect-option:hover) {
-  background-color: #374151;
+.interface-language-select-wrapper :deep(.multiselect-dropdown) {
+  padding: 2px 0 !important;
 }
 
 .language-change-loader {
