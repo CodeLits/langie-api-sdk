@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.23] - 2024-06-10
+
+### Changed
+
+- Clear separation between l() (non-reactive, for JS) and lr() (reactive, for Vue/computed/templates).
+- Refactored internal logic: both use a shared translateInternal with a 'reactive' flag.
+- Updated documentation and usage examples to clarify the difference and best practices.
+
 ## [1.9.22] - 2024-06-10
 
 ### Fixed
