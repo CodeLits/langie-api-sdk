@@ -25,17 +25,24 @@ if (
     .__LANGIE_SINGLETON__ as ReturnType<typeof createLangieInstance>
 }
 
+// Helper for safe localStorage access
+function safeLocalStorageAccess<T>(operation: () => T): T | undefined {
+  if (typeof window === 'undefined') return undefined
+  try {
+    return operation()
+  } catch (e) {
+    devDebug('[useLangie] localStorage error:', e)
+    return undefined
+  }
+}
+
 // Also check if we have a stored singleton in localStorage as backup
 if (!globalLangieInstance && typeof window !== 'undefined') {
-  try {
-    const stored = localStorage.getItem('__LANGIE_SINGLETON_URL__')
-    if (stored) {
-      // Use stored URL to prevent recreation with wrong options
-      const storedOptions = { translatorHost: stored }
-      globalLangieInstance = createLangieInstance(storedOptions)
-    }
-  } catch (e) {
-    // Ignore localStorage errors
+  const stored = safeLocalStorageAccess(() => localStorage.getItem('__LANGIE_SINGLETON_URL__'))
+  if (stored) {
+    // Use stored URL to prevent recreation with wrong options
+    const storedOptions = { translatorHost: stored }
+    globalLangieInstance = createLangieInstance(storedOptions)
   }
 }
 
@@ -235,14 +242,20 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
   // Simple cache to track recently queued translations
   const recentlyQueued = new Set<string>()
+  // Set to track timeout ids for cleanup
+  const pendingTimeouts = new Set<ReturnType<typeof setTimeout>>()
 
-  /**
-   * Synchronously get translation for the provided key.
-   * If the key is not yet translated, the original key will be returned and
-   * an asynchronous request will be triggered to fetch the translation in the
-   * background (this avoids Promise objects leaking into the template).
-   */
-  const l = (text: string, ctx?: string, originalLang?: string, toLang?: string) => {
+  // Internal translation logic shared by l and lr
+  const translateInternal = (
+    text: string,
+    ctx?: string,
+    originalLang?: string,
+    toLang?: string,
+    reactive = false
+  ) => {
+    if (reactive) {
+      void currentLanguage.value // For Vue reactivity
+    }
     const from = originalLang || ltDefaults.orig || ''
     const to = toLang || currentLanguage.value
 
@@ -276,62 +289,30 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     // Clear the recently queued cache after a short delay
     // Use a shorter delay for tests to allow retries
     const clearDelay = 100 // Always use short delay for faster updates
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       recentlyQueued.delete(languageCacheKey)
+      pendingTimeouts.delete(timeoutId)
     }, clearDelay)
+    pendingTimeouts.add(timeoutId)
 
     // Return original text for now (will be updated when translation arrives)
     return text
   }
 
   /**
-   * Get a reactive translation that automatically updates when the translation becomes available.
-   * This function returns a string directly, making it easier to use in templates and computed properties.
+   * l(): Non-reactive translation for plain JavaScript usage.
+   * Returns translation or original text. Does NOT auto-update on language change.
    */
-  const lr = (text: string, ctx?: string, originalLang?: string, toLang?: string) => {
-    // Force reactivity by depending on currentLanguage
-    void currentLanguage.value
+  const l = (text: string, ctx?: string, originalLang?: string, toLang?: string) =>
+    translateInternal(text, ctx, originalLang, toLang, false)
 
-    const from = originalLang || ltDefaults.orig || ''
-    const to = toLang || currentLanguage.value
-
-    // Skip translation if source and target languages are the same
-    if (from === to) {
-      return text
-    }
-
-    // Use provided context or global defaults, but don't fallback to 'ui' if ctx is explicitly provided
-    const effectiveCtx = ctx !== undefined ? ctx : ltDefaults.ctx || 'ui'
-    const cacheKey = `${text}|${effectiveCtx}`
-    const cache = effectiveCtx === 'ui' ? uiTranslations : translations
-
-    // Return cached translation if available
-    if (cache[cacheKey]) {
-      return cache[cacheKey]
-    }
-
-    // Check if we've recently queued this translation
-    const languageCacheKey = `${cacheKey}|${from}|${to}`
-    if (recentlyQueued.has(languageCacheKey)) {
-      return text
-    }
-
-    // Queue for translation, pass __explicitToLang if toLang is set
-    batching.queueTranslation(text, effectiveCtx, from, to, cacheKey, toLang !== undefined)
-
-    // Mark as recently queued
-    recentlyQueued.add(languageCacheKey)
-
-    // Clear the recently queued cache after a short delay
-    // Use a shorter delay for tests to allow retries
-    const clearDelay = 100 // Always use short delay for faster updates
-    setTimeout(() => {
-      recentlyQueued.delete(languageCacheKey)
-    }, clearDelay)
-
-    // Return original text for now (will be updated when translation arrives)
-    return text
-  }
+  /**
+   * lr(): Reactive translation for Vue usage.
+   * Returns translation or original text. Auto-updates on language change (reactive).
+   * Use in templates or computed properties.
+   */
+  const lr = (text: string, ctx?: string, originalLang?: string, toLang?: string) =>
+    translateInternal(text, ctx, originalLang, toLang, true)
 
   const fetchAndCacheBatch = async (
     items: { [API_FIELD_TEXT]: string; [API_FIELD_CTX]?: string }[],
@@ -476,6 +457,9 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     cleanup: () => {
       clearTranslations()
       batching.cleanup()
+      // Очистка всех таймеров
+      pendingTimeouts.forEach((id) => clearTimeout(id))
+      pendingTimeouts.clear()
     },
     getBatchingStats: () => batching.getStats(),
 
@@ -500,7 +484,9 @@ function setGlobalLangieInstance(instance: LangieInstance, options?: TranslatorO
     ;(window as unknown as { __LANGIE_SINGLETON__?: LangieInstance }).__LANGIE_SINGLETON__ =
       instance
     if (options && options.translatorHost) {
-      localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost)
+      safeLocalStorageAccess(() =>
+        localStorage.setItem('__LANGIE_SINGLETON_URL__', options.translatorHost!)
+      )
     }
   }
   globalLangieInstance = instance
@@ -509,48 +495,18 @@ function setGlobalLangieInstance(instance: LangieInstance, options?: TranslatorO
 export function useLangie(options: TranslatorOptions = {}) {
   const globalInstance: LangieInstance | null = getGlobalLangieInstance()
 
-  // If we have a global instance and no specific options, use it
-  if (globalInstance && Object.keys(options).length === 0) {
-    return globalInstance
-  }
-
-  // If we have a global instance but options are provided, check if they match
+  // If no options or options match, always return the global instance if it exists
   if (globalInstance) {
-    const currentHost = (globalInstance as LangieInstance).translatorHost
+    const currentHost = globalInstance.translatorHost
     const newHost = options.translatorHost
-    if (currentHost === newHost) {
+    if (!options.translatorHost || currentHost === newHost) {
       return globalInstance
-    } else {
-      // Create new instance
-      const instance: LangieInstance = createLangieInstance(options)
-
-      // Store as global singleton ONLY if this is the first instance OR if it has a translatorHost
-      if (!globalInstance) {
-        setGlobalLangieInstance(instance, options)
-      } else if (options.translatorHost && !(globalInstance as LangieInstance).translatorHost) {
-        setGlobalLangieInstance(instance, options)
-      } else {
-        // Remove global instance
-        globalLangieInstance = null
-      }
-
-      return instance
     }
   }
 
-  // Create new instance
+  // Otherwise, create a new instance
   const instance: LangieInstance = createLangieInstance(options)
-
-  // Store as global singleton ONLY if this is the first instance OR if it has a translatorHost
-  if (!globalInstance) {
-    setGlobalLangieInstance(instance, options)
-  } else if (options.translatorHost && !(globalInstance as LangieInstance).translatorHost) {
-    setGlobalLangieInstance(instance, options)
-  } else {
-    // Remove global instance
-    globalLangieInstance = null
-  }
-
+  setGlobalLangieInstance(instance, options)
   return instance
 }
 
@@ -562,11 +518,11 @@ export function __resetLangieSingletonForTests() {
 
   // Clear localStorage backup
   if (typeof window !== 'undefined') {
+    safeLocalStorageAccess(() => localStorage.removeItem('__LANGIE_SINGLETON_URL__'))
     try {
-      localStorage.removeItem('__LANGIE_SINGLETON_URL__')
       delete (window as unknown as Record<string, unknown>).__LANGIE_SINGLETON__
     } catch (e) {
-      // Ignore localStorage errors
+      devDebug('[useLangie] window singleton delete error:', e)
     }
   }
 
