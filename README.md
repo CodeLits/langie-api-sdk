@@ -154,12 +154,12 @@ Now you can use simplified syntax:
 const { l, lr } = useLangie()
 
 // Uses global defaults: ctx="ui"
-l('Hello world')
-lr('Welcome message')
+l('Hello world') // Not reactive, for JS only
+lr('Welcome message') // Reactive, for Vue templates/computed
 
 // Override specific parameters
-l('Article title', 'content')
-lr('French text', 'ui', 'fr')
+l('Article title', 'content') // Not reactive
+lr('French text', 'ui', 'fr') // Reactive
 ```
 
 ## Features
