@@ -1,6 +1,12 @@
 import type { TranslateServiceResponse } from '../types'
 import { devDebug } from '../utils/debug'
-import { API_FIELD_TEXT, API_FIELD_FROM, API_FIELD_TO, API_FIELD_CTX } from '../constants'
+import {
+  API_FIELD_TEXT,
+  API_FIELD_FROM,
+  API_FIELD_TO,
+  API_FIELD_CTX,
+  API_FIELD_TRANSLATIONS
+} from '../constants'
 
 export interface BatchingOptions {
   initialBatchDelay?: number
@@ -221,6 +227,22 @@ export class TranslationBatching {
         }
 
         const result = await response.json()
+
+        // Handle error responses in the result
+        if (result[API_FIELD_TRANSLATIONS]) {
+          result[API_FIELD_TRANSLATIONS].forEach((translation: any, index: number) => {
+            if (translation.error) {
+              const originalText = batchRequests[index]?.[API_FIELD_TEXT]
+              devDebug(
+                '[TranslationBatching] Translation error for',
+                originalText,
+                ':',
+                translation.error
+              )
+            }
+          })
+        }
+
         allResults.push(result)
         allRequests.push(...batchRequests)
 

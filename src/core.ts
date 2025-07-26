@@ -20,10 +20,13 @@ const DEFAULT_TRANSLATOR_HOST = 'http://localhost:8081'
 // --- Translation cache ---
 const translationCache = new Map<string, Promise<TranslateServiceResponse[]>>()
 
-function getTranslationCacheKey(serviceTranslations: TranslateRequestBody[], options: TranslatorOptions): string {
+function getTranslationCacheKey(
+  serviceTranslations: TranslateRequestBody[],
+  options: TranslatorOptions
+): string {
   // Create a stable cache key based on translations and options
   return JSON.stringify({
-    translations: serviceTranslations.map(t => ({
+    translations: serviceTranslations.map((t) => ({
       [API_FIELD_TEXT]: t[API_FIELD_TEXT],
       [API_FIELD_FROM]: t[API_FIELD_FROM],
       [API_FIELD_TO]: t[API_FIELD_TO],
@@ -147,7 +150,11 @@ export async function translateBatch(
           // })
 
           if (!resp.ok) {
-            console.error('[translator-sdk] Translator error response:', resp.status, resp.statusText)
+            console.error(
+              '[translator-sdk] Translator error response:',
+              resp.status,
+              resp.statusText
+            )
             throw new Error(`Translator service error: ${resp.status} ${resp.statusText}`)
           }
 
@@ -174,21 +181,33 @@ export async function translateBatch(
           const data = parsed || {}
           const results = Array.isArray(data[API_FIELD_TRANSLATIONS])
             ? data[API_FIELD_TRANSLATIONS].map((translation, index) => {
-              const originalText = serviceTranslations[index]?.[API_FIELD_TEXT] || ''
+                const originalText = serviceTranslations[index]?.[API_FIELD_TEXT] || ''
 
-              // Handle language detection response
-              if (translation[API_FIELD_FROM] && !translation[API_FIELD_TEXT]) {
-                return {
-                  [API_FIELD_TEXT]: originalText, // For detection, return original text
-                  [API_FIELD_FROM]: translation[API_FIELD_FROM]
+                // Handle error responses
+                if (translation.error) {
+                  console.warn(
+                    `[translator-sdk] Translation error for "${originalText}":`,
+                    translation.error
+                  )
+                  return {
+                    [API_FIELD_TEXT]: originalText, // Return original text on error
+                    error: translation.error
+                  }
                 }
-              }
 
-              // Handle translation response
-              return {
-                [API_FIELD_TEXT]: translation[API_FIELD_TEXT] || originalText
-              }
-            })
+                // Handle language detection response
+                if (translation[API_FIELD_FROM] && !translation[API_FIELD_TEXT]) {
+                  return {
+                    [API_FIELD_TEXT]: originalText, // For detection, return original text
+                    [API_FIELD_FROM]: translation[API_FIELD_FROM]
+                  }
+                }
+
+                // Handle translation response
+                return {
+                  [API_FIELD_TEXT]: translation[API_FIELD_TEXT] || originalText
+                }
+              })
             : data[API_FIELD_TEXT]
               ? [{ [API_FIELD_TEXT]: data[API_FIELD_TEXT] }]
               : []

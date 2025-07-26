@@ -187,6 +187,12 @@ function createLangieInstance(options: TranslatorOptions = {}) {
         const originalText = request[API_FIELD_TEXT]
         const originalCtx = request[API_FIELD_CTX] ?? (ltDefaults.ctx || 'ui')
 
+        // Handle error responses
+        if (translation.error) {
+          devDebug('[useLangie] Translation error for', originalText, ':', translation.error)
+          return // Don't cache translations with errors
+        }
+
         // Handle language detection response
         if (translation[API_FIELD_FROM] && !translation[API_FIELD_TEXT]) {
           return
@@ -364,6 +370,12 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             const originalText = item?.[API_FIELD_TEXT]
             if (!originalText) {
               return
+            }
+
+            // Handle error responses
+            if (translation.error) {
+              devDebug('[useLangie] Translation error for', originalText, ':', translation.error)
+              return // Don't cache translations with errors
             }
 
             // Handle language detection response

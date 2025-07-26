@@ -69,12 +69,34 @@ describe('translateBatch', () => {
   })
 
   it('handles API error response', async () => {
-    const translations = [{ t: 'hello', from: 'en', to: 'es' }]
     mockFetch.mockResolvedValue(
       createMockResponse('Server error', false, 500, 'Internal Server Error')
     )
 
-    await expect(translateBatch(translations)).rejects.toThrow(/Failed to connect to translator/)
+    await expect(translateBatch([{ t: 'Hello', to: 'fr' }])).rejects.toThrow(
+      'Failed to connect to translator'
+    )
+  })
+
+  it('handles API response with error field in translations', async () => {
+    mockFetch.mockResolvedValue(
+      createMockResponse({
+        translations: [
+          {
+            t: 'Enter text to translate',
+            error: 'Translation failed or not supported for this language.'
+          }
+        ]
+      })
+    )
+
+    const results = await translateBatch([{ t: 'Enter text to translate', to: 'fr' }])
+
+    expect(results).toHaveLength(1)
+    expect(results[0]).toEqual({
+      t: 'Enter text to translate', // Should return original text
+      error: 'Translation failed or not supported for this language.'
+    })
   })
 
   it('handles network error', async () => {

@@ -39,6 +39,7 @@ export interface TranslateServiceResponse {
   [API_FIELD_TEXT]?: string
   [API_FIELD_FROM]?: string
   [API_FIELD_TRANSLATIONS]?: TranslateServiceResponse[]
+  error?: string // Error message from API
 }
 
 /**

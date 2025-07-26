@@ -471,6 +471,79 @@ app.post('/api/translate', async (req, res) => {
 })
 ```
 
+### API Error Response Format
+
+The SDK can handle error responses in two formats:
+
+#### 1. HTTP Error Status Codes
+
+When the API returns a non-200 status code, the SDK will throw an error:
+
+```javascript
+// Backend returns 500 Internal Server Error
+app.post('/api/translate', (req, res) => {
+  res.status(500).json({ error: 'Internal server error' })
+})
+
+// SDK will throw: "Translator service error: 500 Internal Server Error"
+```
+
+#### 2. Error Field in Translation Objects
+
+You can also return individual translation errors by including an `error` field in translation objects:
+
+```javascript
+app.post('/api/translate', (req, res) => {
+  const { translations } = req.body
+
+  const results = translations.map((item) => {
+    const { t, to } = item
+
+    // Check if translation is supported
+    if (to === 'xx') {
+      return {
+        t,
+        error: 'Translation failed or not supported for this language.'
+      }
+    }
+
+    // Normal translation
+    return {
+      t,
+      translated: translateText(t, to)
+    }
+  })
+
+  res.json({ translations: results })
+})
+```
+
+**Response Example:**
+
+```json
+{
+  "translations": [
+    {
+      "t": "Enter text to translate",
+      "error": "Translation failed or not supported for this language."
+    },
+    {
+      "t": "Hello world",
+      "translated": "Bonjour le monde"
+    }
+  ]
+}
+```
+
+**SDK Behavior:**
+
+- Translations with `error` field are logged as warnings
+- Original text is returned instead of translated text
+- Error messages are preserved in the response
+- Other translations in the same batch continue to work normally
+
+This approach allows for graceful degradation when some translations fail while others succeed.
+
 ## Next Steps
 
 - Learn about [Advanced Usage](./advanced-usage.md) for more complex scenarios

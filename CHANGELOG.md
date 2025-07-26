@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored internal logic: both use a shared translateInternal with a 'reactive' flag.
 - Updated documentation and usage examples to clarify the difference and best practices.
 
+### Added
+
+- **Error Handling**: Added support for API error responses with `error` field in translation objects.
+- **Graceful Degradation**: When individual translations fail, the SDK returns original text and logs warnings instead of breaking the entire batch.
+- **Enhanced Logging**: Better error reporting for translation failures with detailed error messages.
+
+### Fixed
+
+- **Memory Leaks**: Fixed setTimeout cleanup in recentlyQueued logic to prevent memory leaks.
+- **Code Duplication**: Eliminated duplicate logic between l() and lr() functions.
+- **Safe localStorage**: Added safeLocalStorageAccess helper to prevent SSR and cookie-related errors.
+
 ## [1.9.22] - 2024-06-10
 
 ### Fixed
