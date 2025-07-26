@@ -13,6 +13,7 @@ export interface BatchingOptions {
   initialBatchDelay?: number
   followupBatchDelay?: number
   maxBatchSize?: number
+  maxWaitTime?: number
 }
 
 export interface BatchRequest {
@@ -33,6 +34,7 @@ export class TranslationBatching {
   private flushTimeout: NodeJS.Timeout | null = null
   private queuedThisTick = new Set<string>()
   private clearQueuedThisTickScheduled = false
+  private firstItemTime: number | null = null
 
   constructor(
     private options: BatchingOptions = {},
@@ -42,15 +44,19 @@ export class TranslationBatching {
   ) {}
 
   private get initialBatchDelay() {
-    return this.options.initialBatchDelay ?? 100
+    return this.options.initialBatchDelay ?? 50
   }
 
   private get followupBatchDelay() {
-    return this.options.followupBatchDelay ?? 25
+    return this.options.followupBatchDelay ?? 10
   }
 
   private get maxBatchSize() {
     return this.options.maxBatchSize ?? 50
+  }
+
+  private get maxWaitTime() {
+    return this.options.maxWaitTime ?? 1000
   }
 
   private scheduleClearQueuedThisTick() {
@@ -105,6 +111,9 @@ export class TranslationBatching {
         }
       }
     }
+
+    // Reset the first item time after flushing
+    this.firstItemTime = null
   }
 
   private chunkArray<T>(array: T[], size: number): T[][] {
@@ -119,8 +128,21 @@ export class TranslationBatching {
     if (this.flushTimeout) {
       clearTimeout(this.flushTimeout)
     }
+
+    // Calculate total items across all batches
+    let totalItems = 0
+    for (const map of this.queueMap.values()) {
+      totalItems += map.size
+    }
+
+    // Check if we've exceeded maximum wait time
+    if (this.firstItemTime && Date.now() - this.firstItemTime >= this.maxWaitTime) {
+      devDebug('[TranslationBatching] Flushing due to maximum wait time:', totalItems, 'items')
+      this.flushQueues()
+      return
+    }
+
     const delay = this.queueMap.size === 1 ? this.initialBatchDelay : this.followupBatchDelay
-    // devDebug('[TranslationBatching] Scheduling flush in', delay, 'ms')
     devDebug(
       '[TranslationBatching] Scheduling flush in',
       delay,
@@ -145,6 +167,11 @@ export class TranslationBatching {
       // devDebug('[TranslationBatching] Skipping duplicate:', cacheKey)
       devDebug('[TranslationBatching] Skipping duplicate:', cacheKey)
       return
+    }
+
+    // Track when the first item was queued
+    if (this.firstItemTime === null) {
+      this.firstItemTime = Date.now()
     }
 
     this.queuedThisTick.add(cacheKey)
@@ -218,39 +245,96 @@ export class TranslationBatching {
           })
         })
 
+        let result
+        try {
+          result = await response.json()
+        } catch (parseError) {
+          devDebug('[TranslationBatching] Failed to parse response as JSON:', parseError)
+          throw new Error(`Translation request failed: ${response.status}`)
+        }
+
+        // Handle HTTP errors by checking if the response contains an error message
         if (!response.ok) {
           devDebug(
             '[TranslationBatching] Translation request failed:',
             response.status,
             response.statusText
           )
+
+          // If the response contains an error message, use it
+          if (result && result[API_FIELD_ERROR]) {
+            devDebug(
+              '[TranslationBatching] HTTP error with API error message:',
+              result[API_FIELD_ERROR]
+            )
+
+            // Create error responses for all requests in this batch
+            const errorResponses = batchRequests.map((req) => ({
+              [API_FIELD_TEXT]: req[API_FIELD_TEXT],
+              [API_FIELD_ERROR]: result[API_FIELD_ERROR]
+            }))
+
+            // Add error responses to results
+            allResults.push({ [API_FIELD_TRANSLATIONS]: errorResponses })
+            allRequests.push(...batchRequests)
+
+            // Clear pending requests for this batch
+            batchRequests.forEach((req) => {
+              this.pendingRequests.delete(req.cacheKey)
+            })
+
+            // Continue to onBatchComplete to record errors
+            this.onBatchComplete(allResults, allRequests)
+            return
+          }
+
           throw new Error(`Translation request failed: ${response.status}`)
         }
 
-        const result = await response.json()
+        // Handle top-level error responses
+        if (result[API_FIELD_ERROR]) {
+          devDebug('[TranslationBatching] Top-level API error:', result[API_FIELD_ERROR])
 
-        // Handle error responses in the result
-        if (result[API_FIELD_TRANSLATIONS]) {
-          result[API_FIELD_TRANSLATIONS].forEach((translation: any, index: number) => {
-            if (translation[API_FIELD_ERROR]) {
-              const originalText = batchRequests[index]?.[API_FIELD_TEXT]
-              devDebug(
-                '[TranslationBatching] Translation error for',
-                originalText,
-                ':',
-                translation[API_FIELD_ERROR]
-              )
-            }
+          // Create error responses for all requests in this batch
+          const errorResponses = batchRequests.map((req) => ({
+            [API_FIELD_TEXT]: req[API_FIELD_TEXT],
+            [API_FIELD_ERROR]: result[API_FIELD_ERROR]
+          }))
+
+          // Add error responses to results
+          allResults.push({ [API_FIELD_TRANSLATIONS]: errorResponses })
+          allRequests.push(...batchRequests)
+
+          // Clear pending requests for this batch
+          batchRequests.forEach((req) => {
+            this.pendingRequests.delete(req.cacheKey)
+          })
+
+          // Continue to onBatchComplete to record errors
+        } else {
+          // Handle error responses in the result
+          if (result[API_FIELD_TRANSLATIONS]) {
+            result[API_FIELD_TRANSLATIONS].forEach((translation: any, index: number) => {
+              if (translation[API_FIELD_ERROR]) {
+                const originalText = batchRequests[index]?.[API_FIELD_TEXT]
+                devDebug(
+                  '[TranslationBatching] Translation error for',
+                  originalText,
+                  ':',
+                  translation[API_FIELD_ERROR]
+                )
+              }
+            })
+          }
+
+          allResults.push(result)
+          allRequests.push(...batchRequests)
+
+          // Clear pending requests for this batch
+          batchRequests.forEach((req) => {
+            this.pendingRequests.delete(req.cacheKey)
           })
         }
-
-        allResults.push(result)
-        allRequests.push(...batchRequests)
-
-        // Clear pending requests for this batch
-        batchRequests.forEach((req) => {
-          this.pendingRequests.delete(req.cacheKey)
-        })
       } catch (error) {
         devDebug('[TranslationBatching] Batch request failed for', langPair, ':', error)
 
@@ -284,6 +368,7 @@ export class TranslationBatching {
       this.flushTimeout = null
     }
     this.clearQueuedThisTickScheduled = false
+    this.firstItemTime = null
   }
 
   public getStats() {

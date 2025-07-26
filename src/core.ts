@@ -159,7 +159,11 @@ export async function translateBatch(
             throw new Error(`Translator service error: ${resp.status} ${resp.statusText}`)
           }
 
-          let parsed: { translations?: TranslateServiceResponse[]; t?: string } | null
+          let parsed: {
+            translations?: TranslateServiceResponse[]
+            t?: string
+            error?: string
+          } | null
           try {
             parsed = await resp.clone().json()
             // console.debug('[translator-sdk] Response parsed successfully', {
@@ -180,6 +184,18 @@ export async function translateBatch(
           // }
 
           const data = parsed || {}
+
+          // Handle top-level error responses
+          if (data[API_FIELD_ERROR]) {
+            console.warn(`[translator-sdk] Top-level API error:`, data[API_FIELD_ERROR])
+
+            // Create error responses for all translations
+            return serviceTranslations.map((translation) => ({
+              [API_FIELD_TEXT]: translation[API_FIELD_TEXT],
+              [API_FIELD_ERROR]: data[API_FIELD_ERROR]
+            }))
+          }
+
           const results = Array.isArray(data[API_FIELD_TRANSLATIONS])
             ? data[API_FIELD_TRANSLATIONS].map((translation, index) => {
                 const originalText = serviceTranslations[index]?.[API_FIELD_TEXT] || ''

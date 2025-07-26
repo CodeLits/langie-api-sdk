@@ -67,6 +67,11 @@ export interface TranslatorOptions {
    * Defaults to 50. Larger batches may be more efficient but could timeout.
    */
   maxBatchSize?: number
+  /**
+   * Maximum time (ms) to wait before sending a batch.
+   * Defaults to 2000ms (2 seconds).
+   */
+  maxWaitTime?: number
   minPopularity?: number
   country?: string
   region?: string

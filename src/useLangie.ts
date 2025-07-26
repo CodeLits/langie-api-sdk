@@ -153,7 +153,8 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     {
       initialBatchDelay: options.initialBatchDelay,
       followupBatchDelay: options.followupBatchDelay,
-      maxBatchSize: options.maxBatchSize
+      maxBatchSize: options.maxBatchSize,
+      maxWaitTime: options.maxWaitTime
     },
     translatorHost,
     () => currentLanguage.value,
@@ -200,6 +201,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
           // Record the error for future reference
           const errorKey = `${originalText}|${originalCtx}|${request[API_FIELD_FROM]}|${request[API_FIELD_TO]}`
           translationErrors.set(errorKey, translation[API_FIELD_ERROR])
+          console.log(`[Debug] Recorded error:`, { errorKey, error: translation[API_FIELD_ERROR] })
 
           return // Don't cache translations with errors
         }
@@ -383,6 +385,44 @@ function createLangieInstance(options: TranslatorOptions = {}) {
 
       const result = await response.json()
 
+      // Handle top-level error responses
+      if (result[API_FIELD_ERROR]) {
+        devDebug('[useLangie] Top-level API error:', result[API_FIELD_ERROR])
+
+        // Create error responses for all items
+        const errorResponses = items.map((item) => ({
+          [API_FIELD_TEXT]: item[API_FIELD_TEXT],
+          [API_FIELD_ERROR]: result[API_FIELD_ERROR]
+        }))
+
+        // Process error responses
+        errorResponses.forEach((translation: TranslationWithContext, index: number) => {
+          const item = items[index]
+          const originalText = item?.[API_FIELD_TEXT]
+          if (!originalText) {
+            return
+          }
+
+          // Handle error responses
+          if (translation[API_FIELD_ERROR]) {
+            devDebug(
+              '[useLangie] Translation error for',
+              originalText,
+              ':',
+              translation[API_FIELD_ERROR]
+            )
+
+            // Record the error for future reference
+            const errorKey = `${originalText}|${item[API_FIELD_CTX] || effectiveCtx}|${effectiveFrom}|${to}`
+            translationErrors.set(errorKey, translation[API_FIELD_ERROR])
+
+            return // Don't cache translations with errors
+          }
+        })
+
+        return // Skip normal processing
+      }
+
       if (result[API_FIELD_TRANSLATIONS]) {
         result[API_FIELD_TRANSLATIONS].forEach(
           (translation: TranslationWithContext, index: number) => {
@@ -496,7 +536,17 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       const effectiveFrom = from || ltDefaults.orig || ''
       const effectiveTo = to || currentLanguage.value
       const errorKey = `${text}|${effectiveCtx}|${effectiveFrom}|${effectiveTo}`
-      return translationErrors.get(errorKey) || null
+      const error = translationErrors.get(errorKey) || null
+      console.log(`[Debug] getTranslationError:`, {
+        text,
+        ctx,
+        from,
+        to,
+        errorKey,
+        error,
+        allErrors: Array.from(translationErrors.entries())
+      })
+      return error
     },
 
     // Utility functions

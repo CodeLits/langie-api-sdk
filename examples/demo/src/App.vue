@@ -27,7 +27,12 @@ const {
   fetchLanguages,
   getTranslationError
 } = useLangie({
-  translatorHost: API_HOST
+  translatorHost: API_HOST,
+  // Optimized batching settings with reduced timings
+  initialBatchDelay: 100, // Reduced initial batch delay
+  followupBatchDelay: 50, // Reduced followup delay
+  maxBatchSize: 100, // Larger batch size
+  maxWaitTime: 1500 // Reduced maximum wait time
 })
 
 // Theme management
@@ -205,7 +210,7 @@ const handleTranslate = () => {
   // If result is same as original, it might be an error or still loading
   // Wait for translation to arrive or timeout
   let attempts = 0
-  const maxAttempts = 10 // 5 seconds total (10 * 500ms)
+  const maxAttempts = 5 // 2.5 seconds total (5 * 500ms) - reduced for faster error detection
 
   const checkTranslation = () => {
     attempts++
@@ -224,17 +229,22 @@ const handleTranslate = () => {
       translation.value = currentResult
       isTranslating.value = false
     } else if (attempts >= maxAttempts) {
-      // Timeout - likely an error
-      error.value = 'Translation failed or not supported for this language.'
+      // Timeout - check for error one more time before giving up
+      const finalError = getTranslationError(textToTranslate.value, 'ui', 'en', to)
+      if (finalError) {
+        error.value = finalError
+      } else {
+        error.value = 'Translation failed or not supported for this language.'
+      }
       isTranslating.value = false
     } else {
-      // Still waiting, check again in 500ms
-      setTimeout(checkTranslation, 500)
+      // Still waiting, check again in 300ms
+      setTimeout(checkTranslation, 300)
     }
   }
 
   // Start checking for translation
-  setTimeout(checkTranslation, 500)
+  setTimeout(checkTranslation, 300)
 }
 </script>
 
