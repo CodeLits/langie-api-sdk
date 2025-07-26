@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.24] - 2024-06-10
+
+### Added
+
+- **Error Tracking**: Added `getTranslationError()` function to retrieve translation error messages
+- **Demo Error Handling**: Enhanced demo to show translation errors with proper UI feedback
+- **Error UI**: Added error display in demo with loading states and timeout handling
+
+### Enhanced
+
+- **Error Detection**: SDK now tracks translation errors for better user experience
+- **Demo UX**: Improved demo with error states and loading indicators
+- **TypeScript Support**: Added `getTranslationError` to TypeScript definitions
+
 ## [1.9.23] - 2024-06-10
 
 ### Changed
