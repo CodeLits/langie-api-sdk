@@ -24,7 +24,8 @@ const {
   isLoading: isTranslatorLoading,
   setLanguage,
   currentLanguage,
-  fetchLanguages
+  fetchLanguages,
+  getTranslationError
 } = useLangie({
   translatorHost: API_HOST
 })
@@ -39,11 +40,12 @@ const textToTranslate = ref('Welcome to the application! Enjoy!')
 const translation = ref('')
 const error = ref('')
 const isMounted = ref(false)
+const isTranslating = ref(false)
 const serviceStatus = ref('Checking...')
 const rateLimited = ref(false)
 const lastRateLimitTime = ref(null)
 
-const isLoading = computed(() => isTranslatorLoading.value)
+const isLoading = computed(() => isTranslatorLoading.value || isTranslating.value)
 
 const isRateLimitExpired = computed(() => {
   if (!lastRateLimitTime.value) return true
@@ -177,11 +179,74 @@ watch(
 const handleTranslate = () => {
   if (!textToTranslate.value.trim()) {
     translation.value = ''
+    error.value = ''
+    isTranslating.value = false
     return
   }
+
+  // Clear previous error and translation
+  error.value = ''
+  translation.value = ''
+  isTranslating.value = true
+
   // Use selected targetLang as the translation target
   const to = targetLang.value?.code || 'en'
-  translation.value = lr(textToTranslate.value, 'ui', 'en', to)
+
+  // Get the translation
+  const result = lr(textToTranslate.value, 'ui', 'en', to)
+
+  // If translation is immediately available and different from original
+  if (result !== textToTranslate.value) {
+    translation.value = result
+    isTranslating.value = false
+    return
+  }
+
+  // If result is same as original, it might be an error or still loading
+  // Wait for translation to arrive or timeout
+  let attempts = 0
+  const maxAttempts = 10 // 5 seconds total (10 * 500ms)
+
+  const checkTranslation = () => {
+    attempts++
+    const currentResult = lr(textToTranslate.value, 'ui', 'en', to)
+
+    console.log(
+      `[Debug] Attempt ${attempts}: result = "${currentResult}", original = "${textToTranslate.value}"`
+    )
+
+    // Check if there's an error for this translation
+    const translationError = getTranslationError(textToTranslate.value, 'ui', 'en', to)
+    if (translationError) {
+      console.log('[Debug] Translation error detected:', translationError)
+      error.value = translationError
+      isTranslating.value = false
+      return
+    }
+
+    if (currentResult !== textToTranslate.value) {
+      // Translation arrived
+      console.log('[Debug] Translation arrived:', currentResult)
+      translation.value = currentResult
+      isTranslating.value = false
+    } else if (attempts >= maxAttempts) {
+      // Timeout - likely an error
+      console.log('[Debug] Translation timeout - showing error')
+      error.value = 'Translation failed or not supported for this language.'
+      isTranslating.value = false
+    } else {
+      // Still waiting, check again in 500ms
+      setTimeout(checkTranslation, 500)
+    }
+  }
+
+  // Start checking for translation
+  setTimeout(checkTranslation, 500)
+}
+
+const testErrorHandling = () => {
+  textToTranslate.value = 'This text will cause an error'
+  handleTranslate()
 }
 </script>
 
@@ -248,6 +313,22 @@ const handleTranslate = () => {
         :error="error"
         @translate="handleTranslate"
       />
+
+      <!-- Test error button -->
+      <div class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 rounded-md">
+        <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">
+          Test Error Handling
+        </h3>
+        <button
+          class="px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600"
+          @click="testErrorHandling"
+        >
+          Test Error Response
+        </button>
+        <p class="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+          This will set text that should trigger an error response from the API
+        </p>
+      </div>
 
       <ComponentDemo :languages="displayLanguages" :is-loading="isLoading" :is-dark="isDark" />
     </div>

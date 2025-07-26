@@ -196,6 +196,11 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             ':',
             translation[API_FIELD_ERROR]
           )
+
+          // Record the error for future reference
+          const errorKey = `${originalText}|${originalCtx}|${request[API_FIELD_FROM]}|${request[API_FIELD_TO]}`
+          translationErrors.set(errorKey, translation[API_FIELD_ERROR])
+
           return // Don't cache translations with errors
         }
 
@@ -257,6 +262,9 @@ function createLangieInstance(options: TranslatorOptions = {}) {
   // Set to track timeout ids for cleanup
   const pendingTimeouts = new Set<ReturnType<typeof setTimeout>>()
 
+  // Track translation errors
+  const translationErrors = new Map<string, string>()
+
   // Internal translation logic shared by l and lr
   const translateInternal = (
     text: string,
@@ -284,6 +292,12 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     // Return cached translation if available
     if (cache[cacheKey]) {
       return cache[cacheKey]
+    }
+
+    // Check if we have a recorded error for this translation
+    const errorKey = `${text}|${effectiveCtx}|${from}|${to}`
+    if (translationErrors.has(errorKey)) {
+      return text // Return original text for failed translations
     }
 
     // Check if we've recently queued this translation
@@ -476,6 +490,15 @@ function createLangieInstance(options: TranslatorOptions = {}) {
     lr,
     fetchAndCacheBatch,
 
+    // Error handling
+    getTranslationError: (text: string, ctx?: string, from?: string, to?: string) => {
+      const effectiveCtx = ctx !== undefined ? ctx : ltDefaults.ctx || 'ui'
+      const effectiveFrom = from || ltDefaults.orig || ''
+      const effectiveTo = to || currentLanguage.value
+      const errorKey = `${text}|${effectiveCtx}|${effectiveFrom}|${effectiveTo}`
+      return translationErrors.get(errorKey) || null
+    },
+
     // Utility functions
     cleanup: () => {
       clearTranslations()
@@ -483,6 +506,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       // Очистка всех таймеров
       pendingTimeouts.forEach((id) => clearTimeout(id))
       pendingTimeouts.clear()
+      translationErrors.clear()
     },
     getBatchingStats: () => batching.getStats(),
 

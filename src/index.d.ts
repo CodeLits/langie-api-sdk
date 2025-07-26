@@ -26,6 +26,7 @@ export declare function useLangie(options?: TranslatorOptions): {
     to?: string,
     globalCtx?: string
   ) => Promise<void>
+  getTranslationError: (text: string, ctx?: string, from?: string, to?: string) => string | null
   cleanup: () => void
   getBatchingStats: () => {
     pendingRequests: number
