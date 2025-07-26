@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { translateBatch, fetchAvailableLanguages, clearTranslationCache } from './core'
-import { API_FIELD_ERROR } from './constants'
+import { API_FIELD_ERROR, API_FIELD_TEXT } from './constants'
 
 // Mock fetch globally
 const mockFetch = vi.fn()
@@ -35,17 +35,17 @@ describe('translateBatch', () => {
   })
 
   it('does not call fetch for same-language translations', async () => {
-    const translations = [{ t: 'hello', from: 'en', to: 'en' }]
+    const translations = [{ [API_FIELD_TEXT]: 'hello', from: 'en', to: 'en' }]
     const result = await translateBatch(translations)
     expect(mockFetch).not.toHaveBeenCalled()
-    expect(result).toEqual([{ t: 'hello' }])
+    expect(result).toEqual([{ [API_FIELD_TEXT]: 'hello' }])
   })
 
   it('calls fetch for translations that need it', async () => {
-    const translations = [{ t: 'hello', from: 'en', to: 'es' }]
+    const translations = [{ [API_FIELD_TEXT]: 'hello', from: 'en', to: 'es' }]
     mockFetch.mockResolvedValue(
       createMockResponse({
-        translations: [{ t: 'hola' }]
+        translations: [{ [API_FIELD_TEXT]: 'hola' }]
       })
     )
 
@@ -58,15 +58,15 @@ describe('translateBatch', () => {
   })
 
   it('handles successful API response', async () => {
-    const translations = [{ t: 'hello', from: 'en', to: 'es' }]
+    const translations = [{ [API_FIELD_TEXT]: 'hello', from: 'en', to: 'es' }]
     mockFetch.mockResolvedValue(
       createMockResponse({
-        translations: [{ t: 'hola' }]
+        translations: [{ [API_FIELD_TEXT]: 'hola' }]
       })
     )
 
     const result = await translateBatch(translations)
-    expect(result).toEqual([{ t: 'hola' }])
+    expect(result).toEqual([{ [API_FIELD_TEXT]: 'hola' }])
   })
 
   it('handles API error response', async () => {
@@ -74,7 +74,7 @@ describe('translateBatch', () => {
       createMockResponse('Server error', false, 500, 'Internal Server Error')
     )
 
-    await expect(translateBatch([{ t: 'Hello', to: 'fr' }])).rejects.toThrow(
+    await expect(translateBatch([{ [API_FIELD_TEXT]: 'Hello', to: 'fr' }])).rejects.toThrow(
       'Failed to connect to translator'
     )
   })
@@ -84,24 +84,26 @@ describe('translateBatch', () => {
       createMockResponse({
         translations: [
           {
-            t: 'Enter text to translate',
+            [API_FIELD_TEXT]: 'Enter text to translate',
             [API_FIELD_ERROR]: 'Translation failed or not supported for this language.'
           }
         ]
       })
     )
 
-    const results = await translateBatch([{ t: 'Enter text to translate', to: 'fr' }])
+    const results = await translateBatch([
+      { [API_FIELD_TEXT]: 'Enter text to translate', to: 'fr' }
+    ])
 
     expect(results).toHaveLength(1)
     expect(results[0]).toEqual({
-      t: 'Enter text to translate', // Should return original text
+      [API_FIELD_TEXT]: 'Enter text to translate', // Should return original text
       [API_FIELD_ERROR]: 'Translation failed or not supported for this language.'
     })
   })
 
   it('handles network error', async () => {
-    const translations = [{ t: 'hello', from: 'en', to: 'es' }]
+    const translations = [{ [API_FIELD_TEXT]: 'hello', from: 'en', to: 'es' }]
     mockFetch.mockRejectedValue(new Error('Network failure'))
 
     await expect(translateBatch(translations)).rejects.toThrow(/Failed to connect to translator/)
@@ -109,19 +111,23 @@ describe('translateBatch', () => {
 
   it('reassembles results in correct order', async () => {
     const translations = [
-      { t: 'one', from: 'en', to: 'es' },
-      { t: 'two', from: 'en', to: 'en' },
-      { t: 'three', from: 'en', to: 'fr' }
+      { [API_FIELD_TEXT]: 'one', from: 'en', to: 'es' },
+      { [API_FIELD_TEXT]: 'two', from: 'en', to: 'en' },
+      { [API_FIELD_TEXT]: 'three', from: 'en', to: 'fr' }
     ]
 
     mockFetch.mockResolvedValue(
       createMockResponse({
-        translations: [{ t: 'uno' }, { t: 'trois' }]
+        translations: [{ [API_FIELD_TEXT]: 'uno' }, { [API_FIELD_TEXT]: 'trois' }]
       })
     )
 
     const result = await translateBatch(translations)
-    expect(result).toEqual([{ t: 'uno' }, { t: 'two' }, { t: 'trois' }])
+    expect(result).toEqual([
+      { [API_FIELD_TEXT]: 'uno' },
+      { [API_FIELD_TEXT]: 'two' },
+      { [API_FIELD_TEXT]: 'trois' }
+    ])
   })
 })
 
