@@ -3,7 +3,8 @@ import {
   API_FIELD_FROM,
   API_FIELD_TO,
   API_FIELD_CTX,
-  API_FIELD_TRANSLATIONS
+  API_FIELD_TRANSLATIONS,
+  API_FIELD_ERROR
 } from './constants'
 
 /**
@@ -39,7 +40,7 @@ export interface TranslateServiceResponse {
   [API_FIELD_TEXT]?: string
   [API_FIELD_FROM]?: string
   [API_FIELD_TRANSLATIONS]?: TranslateServiceResponse[]
-  error?: string // Error message from API
+  [API_FIELD_ERROR]?: string // Error message from API
 }
 
 /**

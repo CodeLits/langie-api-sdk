@@ -39,3 +39,6 @@ export const API_FIELD_TRANSLATED = 't'
 
 // Translations array field
 export const API_FIELD_TRANSLATIONS = 'translations'
+
+// Error field for API responses
+export const API_FIELD_ERROR = 'error'

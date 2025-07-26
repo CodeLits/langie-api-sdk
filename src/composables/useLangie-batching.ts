@@ -5,7 +5,8 @@ import {
   API_FIELD_FROM,
   API_FIELD_TO,
   API_FIELD_CTX,
-  API_FIELD_TRANSLATIONS
+  API_FIELD_TRANSLATIONS,
+  API_FIELD_ERROR
 } from '../constants'
 
 export interface BatchingOptions {
@@ -231,13 +232,13 @@ export class TranslationBatching {
         // Handle error responses in the result
         if (result[API_FIELD_TRANSLATIONS]) {
           result[API_FIELD_TRANSLATIONS].forEach((translation: any, index: number) => {
-            if (translation.error) {
+            if (translation[API_FIELD_ERROR]) {
               const originalText = batchRequests[index]?.[API_FIELD_TEXT]
               devDebug(
                 '[TranslationBatching] Translation error for',
                 originalText,
                 ':',
-                translation.error
+                translation[API_FIELD_ERROR]
               )
             }
           })

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { translateBatch, fetchAvailableLanguages, clearTranslationCache } from './core'
+import { API_FIELD_ERROR } from './constants'
 
 // Mock fetch globally
 const mockFetch = vi.fn()
@@ -84,7 +85,7 @@ describe('translateBatch', () => {
         translations: [
           {
             t: 'Enter text to translate',
-            error: 'Translation failed or not supported for this language.'
+            [API_FIELD_ERROR]: 'Translation failed or not supported for this language.'
           }
         ]
       })
@@ -95,7 +96,7 @@ describe('translateBatch', () => {
     expect(results).toHaveLength(1)
     expect(results[0]).toEqual({
       t: 'Enter text to translate', // Should return original text
-      error: 'Translation failed or not supported for this language.'
+      [API_FIELD_ERROR]: 'Translation failed or not supported for this language.'
     })
   })
 

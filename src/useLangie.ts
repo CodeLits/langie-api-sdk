@@ -7,7 +7,8 @@ import {
   API_FIELD_FROM,
   API_FIELD_TO,
   API_FIELD_CTX,
-  API_FIELD_TRANSLATIONS
+  API_FIELD_TRANSLATIONS,
+  API_FIELD_ERROR
 } from './constants'
 import { setCache, getCache } from './utils/cache'
 import { devDebug } from './utils/debug'
@@ -188,8 +189,13 @@ function createLangieInstance(options: TranslatorOptions = {}) {
         const originalCtx = request[API_FIELD_CTX] ?? (ltDefaults.ctx || 'ui')
 
         // Handle error responses
-        if (translation.error) {
-          devDebug('[useLangie] Translation error for', originalText, ':', translation.error)
+        if (translation[API_FIELD_ERROR]) {
+          devDebug(
+            '[useLangie] Translation error for',
+            originalText,
+            ':',
+            translation[API_FIELD_ERROR]
+          )
           return // Don't cache translations with errors
         }
 
@@ -373,8 +379,13 @@ function createLangieInstance(options: TranslatorOptions = {}) {
             }
 
             // Handle error responses
-            if (translation.error) {
-              devDebug('[useLangie] Translation error for', originalText, ':', translation.error)
+            if (translation[API_FIELD_ERROR]) {
+              devDebug(
+                '[useLangie] Translation error for',
+                originalText,
+                ':',
+                translation[API_FIELD_ERROR]
+              )
               return // Don't cache translations with errors
             }
 

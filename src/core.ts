@@ -12,7 +12,8 @@ import {
   API_FIELD_FROM,
   API_FIELD_TO,
   API_FIELD_CTX,
-  API_FIELD_TRANSLATIONS
+  API_FIELD_TRANSLATIONS,
+  API_FIELD_ERROR
 } from './constants'
 
 const DEFAULT_TRANSLATOR_HOST = 'http://localhost:8081'
@@ -184,14 +185,14 @@ export async function translateBatch(
                 const originalText = serviceTranslations[index]?.[API_FIELD_TEXT] || ''
 
                 // Handle error responses
-                if (translation.error) {
+                if (translation[API_FIELD_ERROR]) {
                   console.warn(
                     `[translator-sdk] Translation error for "${originalText}":`,
-                    translation.error
+                    translation[API_FIELD_ERROR]
                   )
                   return {
                     [API_FIELD_TEXT]: originalText, // Return original text on error
-                    error: translation.error
+                    [API_FIELD_ERROR]: translation[API_FIELD_ERROR]
                   }
                 }
 
