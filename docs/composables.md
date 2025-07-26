@@ -246,6 +246,114 @@ const description = lr('Product description', 'content')
 </script>
 ```
 
+## Error Handling
+
+The SDK provides comprehensive error handling for translation failures:
+
+### Translation Error Tracking
+
+The SDK automatically tracks translation errors and provides a way to retrieve them:
+
+```typescript
+const { getTranslationError } = useLangie()
+
+// Check if a specific translation failed
+const error = getTranslationError('Hello world', 'ui', 'en', 'fr')
+if (error) {
+  console.log('Translation failed:', error)
+  // Show error message to user
+}
+```
+
+### API Error Response Format
+
+The SDK handles two types of error responses:
+
+#### 1. HTTP Error Status Codes
+
+When the API returns a non-200 status code, the SDK will throw an error:
+
+```javascript
+// Backend returns 500 Internal Server Error
+// SDK will throw: "Translator service error: 500 Internal Server Error"
+```
+
+#### 2. Error Field in Translation Objects
+
+You can also return individual translation errors by including an `error` field in translation objects:
+
+```javascript
+// API Response
+{
+  "translations": [
+    {
+      "t": "Enter text to translate",
+      "error": "Translation failed or not supported for this language."
+    },
+    {
+      "t": "Hello world",
+      "translated": "Bonjour le monde"
+    }
+  ]
+}
+```
+
+**SDK Behavior:**
+
+- Translations with `error` field are logged as warnings
+- Original text is returned instead of translated text
+- Error messages are preserved and can be retrieved with `getTranslationError()`
+- Other translations in the same batch continue to work normally
+
+### Error Handling in Components
+
+```vue
+<template>
+  <div>
+    <p>{{ lr('Hello world') }}</p>
+
+    <!-- Show error if translation failed -->
+    <div v-if="translationError" class="error-message">
+      {{ translationError }}
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { useLangie } from 'langie-api-sdk'
+
+const { lr, getTranslationError } = useLangie()
+
+const translationError = computed(() => {
+  return getTranslationError('Hello world', 'ui', 'en', 'fr')
+})
+</script>
+```
+
+### Demo Error Handling
+
+The demo application includes comprehensive error handling:
+
+```javascript
+const handleTranslate = () => {
+  // Clear previous errors
+  error.value = ''
+
+  const result = lr(textToTranslate.value, 'ui', 'en', to)
+
+  // Check for translation errors
+  const translationError = getTranslationError(textToTranslate.value, 'ui', 'en', to)
+  if (translationError) {
+    error.value = translationError
+    return
+  }
+
+  // Handle successful translation
+  translation.value = result
+}
+```
+
 ## Important Notes
 
 ### Translation Caching (v1.7.2+)

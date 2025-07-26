@@ -211,14 +211,9 @@ const handleTranslate = () => {
     attempts++
     const currentResult = lr(textToTranslate.value, 'ui', 'en', to)
 
-    console.log(
-      `[Debug] Attempt ${attempts}: result = "${currentResult}", original = "${textToTranslate.value}"`
-    )
-
     // Check if there's an error for this translation
     const translationError = getTranslationError(textToTranslate.value, 'ui', 'en', to)
     if (translationError) {
-      console.log('[Debug] Translation error detected:', translationError)
       error.value = translationError
       isTranslating.value = false
       return
@@ -226,12 +221,10 @@ const handleTranslate = () => {
 
     if (currentResult !== textToTranslate.value) {
       // Translation arrived
-      console.log('[Debug] Translation arrived:', currentResult)
       translation.value = currentResult
       isTranslating.value = false
     } else if (attempts >= maxAttempts) {
       // Timeout - likely an error
-      console.log('[Debug] Translation timeout - showing error')
       error.value = 'Translation failed or not supported for this language.'
       isTranslating.value = false
     } else {
@@ -242,11 +235,6 @@ const handleTranslate = () => {
 
   // Start checking for translation
   setTimeout(checkTranslation, 500)
-}
-
-const testErrorHandling = () => {
-  textToTranslate.value = 'This text will cause an error'
-  handleTranslate()
 }
 </script>
 
@@ -313,22 +301,6 @@ const testErrorHandling = () => {
         :error="error"
         @translate="handleTranslate"
       />
-
-      <!-- Test error button -->
-      <div class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 rounded-md">
-        <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">
-          Test Error Handling
-        </h3>
-        <button
-          class="px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600"
-          @click="testErrorHandling"
-        >
-          Test Error Response
-        </button>
-        <p class="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-          This will set text that should trigger an error response from the API
-        </p>
-      </div>
 
       <ComponentDemo :languages="displayLanguages" :is-loading="isLoading" :is-dark="isDark" />
     </div>
