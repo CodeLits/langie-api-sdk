@@ -201,7 +201,6 @@ function createLangieInstance(options: TranslatorOptions = {}) {
           // Record the error for future reference
           const errorKey = `${originalText}|${originalCtx}|${request[API_FIELD_FROM]}|${request[API_FIELD_TO]}`
           translationErrors.set(errorKey, translation[API_FIELD_ERROR])
-          console.log(`[Debug] Recorded error:`, { errorKey, error: translation[API_FIELD_ERROR] })
 
           return // Don't cache translations with errors
         }
@@ -536,17 +535,7 @@ function createLangieInstance(options: TranslatorOptions = {}) {
       const effectiveFrom = from || ltDefaults.orig || ''
       const effectiveTo = to || currentLanguage.value
       const errorKey = `${text}|${effectiveCtx}|${effectiveFrom}|${effectiveTo}`
-      const error = translationErrors.get(errorKey) || null
-      console.log(`[Debug] getTranslationError:`, {
-        text,
-        ctx,
-        from,
-        to,
-        errorKey,
-        error,
-        allErrors: Array.from(translationErrors.entries())
-      })
-      return error
+      return translationErrors.get(errorKey) || null
     },
 
     // Utility functions

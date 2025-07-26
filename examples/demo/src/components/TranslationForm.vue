@@ -36,7 +36,7 @@
       v-if="error"
       class="mt-6 p-4 bg-red-50 text-red-700 dark:bg-red-900 dark:text-red-300 rounded-md"
     >
-      {{ error }}
+      <span v-html="formatErrorMessage(error)"></span>
     </div>
   </div>
 </template>
@@ -56,4 +56,18 @@ defineProps({
 })
 
 defineEmits(['update:textToTranslate', 'translate'])
+
+const formatErrorMessage = (error) => {
+  if (!error) return ''
+
+  // Check if this is the rate limit error and make "create an account" clickable
+  if (error.includes('create an account')) {
+    return error.replace(
+      'create an account',
+      '<a href="https://api.langie.uk/login" target="_blank" class="underline hover:text-red-800 dark:hover:text-red-200 font-medium">create an account</a>'
+    )
+  }
+
+  return error
+}
 </script>
