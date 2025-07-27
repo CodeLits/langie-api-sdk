@@ -320,6 +320,7 @@ const onFlagError = (event: Event) => {
   --ms-ring-width: 3px;
   --ms-ring-color: v-bind('THEME_COLORS.light.ring');
   --ms-placeholder-color: v-bind('THEME_COLORS.light.placeholder');
+  --ms-color: #1f2937; /* Explicit text color for light theme */
 
   /* Options */
   --ms-option-font-size: 1rem;
@@ -336,6 +337,7 @@ const onFlagError = (event: Event) => {
   /* Dropdown */
   --ms-dropdown-bg: v-bind('THEME_COLORS.light.dropdownBackground');
   --ms-dropdown-border-color: v-bind('THEME_COLORS.light.dropdownBorder');
+  --ms-dropdown-color: #1f2937; /* Explicit dropdown text color for light theme */
 
   /* Others */
   --ms-tag-bg: v-bind('THEME_COLORS.light.tagBackground');
@@ -399,6 +401,12 @@ const onFlagError = (event: Event) => {
   text-overflow: ellipsis;
   flex: 1;
   line-height: 1.4;
+  color: #1f2937; /* Explicit text color for light theme */
+}
+
+.is-dark :deep(.multiselect-single-label span),
+.is-dark :deep(.multiselect-option span) {
+  color: #f9fafb; /* Explicit text color for dark theme */
 }
 
 :deep(.native-name) {
@@ -414,6 +422,11 @@ const onFlagError = (event: Event) => {
 :deep(.multiselect) {
   width: 100%;
   min-width: 200px;
+  color: #1f2937; /* Explicit text color for light theme */
+}
+
+.is-dark :deep(.multiselect) {
+  color: #f9fafb; /* Explicit text color for dark theme */
 }
 
 :deep(.multiselect-dropdown) {
