@@ -5,17 +5,17 @@
         <lt>Vue Components Demo</lt>
       </h2>
       <button
-        class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
-        @click="showDemo = !showDemo"
+        class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-all duration-200 ease-in-out"
+        @click="toggleDemo"
       >
         <lt v-if="showDemo">Hide Demo</lt>
         <lt v-else>Show Demo</lt>
       </button>
     </div>
 
-    <div v-if="showDemo" class="space-y-6">
+    <div v-show="showDemo" class="space-y-6 transition-all duration-300 ease-in-out">
       <!-- Advanced LanguageSelect Demo -->
-      <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg min-h-[200px]">
         <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
           Advanced <span class="text-blue-500">{{ '<LanguageSelect />' }}</span>
         </h3>
@@ -38,7 +38,7 @@
       </div>
 
       <!-- InterfaceLanguageSelect Demo -->
-      <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg min-h-[200px]">
         <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
           <span class="text-blue-500">{{ '<InterfaceLanguageSelect />' }}</span>
         </h3>
@@ -64,7 +64,7 @@
       </div>
 
       <!-- Simple LanguageSelect Demo -->
-      <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg min-h-[200px]">
         <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
           <span class="text-blue-500">{{ '<SimpleLanguageSelect />' }}</span>
         </h3>
@@ -89,7 +89,7 @@
 
       <!-- Comparison Info -->
       <div
-        class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+        class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 min-h-[150px]"
       >
         <h4 class="font-medium text-blue-900 dark:text-blue-200 mb-2">
           <lt>When to use which component?</lt>
@@ -134,5 +134,9 @@ const selectedInterfaceLang = ref(null)
 function handleInterfaceLanguageChange(language) {
   selectedInterfaceLang.value = language
   // Interface language changed
+}
+
+function toggleDemo() {
+  showDemo.value = !showDemo.value
 }
 </script>
