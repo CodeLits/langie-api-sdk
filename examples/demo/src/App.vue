@@ -273,8 +273,8 @@ const handleTranslate = () => {
               class="inline-flex h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-200 ease-in-out items-center justify-center"
               :class="isDark ? 'translate-x-7' : 'translate-x-1'"
             >
-              <SunIcon v-if="isDark" class="w-4 h-4 text-yellow-500" />
-              <MoonIcon v-else class="w-4 h-4 text-gray-600" />
+              <MoonIcon v-if="isDark" class="w-4 h-4 text-gray-600" />
+              <SunIcon v-else class="w-4 h-4 text-yellow-500" />
             </span>
           </button>
         </div>
