@@ -265,11 +265,17 @@ const handleTranslate = () => {
         </div>
         <div class="flex items-center space-x-2">
           <button
-            class="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900"
+            :class="isDark ? 'bg-blue-600' : 'bg-gray-200'"
             @click="toggleTheme"
           >
-            <SunIcon v-if="isDark" class="w-7 h-7 text-yellow-500" />
-            <MoonIcon v-else class="w-7 h-7 text-black" />
+            <span
+              class="inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-200 ease-in-out"
+              :class="isDark ? 'translate-x-7' : 'translate-x-1'"
+            >
+              <SunIcon v-if="isDark" class="w-4 h-4 text-yellow-500 mx-auto mt-0.5" />
+              <MoonIcon v-else class="w-4 h-4 text-gray-600 mx-auto mt-0.5" />
+            </span>
           </button>
         </div>
       </div>
