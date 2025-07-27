@@ -30,7 +30,7 @@
             :alt="`${value.native_name || value.name} flag`"
             @error="onFlagError"
           />
-          <span
+          <span class="language-text"
             >{{ value.name }}
             <span class="native-name">({{ value.native_name || value.name }})</span></span
           >
@@ -45,7 +45,7 @@
             :alt="`${option.name} flag`"
             @error="onFlagError"
           />
-          <span
+          <span class="language-text"
             >{{ option.name }}
             <span class="native-name">({{ option.native_name || option.name }})</span></span
           >
@@ -379,40 +379,50 @@ const onFlagError = (event: Event) => {
 
 :deep(.multiselect-single-label),
 :deep(.multiselect-option) {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  width: 100%;
-  padding: 4px 8px;
-  gap: 8px;
+  display: flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  padding: 4px 8px !important;
+  gap: 8px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
 }
 
 :deep(.multiselect-option) {
-  text-align: left;
-  transition: background-color 0.15s ease;
+  text-align: left !important;
+  transition: background-color 0.15s ease !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
 }
 
-:deep(.multiselect-single-label span),
-:deep(.multiselect-option span) {
-  display: block;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  line-height: 1.4;
-  color: #1f2937; /* Explicit text color for light theme */
+:deep(.language-text) {
+  display: inline-block !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex: 1 !important;
+  line-height: 1.4 !important;
+  color: #1f2937 !important; /* Explicit text color for light theme */
+  word-break: keep-all !important;
+  word-wrap: normal !important;
+  word-spacing: normal !important;
+  max-width: 100% !important;
 }
 
-.is-dark :deep(.multiselect-single-label span),
-.is-dark :deep(.multiselect-option span) {
-  color: #f9fafb; /* Explicit text color for dark theme */
+.is-dark :deep(.language-text) {
+  color: #f9fafb !important; /* Explicit text color for dark theme */
 }
 
 :deep(.native-name) {
   color: v-bind('COLORS.text.secondary');
   margin-left: 0.5rem;
   font-size: 0.9em;
+  white-space: nowrap !important;
+  display: inline !important;
 }
 
 .is-dark :deep(.native-name) {
@@ -436,6 +446,19 @@ const onFlagError = (event: Event) => {
 :deep(.multiselect-dropdown .multiselect-option) {
   padding: 4px 8px !important;
   margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
+}
+
+:deep(.multiselect-dropdown .language-text) {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  word-break: keep-all !important;
+  word-wrap: normal !important;
+  word-spacing: normal !important;
+  max-width: 100% !important;
 }
 
 :deep(.multiselect-no-results),
