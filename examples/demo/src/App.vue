@@ -265,16 +265,22 @@ const handleTranslate = () => {
         </div>
         <div class="flex items-center space-x-2">
           <button
-            class="relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900"
-            :class="isDark ? 'bg-blue-600' : 'bg-gray-200'"
+            class="relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900 hover:scale-105 active:scale-95"
+            :class="isDark ? 'bg-blue-600 shadow-lg shadow-blue-600/30' : 'bg-gray-200 shadow-md'"
             @click="toggleTheme"
           >
             <span
-              class="inline-flex h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-200 ease-in-out items-center justify-center"
-              :class="isDark ? 'translate-x-7' : 'translate-x-1'"
+              class="inline-flex h-6 w-6 transform rounded-full bg-white shadow-lg transition-all duration-300 ease-in-out items-center justify-center hover:shadow-xl"
+              :class="isDark ? 'translate-x-7 rotate-12' : 'translate-x-1 -rotate-12'"
             >
-              <MoonIcon v-if="isDark" class="w-4 h-4 text-gray-600" />
-              <SunIcon v-else class="w-4 h-4 text-yellow-500" />
+              <MoonIcon
+                v-if="isDark"
+                class="w-4 h-4 text-gray-600 transition-all duration-300 ease-in-out"
+              />
+              <SunIcon
+                v-else
+                class="w-4 h-4 text-yellow-500 transition-all duration-300 ease-in-out"
+              />
             </span>
           </button>
         </div>
