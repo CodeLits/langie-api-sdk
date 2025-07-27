@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
 import { useLangie, DEFAULT_API_HOST, DEV_API_HOST, InterfaceLanguageSelect } from '@/index'
-import { SunIcon, MoonIcon } from '@heroicons/vue/24/solid'
+import { SunIcon, StarIcon } from '@heroicons/vue/24/solid'
 import { devDebug as debugOnlyDev } from '@/utils/debug'
 
 // Components
@@ -268,7 +268,7 @@ const handleTranslate = () => {
             @click="toggleTheme"
           >
             <SunIcon v-if="isDark" class="w-7 h-7 text-yellow-500" />
-            <MoonIcon v-else class="w-7 h-7 text-blue-400" />
+            <StarIcon v-else class="w-7 h-7 text-blue-400" />
           </button>
         </div>
       </div>
