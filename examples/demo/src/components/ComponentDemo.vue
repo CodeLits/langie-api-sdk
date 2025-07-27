@@ -123,11 +123,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { LanguageSelect, SimpleLanguageSelect, InterfaceLanguageSelect, lt } from '@/index'
 import Modal from './Modal.vue'
 
-defineProps({
+const props = defineProps({
   languages: Array,
   isLoading: Boolean,
   isDark: Boolean
@@ -137,6 +137,20 @@ const showDemo = ref(false)
 const demoLangAdvanced = ref(null)
 const demoLangSimple = ref(null)
 const selectedInterfaceLang = ref(null)
+
+// Set English as default for Advanced LanguageSelect
+watch(
+  () => props.languages,
+  (languages) => {
+    if (languages && languages.length > 0 && !demoLangAdvanced.value) {
+      const english = languages.find((lang) => lang.code === 'en')
+      if (english) {
+        demoLangAdvanced.value = english
+      }
+    }
+  },
+  { immediate: true }
+)
 
 function handleInterfaceLanguageChange(language) {
   selectedInterfaceLang.value = language

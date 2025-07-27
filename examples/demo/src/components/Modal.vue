@@ -138,22 +138,38 @@ const handleOverlayClick = () => {
 /* Modal transitions */
 .modal-enter-active,
 .modal-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .modal-enter-from {
   opacity: 0;
-  transform: scale(0.9);
 }
 
 .modal-leave-to {
   opacity: 0;
-  transform: scale(0.9);
 }
 
 .modal-enter-to,
 .modal-leave-from {
   opacity: 1;
+}
+
+/* Container animation */
+.modal-enter-active .modal-container,
+.modal-leave-active .modal-container {
+  transition: transform 0.3s ease;
+}
+
+.modal-enter-from .modal-container {
+  transform: scale(0.9);
+}
+
+.modal-leave-to .modal-container {
+  transform: scale(0.9);
+}
+
+.modal-enter-to .modal-container,
+.modal-leave-from .modal-container {
   transform: scale(1);
 }
 </style>
