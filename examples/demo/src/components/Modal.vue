@@ -86,8 +86,9 @@ const handleOverlayClick = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1rem 0 1rem;
+  padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
+  min-height: 3rem;
 }
 
 .dark .modal-header {
@@ -99,6 +100,9 @@ const handleOverlayClick = () => {
   font-weight: 600;
   color: #111827;
   margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
 .dark .modal-title {
@@ -113,6 +117,11 @@ const handleOverlayClick = () => {
   padding: 0.5rem;
   border-radius: 0.375rem;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
 }
 
 .modal-close:hover {
