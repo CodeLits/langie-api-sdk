@@ -17,7 +17,7 @@
       :disabled="
         !isMounted || isLoading || !textToTranslate || (rateLimited && !isRateLimitExpired)
       "
-      class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+      class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg disabled:hover:scale-100 disabled:active:scale-100"
       @click="$emit('translate')"
     >
       <span v-if="isLoading"><lt>Translating...</lt></span>

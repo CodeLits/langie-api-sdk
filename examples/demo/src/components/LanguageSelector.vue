@@ -17,11 +17,13 @@
       <div class="col-span-1 flex justify-center">
         <button
           :disabled="isLoading || !sourceLang || !targetLang"
-          class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+          class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-300 ease-in-out hover:scale-110 active:scale-95 hover:shadow-md disabled:hover:scale-100 disabled:active:scale-100"
           :title="swapTitle"
           @click="$emit('swap')"
         >
-          <ArrowPathIcon class="w-7 h-7 text-gray-600 dark:text-gray-300" />
+          <ArrowPathIcon
+            class="w-7 h-7 text-gray-600 dark:text-gray-300 transition-transform duration-300 ease-in-out hover:rotate-180"
+          />
         </button>
       </div>
       <div class="col-span-2">

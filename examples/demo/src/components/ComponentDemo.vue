@@ -5,7 +5,7 @@
         <lt>Vue Components Demo</lt>
       </h2>
       <button
-        class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-all duration-200 ease-in-out"
+        class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         @click="showDemo = true"
       >
         <lt>Show Demo</lt>

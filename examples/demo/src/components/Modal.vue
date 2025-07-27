@@ -116,7 +116,7 @@ const handleOverlayClick = () => {
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  transition: all 0.2s;
+  transition: all 0.3s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,6 +127,7 @@ const handleOverlayClick = () => {
 .modal-close:hover {
   background-color: #f3f4f6;
   color: #374151;
+  transform: scale(1.1);
 }
 
 .dark .modal-close {
