@@ -12,12 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Enhanced
 
 - **Demo UI**: Improved demo with modal component for better user experience
-- **SimpleLanguageSelect**: Added proper dark mode support with `isDark` prop
 - **Component Styling**: Enhanced transitions and styling for better visual feedback
 
 ### Fixed
 
-- **Dark Mode**: Fixed dark mode styling in SimpleLanguageSelect component
 - **Demo Layout**: Improved demo layout with better spacing and responsive design
 
 ## [1.9.23] - 2024-06-10
@@ -370,9 +368,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Improved Component Descriptions**: Enhanced component comparison section in demo
   - Simplified and clarified component usage descriptions
   - Updated LanguageSelect description to "Smart name/code search, flags, autocomplete"
-  - Updated SimpleLanguageSelect description to "Perfect for device integration"
-  - Removed "Basic" from SimpleLanguageSelect features to improve professional appearance
-  - Enhanced features description to "Perfect device integration, HTML select, no dependencies"
 
 ## [1.9.5] - 2024-12-19
 

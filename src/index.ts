@@ -12,7 +12,6 @@ export { setLtDefaults, getLtDefaults } from './useLangie'
 
 // Component exports
 export { default as LanguageSelect } from './components/LanguageSelect.vue'
-export { default as SimpleLanguageSelect } from './components/SimpleLanguageSelect.vue'
 export { default as InterfaceLanguageSelect } from './components/InterfaceLanguageSelect.vue'
 export { default as lt } from './components/lt.vue'
 

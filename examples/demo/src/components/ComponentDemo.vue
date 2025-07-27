@@ -22,7 +22,7 @@
         <!-- Advanced LanguageSelect Demo -->
         <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg min-h-[180px]">
           <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
-            Advanced <span class="text-blue-500">{{ '<LanguageSelect />' }}</span>
+            <span class="text-blue-500">{{ '<LanguageSelect />' }}</span>
           </h3>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             <lt>Features: Smart search, smart flags detection</lt>
@@ -68,30 +68,6 @@
           </div>
         </div>
 
-        <!-- Simple LanguageSelect Demo -->
-        <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg min-h-[180px]">
-          <h3 class="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
-            <span class="text-blue-500">{{ '<SimpleLanguageSelect />' }}</span>
-          </h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            <lt>Features: Perfect device integration, HTML select, no dependencies</lt>
-          </p>
-          <div class="max-w-md">
-            <SimpleLanguageSelect
-              v-model="demoLangSimple"
-              placeholder="Pick a language..."
-              :disabled="isLoading"
-              :show-native-names="true"
-              :languages="languages"
-              :is-dark="isDark"
-            />
-          </div>
-          <div v-if="demoLangSimple" class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-            <lt>Selected:</lt> {{ demoLangSimple.name }} ({{ demoLangSimple.code }})
-            <span v-if="demoLangSimple.native_name"> - {{ demoLangSimple.native_name }}</span>
-          </div>
-        </div>
-
         <!-- Comparison Info -->
         <div
           class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 min-h-[120px]"
@@ -110,11 +86,6 @@
               <br />
               <lt>For switching app interface language (auto API, smart search)</lt>
             </div>
-            <div>
-              <strong><lt>SimpleLanguageSelect:</lt></strong>
-              <br />
-              <lt>Perfect for native device integration</lt>
-            </div>
           </div>
         </div>
       </div>
@@ -124,7 +95,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { LanguageSelect, SimpleLanguageSelect, InterfaceLanguageSelect, lt } from '@/index'
+import { LanguageSelect, InterfaceLanguageSelect, lt } from '@/index'
 import Modal from './Modal.vue'
 
 const props = defineProps({
@@ -135,7 +106,6 @@ const props = defineProps({
 
 const showDemo = ref(false)
 const demoLangAdvanced = ref(null)
-const demoLangSimple = ref(null)
 const selectedInterfaceLang = ref(null)
 
 // Set English as default for Advanced LanguageSelect
