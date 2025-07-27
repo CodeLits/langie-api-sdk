@@ -78,6 +78,7 @@
             :disabled="isLoading"
             :show-native-names="true"
             :languages="languages"
+            :is-dark="isDark"
           />
         </div>
         <div v-if="demoLangSimple" class="mt-3 text-sm text-gray-600 dark:text-gray-400">

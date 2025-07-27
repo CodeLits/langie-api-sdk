@@ -1,5 +1,5 @@
 <template>
-  <div class="simple-language-select">
+  <div class="simple-language-select" :class="{ 'is-dark': isDark }">
     <select
       :value="modelValue?.code || ''"
       :disabled="disabled"
@@ -43,6 +43,10 @@ const props = defineProps({
   showNativeNames: {
     type: Boolean,
     default: true
+  },
+  isDark: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -92,20 +96,18 @@ const handleChange = (event: Event) => {
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .language-dropdown {
-    background-color: v-bind('COLORS.neutral.gray800');
-    border-color: v-bind('COLORS.border.dark');
-    color: v-bind('COLORS.neutral.gray50');
-  }
+.is-dark .language-dropdown {
+  background-color: v-bind('COLORS.neutral.gray800');
+  border-color: v-bind('COLORS.border.dark');
+  color: v-bind('COLORS.neutral.gray50');
+}
 
-  .language-dropdown:hover {
-    border-color: v-bind('COLORS.neutral.gray500');
-  }
+.is-dark .language-dropdown:hover {
+  border-color: v-bind('COLORS.neutral.gray500');
+}
 
-  .language-dropdown:disabled {
-    background-color: v-bind('COLORS.neutral.gray700');
-    color: v-bind('COLORS.neutral.gray500');
-  }
+.is-dark .language-dropdown:disabled {
+  background-color: v-bind('COLORS.neutral.gray700');
+  color: v-bind('COLORS.neutral.gray500');
 }
 </style>
