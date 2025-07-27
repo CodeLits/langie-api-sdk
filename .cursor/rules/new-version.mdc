@@ -16,3 +16,4 @@ To release a new version, follow these steps:
 9. Push the changes to the remote repository
 10. Create a new release on GitHub with the tag vx.x.x
 11. Push to github and it will automatically publish to npm
+12. Make a release on the github repo with the tag vx.x.x
