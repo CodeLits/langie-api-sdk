@@ -337,7 +337,7 @@ const onFlagError = (event: Event) => {
   /* Dropdown */
   --ms-dropdown-bg: v-bind('THEME_COLORS.light.dropdownBackground');
   --ms-dropdown-border-color: v-bind('THEME_COLORS.light.dropdownBorder');
-  --ms-dropdown-color: #1f2937; /* Explicit dropdown text color for light theme */
+  --ms-dropdown-color: v-bind('THEME_COLORS.light.dropdownText');
 
   /* Others */
   --ms-tag-bg: v-bind('THEME_COLORS.light.tagBackground');
@@ -406,7 +406,7 @@ const onFlagError = (event: Event) => {
   text-overflow: ellipsis !important;
   flex: 1 !important;
   line-height: 1.4 !important;
-  color: #1f2937 !important; /* Explicit text color for light theme */
+  color: v-bind('THEME_COLORS.light.dropdownText') !important;
   word-break: keep-all !important;
   word-wrap: normal !important;
   word-spacing: normal !important;
@@ -414,7 +414,7 @@ const onFlagError = (event: Event) => {
 }
 
 .is-dark :deep(.language-text) {
-  color: #f9fafb !important; /* Explicit text color for dark theme */
+  color: v-bind('THEME_COLORS.dark.dropdownText') !important;
 }
 
 :deep(.native-name) {
@@ -432,11 +432,11 @@ const onFlagError = (event: Event) => {
 :deep(.multiselect) {
   width: 100%;
   min-width: 200px;
-  color: #1f2937; /* Explicit text color for light theme */
+  color: v-bind('THEME_COLORS.light.dropdownText');
 }
 
 .is-dark :deep(.multiselect) {
-  color: #f9fafb; /* Explicit text color for dark theme */
+  color: v-bind('THEME_COLORS.dark.dropdownText');
 }
 
 :deep(.multiselect-dropdown) {

@@ -56,6 +56,7 @@ export const THEME_COLORS = {
     optionSelectedText: COLORS.neutral.white,
     dropdownBackground: COLORS.neutral.white,
     dropdownBorder: COLORS.border.light,
+    dropdownText: COLORS.text.primary,
     tagBackground: COLORS.primary.blue
   },
   dark: {
