@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.25] - 2024-12-19
+
+### Enhanced
+
+- **Demo UI**: Added animations to all demo buttons for better user interaction feedback
+- **Theme Toggle**: Converted theme toggle to modern switch design with improved visual design
+- **Icons**: Updated theme toggle icons for better visual consistency
+- **Component Refactoring**: Removed unused SimpleLanguageSelect component for cleaner codebase
+
 ## [1.9.24] - 2024-12-19
 
 ### Enhanced
